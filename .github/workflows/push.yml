@@ -3,12 +3,12 @@ name: 'GitHub Actions'
     - push
 concurrency: 'ci-${{ github.ref }}'
 env:
-    APP_IMAGE: keboola-component
+    APP_IMAGE: keboola/mongodb-extractor
     KBC_DEVELOPERPORTAL_VENDOR: keboola-test
     KBC_DEVELOPERPORTAL_APP: keboola-test.ex-mongodb-v5
     KBC_DEVELOPERPORTAL_USERNAME: keboola-test+ex_mongodb_v5_github_gha
     KBC_DEVELOPERPORTAL_PASSWORD: '${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}'
-    DOCKERHUB_USER: ''
+    DOCKERHUB_USER: '${{ secrets.DOCKERHUB_USER }}'
     DOCKERHUB_TOKEN: '${{ secrets.DOCKERHUB_TOKEN }}'
     KBC_STORAGE_TOKEN: '${{ secrets.KBC_STORAGE_TOKEN }}'
     KBC_TEST_PROJECT_URL: ''
