@@ -56,6 +56,10 @@ jobs:
     tests:
         needs: build
         runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                mongodb: [ latest, 5.0, 4.4, 3.2 ]
         steps:
             -
                 name: 'Check out the repo'
@@ -73,7 +77,10 @@ jobs:
                     tag_as_latest: true
             -
                 name: 'Run tests'
-                run: 'docker run ${{env.APP_IMAGE}} composer ci'
+                run: |
+                    export MONGODB_VERSION="${{ matrix.mongodb }}"
+                    docker-compose run wait
+                    docker-compose run app composer ci
     tests-in-kbc:
         needs: build
         runs-on: ubuntu-latest

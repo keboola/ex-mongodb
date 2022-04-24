@@ -1,7 +1,22 @@
 version: '3'
 services:
-  dev:
+  app: &main
     build: .
+    links:
+      - mongodb
+  dev:
+    <<: *main
     volumes:
       - ./:/code
       - ./data:/data
+
+  mongodb:
+    image: mongo:${MONGODB_VERSION}
+
+  wait:
+    image: waisbrot/wait
+    depends_on:
+      - mongodb
+    environment:
+      - TARGETS=mongodb:27017
+      - TIMEOUT=120
