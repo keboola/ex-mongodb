@@ -1,20 +1,18 @@
-# my-component
+# MongoDB extractor
 
-[![Build Status](https://travis-ci.com/keboola/my-component.svg?branch=master)](https://travis-ci.com/keboola/my-component)
-
-> Fill in description
+> Docker application for exporting data from MongoDB. Basically, it's a simple wrapper of mongoexport command, which exports data from specified database and collection. Then those data are processed by php-csvmap.
 
 # Usage
 
-> fill in usage instructions
+> TODO
 
 ## Development
  
 Clone this repository and init the workspace with following command:
 
 ```
-git clone https://github.com/keboola/my-component
-cd my-component
+git clone https://github.com/keboola/ex-mongodb.git
+cd ex-mongodb
 docker-compose build
 docker-compose run --rm dev composer install --no-scripts
 ```
