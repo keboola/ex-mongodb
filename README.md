@@ -11,8 +11,8 @@
 Clone this repository and init the workspace with following command:
 
 ```
-git clone https://github.com/keboola/mongodb-extractor-v5.git
-cd mongodb-extractor-v5
+git clone https://github.com/keboola/ex-mongodb.git
+cd ex-mongodb
 docker-compose build
 docker-compose run --rm dev composer install --no-scripts
 ```

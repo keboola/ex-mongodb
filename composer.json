@@ -1,5 +1,5 @@
 {
-    "name": "keboola/mongodb-extractor",
+    "name": "keboola/ex-mongodb",
     "description": "Keboola Extractor for MongoDB",
     "license": "MIT",
     "require": {
