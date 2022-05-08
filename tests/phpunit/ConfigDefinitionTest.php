@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Keboola\MongoDbExtractor\Tests;
+namespace MongoExtractor\Tests\Unit;
 
 use Generator;
 use MongoExtractor\Config\Config;

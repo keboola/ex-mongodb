@@ -3,22 +3,8 @@
 declare(strict_types = 1);
 
 use MongoExtractor\FunctionalTests\DatadirTest;
-use Symfony\Component\Process\Process;
+use MongoExtractor\Tests\Traits\ImportDatasetTrait;
 
 return static function (DatadirTest $test): void {
-    $process = new Process([
-        'mongoimport',
-        '--host',
-        'mongodb',
-        '--db',
-        'test',
-        '--collection',
-        'restaurants',
-        '--drop',
-        '--jsonArray',
-        '--file',
-        __DIR__ . '/source/data/in/dataset.json',
-    ]);
-
-    $process->mustRun();
+    (new class { use ImportDatasetTrait; })::importDatatasetAuthDb('restaurants', 'dataset.json');
 };

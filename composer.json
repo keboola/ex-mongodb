@@ -37,7 +37,8 @@
     "autoload-dev": {
         "psr-4": {
             "MongoExtractor\\Tests\\": "tests/phpunit/",
-            "MongoExtractor\\FunctionalTests\\": "tests/functional/"
+            "MongoExtractor\\FunctionalTests\\": "tests/functional/",
+            "MongoExtractor\\Tests\\Traits\\": "tests/traits/"
         }
     },
     "scripts": {
@@ -48,7 +49,7 @@
             "@tests-datadir"
         ],
 
-        "phpstan": "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon",
+        "phpstan": "phpstan analyse ./src tests --level=max --no-progress -c phpstan.neon",
         "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
         "phplint": "parallel-lint -j 10 --exclude vendor .",

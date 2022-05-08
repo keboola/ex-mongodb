@@ -17,7 +17,7 @@ return static function (DatadirTest $test): void {
         '--legacy',
         '--drop',
         '--file',
-        __DIR__ . '/source/data/in/dataset-invalid-json-values.json',
+        sprintf("%s/../../datasets/%s", __DIR__, 'dataset-invalid-json-values.json'),
     ]);
 
     $process->mustRun();
