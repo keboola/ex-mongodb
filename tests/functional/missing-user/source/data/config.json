@@ -1,0 +1,21 @@
+{
+  "parameters": {
+    "db": {
+      "host": "locahost",
+      "password": "password",
+      "port": 27017,
+      "database": "test"
+    },
+    "exports": [
+      {
+        "name": "bakeries",
+        "id": 123,
+        "collection": "restaurants",
+        "incremental": true,
+        "mapping": {
+          "_id.$oid": "id"
+        }
+      }
+    ]
+  }
+}

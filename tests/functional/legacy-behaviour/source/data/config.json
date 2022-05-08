@@ -1,0 +1,43 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "exports": [
+      {
+        "name": "root",
+        "id": 123,
+        "collection": "sameSubDocs",
+        "mapping": {
+          "_id.$oid": "id",
+          "item": {
+            "type": "table",
+            "destination": "level1",
+            "tableMapping": {
+              "a.itemId": "a",
+              "b.itemId": "b",
+              "a": {
+                "type": "table",
+                "destination": "level2-a",
+                "tableMapping": {
+                  "count": "count",
+                  "itemId": "itemId"
+                }
+              },
+              "b": {
+                "type": "table",
+                "destination": "level2-b",
+                "tableMapping": {
+                  "count": "count",
+                  "itemId": "itemId"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

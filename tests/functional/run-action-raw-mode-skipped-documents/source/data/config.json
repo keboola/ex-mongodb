@@ -1,0 +1,18 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "exports": [
+      {
+        "name": "export-only-valid-lines",
+        "id": 123,
+        "collection": "invalidJSON",
+        "sort": "{_id: 1}",
+        "mode": "raw"
+      }
+    ]
+  }
+}

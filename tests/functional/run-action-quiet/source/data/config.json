@@ -1,0 +1,55 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "quiet": true,
+    "exports": [
+      {
+        "name": "bakeries",
+        "id": 123,
+        "collection": "restaurants",
+        "query": "{borough: \"Bronx\", \"address.street\": \"Westchester Avenue\"}",
+        "sort": "{name: 1, _id: 1}",
+        "incremental": true,
+        "mapping": {
+          "_id.$oid": {
+            "type": "column",
+            "mapping": {
+              "destination": "id",
+              "primaryKey": true
+            }
+          },
+          "name": "name",
+          "address": {
+            "type": "table",
+            "destination": "Bakeries Coords",
+            "parentKey": {
+              "destination": "bakeries_id"
+            },
+            "tableMapping": {
+              "coord.0": "w",
+              "coord.1": "n",
+              "zipcode": {
+                "type": "column",
+                "mapping": {
+                  "destination": "zipcode",
+                  "primaryKey": true
+                }
+              },
+              "street": {
+                "type": "column",
+                "mapping": {
+                  "destination": "street",
+                  "primaryKey": true
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

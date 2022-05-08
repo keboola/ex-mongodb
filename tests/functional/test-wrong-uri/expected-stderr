@@ -1,0 +1,1 @@
+Failed to parse MongoDB URI: 'mongodb://mongodb://keboola-test@mongodb/test:27017/test'. Invalid host string in URI.

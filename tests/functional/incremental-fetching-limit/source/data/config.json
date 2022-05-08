@@ -1,0 +1,25 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "exports": [
+      {
+        "name": "incremental",
+        "id": "export-id",
+        "collection": "incremental",
+        "incremental": true,
+        "incrementalFetchingColumn": "id",
+        "limit": "2",
+        "mapping": {
+          "id": "id",
+          "decimal": "decimal",
+          "date.$date": "date",
+          "timestamp": "timestamp"
+        }
+      }
+    ]
+  }
+}

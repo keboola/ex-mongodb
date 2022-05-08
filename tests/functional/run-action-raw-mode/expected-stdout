@@ -1,0 +1,4 @@
+%sconnected to: mongodb://mongodb:27017/
+%sexported 3 records
+Parsing "/tmp/%s/out/tables/restaurants.json"
+Done "/tmp/%s/out/tables/restaurants.json"

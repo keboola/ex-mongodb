@@ -1,0 +1,35 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb-auth",
+      "port": 27017,
+      "database": "test",
+      "authenticationDatabase": "authDb",
+      "user": "userInAuthDb",
+      "#password": "p#a!s@sw:o&r%^d"
+    },
+    "exports": [
+      {
+        "collection": "restaurants",
+        "name": "export-all",
+        "mapping": {
+          "_id.$oid": {
+            "type": "column",
+            "mapping": {
+              "destination": "id"
+            }
+          },
+          "name": {
+            "type": "column",
+            "mapping": {
+              "destination": "name"
+            }
+          }
+        },
+        "enabled": true,
+        "mode": "mapping",
+        "sort": "{_id: 1}"
+      }
+    ]
+  }
+}
