@@ -2,21 +2,43 @@ version: '3'
 services:
   app: &main
     build: .
+    volumes:
+      - ssh-keys:/root/.ssh
     links:
       - mongodb
+      - mongodb-auth
+      - sshproxy
   dev:
     <<: *main
     volumes:
       - ./:/code
       - ./data:/data
+      - ssh-keys:/root/.ssh:ro,z
 
-  mongodb:
+  mongodb: &mongodb
     image: mongo:${MONGODB_VERSION}
+
+  mongodb-auth:
+    <<: *mongodb
+    volumes:
+      - ./docker/mongodb/init-auth.js:/docker-entrypoint-initdb.d/init.js
+
+  sshproxy:
+    image: keboola/db-component-ssh-proxy:latest
+    volumes:
+      - ssh-keys:/root/.ssh
+    links:
+      - mongodb
+      - mongodb-auth
 
   wait:
     image: waisbrot/wait
     depends_on:
       - mongodb
+      - mongodb-auth
     environment:
-      - TARGETS=mongodb:27017
+      - TARGETS=mongodb:27017,mongodb-auth:27017
       - TIMEOUT=120
+
+volumes:
+  ssh-keys:
