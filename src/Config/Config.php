@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MongoExtractor;
+namespace MongoExtractor\Config;
 
 use Keboola\Component\Config\BaseConfig;
 
