@@ -1,0 +1,70 @@
+[
+  {
+    "_id": {
+      "$oid": "6278f68b4f9bd5bf35facb03"
+    },
+    "id": 1,
+    "decimal": 123.344,
+    "date": {
+      "$date": "2020-05-18T16:00:00Z"
+    },
+    "nested": {
+      "date": {
+        "$date": "2020-03-18T05:00:00Z"
+      }
+    },
+    "timestamp": 1587646020,
+    "string": "testString"
+  },
+  {
+    "_id": {
+      "$oid": "6278f6e0ad463909c022abcf"
+    },
+    "id": 2,
+    "decimal": 133.444,
+    "date": {
+      "$date": "2020-02-15T13:00:00Z"
+    },
+    "nested": {
+      "date": {
+        "$date": "2020-03-18T02:00:00Z"
+      }
+    },
+    "timestamp": 1587626020,
+    "string": "testString"
+  },
+  {
+    "_id": {
+      "$oid": "6278f6ee5985ae4a636e82e5"
+    },
+    "id": 3,
+    "decimal": 783.028,
+    "date": {
+      "$date": "2020-05-18T11:00:00Z"
+    },
+    "nested": {
+      "date": {
+        "$date": "2020-03-18T06:00:00Z"
+      }
+    },
+    "timestamp": 1587606020,
+    "string": "testString"
+  },
+  {
+    "_id": {
+      "$oid": "6278f6fcfa76b54e3094a204"
+    },
+    "id": 4,
+    "decimal": 283.473,
+    "date": {
+      "$date": "2020-04-18T16:00:00Z"
+    },
+    "nested": {
+      "date": {
+        "$date": "2020-03-18T01:00:00Z"
+      }
+    },
+    "timestamp": 1587146020,
+    "string": "testString"
+  }
+]

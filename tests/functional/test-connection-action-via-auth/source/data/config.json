@@ -1,0 +1,24 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "host": "mongodb-auth",
+      "port": 27017,
+      "database": "test",
+      "authenticationDatabase": "authDb",
+      "user": "userInAuthDb",
+      "#password": "p#a!s@sw:o&r%^d"
+    },
+    "exports": [
+      {
+        "name": "bakeries",
+        "id": 123,
+        "collection": "restaurants",
+        "incremental": true,
+        "mapping": {
+          "_id.id": "id"
+        }
+      }
+    ]
+  }
+}

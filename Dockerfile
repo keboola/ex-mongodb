@@ -11,10 +11,14 @@ COPY docker/php-prod.ini /usr/local/etc/php/php.ini
 COPY docker/composer-install.sh /tmp/composer-install.sh
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        libicu-dev \
+        libssl-dev \
         git \
+        ssh \
         locales \
         unzip \
-	&& rm -r /var/lib/apt/lists/* \
+        wget \
+    && rm -r /var/lib/apt/lists/* \
 	&& sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
 	&& locale-gen \
 	&& chmod +x /tmp/composer-install.sh \
@@ -23,6 +27,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
+
+RUN wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian10-x86_64-100.5.2.deb \
+    && wget https://downloads.mongodb.com/compass/mongodb-mongosh_1.3.1_amd64.deb \
+    && apt install ./mongodb-database-tools-debian10-x86_64-100.5.2.deb \
+    && apt install ./mongodb-mongosh_1.3.1_amd64.deb
+
+# Intl is required for league/uri
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install intl
+
+RUN pecl install mongodb \
+  && docker-php-ext-enable mongodb
 
 ## Composer - deps always cached unless changed
 # First copy only composer files

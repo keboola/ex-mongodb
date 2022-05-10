@@ -1,0 +1,1 @@
+CSV writing error. Header and mapped documents must be scalar values. Cannot write data into column: array (   0 => 'bad',   1 => 'type', )

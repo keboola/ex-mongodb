@@ -1,0 +1,21 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "protocol": "custom_uri",
+      "uri": "mongodb://user@mongodb-auth:27017/test",
+      "password": "p#a!s@sw:o&r%^d"
+    },
+    "exports": [
+      {
+        "name": "bakeries",
+        "id": 123,
+        "collection": "restaurants",
+        "incremental": true,
+        "mapping": {
+          "_id.$oid": "id"
+        }
+      }
+    ]
+  }
+}

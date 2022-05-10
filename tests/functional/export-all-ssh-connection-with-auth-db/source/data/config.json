@@ -1,0 +1,47 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb-auth",
+      "port": 27017,
+      "database": "test",
+      "authenticationDatabase": "authDb",
+      "user": "userInAuthDb",
+      "password": "p#a!s@sw:o&r%^d",
+      "ssh": {
+        "enabled": true,
+        "keys": {
+          "#private": "%env(string:SSH_PRIVATE_KEY)%",
+          "public": "%env(string:SSH_PUBLIC_KEY)%"
+        },
+        "user": "root",
+        "sshHost": "sshproxy",
+        "remoteHost": "mongodb-auth",
+        "remotePort": "27017",
+        "localPort": "1234"
+      }
+    },
+    "exports": [
+      {
+        "collection": "restaurants",
+        "name": "export-all",
+        "mapping": {
+          "_id.$oid": {
+            "type": "column",
+            "mapping": {
+              "destination": "id"
+            }
+          },
+          "name": {
+            "type": "column",
+            "mapping": {
+              "destination": "name"
+            }
+          }
+        },
+        "enabled": true,
+        "mode": "mapping",
+        "sort": "{_id: 1}"
+      }
+    ]
+  }
+}

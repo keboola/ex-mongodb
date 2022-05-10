@@ -3,8 +3,23 @@
     "description": "Keboola Extractor for MongoDB",
     "license": "MIT",
     "require": {
+        "ext-json": "*",
+        "ext-intl": "*",
+        "ext-mongodb": "*",
+        "keboola/csv": "^3.0",
+        "keboola/csvmap": "^2.1",
+        "keboola/php-component": "^9.0",
+        "keboola/ssh-tunnel": "^2.0",
+        "league/uri": "^6.2",
+        "league/uri-components": "^2.2",
+        "monolog/monolog": "^2.0",
+        "nette/utils": "^2.5",
         "php": "^8.1",
-        "keboola/php-component": "^9.0"
+        "symfony/config": "^5.0",
+        "symfony/console": "^5.0",
+        "symfony/filesystem": "^5.0",
+        "symfony/process": "^5.0",
+        "symfony/serializer": "^5.0"
     },
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "^1.3",
@@ -12,8 +27,7 @@
         "keboola/datadir-tests": "^5.3",
         "keboola/php-temp": "^2.0",
         "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^9.5",
-        "symfony/process": "^5.0"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
@@ -23,7 +37,8 @@
     "autoload-dev": {
         "psr-4": {
             "MongoExtractor\\Tests\\": "tests/phpunit/",
-            "MongoExtractor\\FunctionalTests\\": "tests/functional/"
+            "MongoExtractor\\FunctionalTests\\": "tests/functional/",
+            "MongoExtractor\\Tests\\Traits\\": "tests/traits/"
         }
     },
     "scripts": {
@@ -34,7 +49,7 @@
             "@tests-datadir"
         ],
 
-        "phpstan": "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon",
+        "phpstan": "phpstan analyse ./src tests --level=max --no-progress -c phpstan.neon",
         "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
         "phplint": "parallel-lint -j 10 --exclude vendor .",
@@ -44,9 +59,13 @@
             "@phpstan",
             "@tests"
         ],
+        "build-temp": [
+            "@phplint",
+            "@tests"
+        ],
         "ci": [
             "@composer validate --no-check-publish --no-check-all",
-            "@build"
+            "@build-temp"
         ]
     },
     "config": {

@@ -1,0 +1,32 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "exports": [
+      {
+        "collection": "restaurants",
+        "query": "{a: b}",
+        "name": "export-bad-query",
+        "mapping": {
+          "_id.$oid": {
+            "type": "column",
+            "mapping": {
+              "destination": "id"
+            }
+          },
+          "name": {
+            "type": "column",
+            "mapping": {
+              "destination": "name"
+            }
+          }
+        },
+        "enabled": true,
+        "mode": "mapping"
+      }
+    ]
+  }
+}

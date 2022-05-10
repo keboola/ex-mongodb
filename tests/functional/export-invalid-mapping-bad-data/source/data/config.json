@@ -1,0 +1,20 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "exports": [
+      {
+        "collection": "restaurants",
+        "name": "export-bad-mapping",
+        "mapping": {
+          "2": []
+        },
+        "enabled": true,
+        "mode": "mapping"
+      }
+    ]
+  }
+}

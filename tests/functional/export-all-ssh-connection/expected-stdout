@@ -1,0 +1,4 @@
+%sconnected to: mongodb://127.0.0.1:1234/
+%sexported 73 records
+Parsing "/tmp/%s/out/tables/export-all.json"
+Done "/tmp/%s/out/tables/export-all.json"
