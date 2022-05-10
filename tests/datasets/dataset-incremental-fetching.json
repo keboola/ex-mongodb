@@ -1,5 +1,8 @@
 [
   {
+    "_id": {
+      "$oid": "6278f68b4f9bd5bf35facb03"
+    },
     "id": 1,
     "decimal": 123.344,
     "date": {
@@ -14,6 +17,9 @@
     "string": "testString"
   },
   {
+    "_id": {
+      "$oid": "6278f6e0ad463909c022abcf"
+    },
     "id": 2,
     "decimal": 133.444,
     "date": {
@@ -28,6 +34,9 @@
     "string": "testString"
   },
   {
+    "_id": {
+      "$oid": "6278f6ee5985ae4a636e82e5"
+    },
     "id": 3,
     "decimal": 783.028,
     "date": {
@@ -42,6 +51,9 @@
     "string": "testString"
   },
   {
+    "_id": {
+      "$oid": "6278f6fcfa76b54e3094a204"
+    },
     "id": 4,
     "decimal": 283.473,
     "date": {
