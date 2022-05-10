@@ -7,7 +7,7 @@
     },
     "exports": [
       {
-        "name": "export-only-valid-lines",
+        "name": "export-with-nan-values",
         "id": 123,
         "collection": "invalidJSON",
         "sort": "{_id: 1}",
