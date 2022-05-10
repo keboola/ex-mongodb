@@ -1,1 +1,1 @@
-{"primary_key":null,"incremental":false}
+{"primary_key":["id"],"incremental":false}
