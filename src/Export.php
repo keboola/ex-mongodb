@@ -147,6 +147,7 @@ class Export
                 ));
             } finally {
                 $parsedDocumentsCount++;
+                $this->filesystem->remove($this->getOutputFilename());
             }
         }
 
@@ -154,8 +155,6 @@ class Export
         if ($this->exportOptions['mode'] === 'raw') {
             $parser->writeManifestFile();
         }
-
-        $this->filesystem->remove($this->getOutputFilename());
 
         if ($skippedDocumentsCount !== 0) {
             $this->consoleOutput->writeln('Skipped documents: ' . $skippedDocumentsCount);
