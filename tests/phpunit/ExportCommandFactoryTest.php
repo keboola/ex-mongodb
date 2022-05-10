@@ -32,7 +32,7 @@ class ExportCommandFactoryTest extends TestCase
         $command = $this->commandFactory->create($options);
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
         $this->assertSame($expectedCommand, $command);
@@ -52,7 +52,7 @@ BASH;
         $command = $this->commandFactory->create($options);
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
 
@@ -75,7 +75,7 @@ BASH;
         // URI starting with mongodb+srv:// must not include a port number
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --uri 'mongodb+srv://localhost/myDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --uri 'mongodb+srv://localhost/myDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
 
@@ -97,7 +97,7 @@ BASH;
         // URI starting with mongodb+srv:// must not include a port number
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --uri 'mongodb+srv://localhost/myDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --uri 'mongodb+srv://localhost/myDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
 
@@ -121,7 +121,7 @@ BASH;
         $command = $this->commandFactory->create($options);
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --authenticationDatabase 'myAuthDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --authenticationDatabase 'myAuthDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
 
@@ -146,7 +146,7 @@ BASH;
 
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --uri 'mongodb+srv://user:pass@localhost/myDatabase?authSource=myAuthDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --uri 'mongodb+srv://user:pass@localhost/myDatabase?authSource=myAuthDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
         $this->assertSame($expectedCommand, $command);
@@ -169,7 +169,7 @@ BASH;
         $command = $this->commandFactory->create($options);
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
 
@@ -219,7 +219,7 @@ BASH;
         $command = $this->commandFactory->create($options);
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json'
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json'
 BASH;
         // phpcs:enable
 
@@ -240,7 +240,7 @@ BASH;
         $command = $commandFactory->create($options);
         // phpcs:disable Generic.Files.LineLength.MaxExceeded
         $expectedCommand = <<<BASH
-mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --collection 'myCollection' --type 'json' --out '/tmp/create-test.json' --quiet
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --collection 'myCollection' --sort '{_id: 1}' --type 'json' --out '/tmp/create-test.json' --quiet
 BASH;
         // phpcs:enable
         $this->assertSame($expectedCommand, $command);
