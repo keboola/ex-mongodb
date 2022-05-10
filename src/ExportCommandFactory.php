@@ -65,6 +65,8 @@ class ExportCommandFactory
                     $params[$option] = ExportHelper::convertStringIdToObjectId($params[$option]);
                 }
                 $command[] = '--' . $option . ' ' . escapeshellarg((string) $params[$option]);
+            } elseif ($option === 'sort') {
+                $command[] = $this->addDefaultSort();
             }
         }
 
@@ -79,5 +81,10 @@ class ExportCommandFactory
         }
 
         return implode(' ', $command);
+    }
+
+    protected function addDefaultSort(): string
+    {
+        return '--sort ' . escapeshellarg('{_id: 1}');
     }
 }
