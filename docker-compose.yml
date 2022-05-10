@@ -20,6 +20,7 @@ services:
 
   mongodb-auth:
     <<: *mongodb
+    command: [--auth]
     volumes:
       - ./docker/mongodb/init-auth.js:/docker-entrypoint-initdb.d/init.js
 
