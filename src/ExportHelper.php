@@ -64,17 +64,12 @@ class ExportHelper
 
     }
 
-    /**
-     * Incremental fetching query is build by json_encode funciton,
-     * but MongoDB is using extended JSON with ISODate without quotes.
-     * So it is needed to remove surrounding slashes from "ISODate(...)".
-     */
     public static function fixIsoDateInGteQuery(string $input): string
     {
         return preg_replace_callback(
             '~"\$gte":"ISODate\((\\\"(?>(?>\\\")|[^"])*\\\")\)"~',
             function (array $m): string {
-                return '"$gte":ISODate(' . stripslashes($m[1]) . ')';
+                return '"$gte":{"$date": ' . stripslashes($m[1]) . '}';
             },
             $input
         );
@@ -85,7 +80,7 @@ class ExportHelper
         return preg_replace_callback(
             '~"\$gte":"ObjectId\((\\\"(?>(?>\\\")|[^"])*\\\")\)"~',
             function (array $m): string {
-                return '"$gte":ObjectId(' . stripslashes($m[1]) . ')';
+                return '"$gte":{"$oid": ' . stripslashes($m[1]) . '}';
             },
             $input
         );
