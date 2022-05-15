@@ -93,6 +93,6 @@ class ExportHelper
 
     public static function addQuotesToJsonKeys(string $input): string
     {
-        return preg_replace('/\b(\w+)\s?:/', '"$1":', $input);
+        return preg_replace('/([{,])(\s*)([A-Za-z\d_\-]+?)\s*:/', '$1"$3":', $input);
     }
 }

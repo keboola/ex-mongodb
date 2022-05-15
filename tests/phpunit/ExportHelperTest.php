@@ -164,9 +164,16 @@ class ExportHelperTest extends TestCase
     public function testAddQuotesToJsonKeys(): void
     {
         $this->assertSame(
-            "{\"borough\": \"Bronx\", \"cuisine\": \"Bakery\", \"address.zipcode\": \"10452\"}",
+            "{\"borough\": \"Bronx\",\"cuisine\": \"Bakery\", \"address.zipcode\": \"10452\"}",
             ExportHelper::addQuotesToJsonKeys(
                 "{borough : \"Bronx\", cuisine: \"Bakery\", \"address.zipcode\": \"10452\"}"
+            )
+        );
+
+        $this->assertSame(
+            "{\"date\":{\"\$gte\":ISODate(\"2020-05-18T16:00:00Z\")}}",
+            ExportHelper::addQuotesToJsonKeys(
+                "{\"date\":{\"\$gte\":ISODate(\"2020-05-18T16:00:00Z\")}}"
             )
         );
     }
