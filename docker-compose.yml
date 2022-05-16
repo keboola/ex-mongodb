@@ -13,7 +13,7 @@ services:
     volumes:
       - ./:/code
       - ./data:/data
-      - ssh-keys:/root/.ssh:ro,z
+      - ssh-keys:/root/.ssh
 
   mongodb: &mongodb
     image: mongo:${MONGODB_VERSION}
