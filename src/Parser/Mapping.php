@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MongoExtractor\Parser;
 
+use Exception;
 use Keboola\Component\UserException;
 use Keboola\CsvMap\Exception\BadConfigException;
 use Keboola\CsvMap\Mapper;
@@ -11,6 +12,7 @@ use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Throwable;
 
 class Mapping
 {
@@ -74,9 +76,14 @@ class Mapping
                     $content = implode("\n", $contentArr);
                 }
 
-                if (@file_put_contents($outputCsv, $content, FILE_APPEND | LOCK_EX) === false) {
-                    throw new \Exception('Failed write to file "' . $outputCsv);
+                try {
+                    if (@file_put_contents($outputCsv, $content, FILE_APPEND | LOCK_EX) === false) {
+                        throw new Exception('Failed write to file "' . $outputCsv . '"');
+                    }
+                } catch (Throwable $e) {
+                    throw new Exception('Failed write to file "' . $outputCsv . '"');
                 }
+
 
                 $manifest = [
                     'primary_key' => $file->getPrimaryKey(true),
