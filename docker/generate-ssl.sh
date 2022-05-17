@@ -21,7 +21,7 @@ openssl req -subj "/CN=invalidCNCa" -new -x509 -days $DAYS -key ca.key -out ca.c
 
 # Create the Server Key, CSR, and Certificate
 openssl genrsa -out mongodb.key 4096
-openssl req -subj "/CN=${SSL_HOST}" -new -key mongodb.key -out mongodb.csr
+openssl req -subj "/CN=${SSL_HOST}" -new -key mongodb.key -out mongodb.csr -addext "subjectAltName = DNS:localhost,DNS:${SSL_HOST}"
 
 # We're self signing our own server cert here.  This is a no-no in production.
 openssl x509 -req -days $DAYS -sha256 -in mongodb.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out mongodb.crt
@@ -29,5 +29,5 @@ openssl x509 -req -days $DAYS -sha256 -in mongodb.csr -CA ca.crt -CAkey ca.key -
 # Verify Server Certificate
 openssl verify -purpose sslserver -CAfile ca.crt mongodb.crt
 
-cat mongodb.key mongodb.crt > mongodb.pem
-cat ca.key ca.crt > ca.pem
+cat mongodb.crt mongodb.key > mongodb.pem
+cat ca.crt ca.key > ca.pem
