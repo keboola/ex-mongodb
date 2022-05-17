@@ -7,13 +7,41 @@ services:
     links:
       - mongodb
       - mongodb-auth
+      - node1.mongodb.cluster.local
       - sshproxy
+      - dns.local
+    environment:
+      - GODEBUG="x509ignoreCN=0"
+    entrypoint:
+      - sh
+      - -c
+      - >
+        php -r "echo \"nameserver \" . gethostbyname(\"dns.local\") . \"\n\";" > /etc/resolv.conf.new
+        && cp /etc/resolv.conf /etc/resolv.conf.bak
+        && cp /etc/resolv.conf.new /etc/resolv.conf
+        && exec "$$@"
+      - sh
+
   dev:
     <<: *main
     volumes:
       - ./:/code
       - ./data:/data
       - ssh-keys:/root/.ssh
+
+  # DNS server for testing mongodb+srv:// connection
+  # https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format
+  dns.local:
+    image: jpillora/dnsmasq
+    entrypoint: >
+      dnsmasq
+        --conf-file=''
+        --resolv-file=/etc/resolv.conf
+        --no-daemon
+        --log-queries
+        --log-facility=-
+        --srv-host '_mongodb._tcp.mongodb.cluster.local,node1.mongodb.cluster.local,27017'
+        --txt-record 'mongodb.cluster.local'
 
   mongodb: &mongodb
     image: mongo:${MONGODB_VERSION}
@@ -23,6 +51,14 @@ services:
     command: [--auth]
     volumes:
       - ./docker/mongodb/init-auth.js:/docker-entrypoint-initdb.d/init.js
+
+  node1.mongodb.cluster.local:
+    image: mongo:5
+    volumes:
+      - ./docker/mongodb/ssl-config.conf:/etc/ssl/ssl-config.conf
+      - ./docker/certificates/mongodb.pem:/etc/ssl/mongodb.pem:ro
+      - ./docker/certificates/ca.pem:/etc/ssl/ca.pem:ro
+    command: [mongod, --config=/etc/ssl/ssl-config.conf]
 
   sshproxy:
     image: keboola/db-component-ssh-proxy:latest
@@ -37,8 +73,9 @@ services:
     depends_on:
       - mongodb
       - mongodb-auth
+      - node1.mongodb.cluster.local
     environment:
-      - TARGETS=mongodb:27017,mongodb-auth:27017
+      - TARGETS=mongodb:27017,mongodb-auth:27017,node1.mongodb.cluster.local:27017
       - TIMEOUT=120
 
 volumes:
