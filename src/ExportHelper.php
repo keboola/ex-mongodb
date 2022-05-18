@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MongoExtractor;
 
-use MongoDB\BSON;
-
 class ExportHelper
 {
 

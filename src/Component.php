@@ -7,7 +7,7 @@ namespace MongoExtractor;
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
 use MongoExtractor\Config\Config;
-use MongoExtractor\Config\ConfigDefinition;
+use MongoExtractor\Config\ConfigRowDefinition;
 use Psr\Log\LoggerInterface;
 
 class Component extends BaseComponent
@@ -72,6 +72,6 @@ class Component extends BaseComponent
 
     protected function getConfigDefinitionClass(): string
     {
-        return ConfigDefinition::class;
+        return ConfigRowDefinition::class;
     }
 }

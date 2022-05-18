@@ -6,11 +6,12 @@ namespace MongoExtractor\Tests\Unit;
 
 use Generator;
 use MongoExtractor\Config\Config;
-use MongoExtractor\Config\ConfigDefinition;
+use MongoExtractor\Config\ConfigRowDefinition;
+use MongoExtractor\Config\DbNode;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ConfigDefinitionTest extends TestCase
+class ConfigRowDefinitionTest extends TestCase
 {
     /**
      * @param array<string, mixed> $configData
@@ -18,7 +19,7 @@ class ConfigDefinitionTest extends TestCase
      */
     public function testValidConfig(array $configData): void
     {
-        $config = new Config($configData, new ConfigDefinition());
+        $config = new Config($configData, new ConfigRowDefinition());
         $configData = $this->addDefaultValues($configData);
         $this->assertEquals($configData, $config->getData());
     }
@@ -30,7 +31,7 @@ class ConfigDefinitionTest extends TestCase
     public function testInvalidConfigs(array $configData, string $expectedError): void
     {
         try {
-            new Config($configData, new ConfigDefinition());
+            new Config($configData, new ConfigRowDefinition());
             $this->fail('Validation should produce error');
         } catch (InvalidConfigurationException $e) {
             $this->assertStringContainsString($expectedError, $e->getMessage());
@@ -299,7 +300,7 @@ class ConfigDefinitionTest extends TestCase
     protected function addDefaultValues(array $configData): array
     {
         if (!array_key_exists('protocol', $configData['parameters']['db'])) {
-            $configData['parameters']['db']['protocol'] = ConfigDefinition::PROTOCOL_MONGO_DB;
+            $configData['parameters']['db']['protocol'] = DbNode::PROTOCOL_MONGO_DB;
         }
 
         foreach ($configData['parameters']['exports'] as $key => $value) {
