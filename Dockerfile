@@ -53,4 +53,8 @@ COPY . /code/
 # Run normal composer - all deps are cached already
 RUN composer install $COMPOSER_FLAGS
 
+# Make self-signed certificate trusted
+COPY docker/certificates/ca.crt /usr/local/share/ca-certificates/ca.crt
+RUN update-ca-certificates
+
 CMD ["php", "/code/src/run.php"]
