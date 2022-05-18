@@ -1,4 +1,4 @@
-%sconnected to: mongodb://mongodb:27017/
+%sconnected to: mongodb+srv://mongodb.cluster.local/test
 %sexported 73 records
 Parsing "/tmp/%s/out/tables/export-all.json"
 Done "/tmp/%s/out/tables/export-all.json"
