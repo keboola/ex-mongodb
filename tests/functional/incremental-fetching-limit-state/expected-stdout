@@ -1,0 +1,4 @@
+%sconnected to: mongodb://mongodb:27017/
+%sexported 2 records
+Parsing "/tmp/%s/out/tables/incremental.json"
+Done "/tmp/%s/out/tables/incremental.json"

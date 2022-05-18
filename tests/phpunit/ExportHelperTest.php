@@ -51,7 +51,7 @@ class ExportHelperTest extends TestCase
     public function testFixObjectIdInGteQuery(): void
     {
         $input = '{"$gte":"ObjectId(\"61f8e6b99e2986a522ebb90f\")"}';
-        $expected = '{"$gte":ObjectId("61f8e6b99e2986a522ebb90f")}';
+        $expected = '{"$gte":{"$oid": "61f8e6b99e2986a522ebb90f"}}';
 
         Assert::assertSame(
             $expected,
@@ -132,19 +132,19 @@ class ExportHelperTest extends TestCase
         return [
             'simple' => [
                 '{"$gte":"ISODate(\"2020-05-18T16:00:00Z\")"}',
-                '{"$gte":ISODate("2020-05-18T16:00:00Z")}',
+                '{"$gte":{"$date": "2020-05-18T16:00:00Z"}}',
             ],
             'empty-1' => [
                 '{"$gte":"ISODate(\"\")"}',
-                '{"$gte":ISODate("")}',
+                '{"$gte":{"$date": ""}}',
             ],
             'escaping' => [
                 '{"$gte":"ISODate(\"2020-05-\\\\\"18\\\\\"T16:00:00Z\")"}',
-                '{"$gte":ISODate("2020-05-\"18\"T16:00:00Z")}',
+                '{"$gte":{"$date": "2020-05-\"18\"T16:00:00Z"}}',
             ],
             'invalid-1' => [
                 '{"$gte":"ISODate(\"2020-05\"\"-18T16:00:00Z\")"}',
-                '{"$gte":ISODate("2020-05""-18T16:00:00Z")}',
+                '{"$gte":{"$date": "2020-05""-18T16:00:00Z"}}',
             ],
             'invalid-2' => [
                 '{"$gte":"ISODate()"}',
@@ -164,9 +164,16 @@ class ExportHelperTest extends TestCase
     public function testAddQuotesToJsonKeys(): void
     {
         $this->assertSame(
-            "{\"borough\": \"Bronx\", \"cuisine\": \"Bakery\", \"address.zipcode\": \"10452\"}",
+            "{\"borough\": \"Bronx\",\"cuisine\": \"Bakery\", \"address.zipcode\": \"10452\"}",
             ExportHelper::addQuotesToJsonKeys(
                 "{borough : \"Bronx\", cuisine: \"Bakery\", \"address.zipcode\": \"10452\"}"
+            )
+        );
+
+        $this->assertSame(
+            "{\"date\":{\"\$gte\":ISODate(\"2020-05-18T16:00:00Z\")}}",
+            ExportHelper::addQuotesToJsonKeys(
+                "{\"date\":{\"\$gte\":ISODate(\"2020-05-18T16:00:00Z\")}}"
             )
         );
     }

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace MongoExtractor\FunctionalTests;
 
 use Keboola\DatadirTests\DatadirTestCase;
+use Keboola\Temp\Temp;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -16,6 +17,11 @@ class DatadirTest extends DatadirTestCase
 
         putenv('SSH_PRIVATE_KEY=' . file_get_contents('/root/.ssh/id_rsa'));
         putenv('SSH_PUBLIC_KEY=' . file_get_contents('/root/.ssh/id_rsa.pub'));
+    }
+
+    public function getTemp(): Temp
+    {
+        return $this->temp;
     }
 
     protected function setUp(): void

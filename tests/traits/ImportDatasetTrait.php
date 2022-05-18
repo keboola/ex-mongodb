@@ -50,4 +50,24 @@ trait ImportDatasetTrait
 
         $process->mustRun();
     }
+
+    public static function importDatatasetCluster(string $collection, string $dataset): void
+    {
+        $process = new Process([
+            'mongoimport',
+            '--host',
+            'node1.mongodb.cluster.local',
+            '--ssl',
+            '--db',
+            'test',
+            '--collection',
+            $collection,
+            '--drop',
+            '--jsonArray',
+            '--file',
+            sprintf("%s/../datasets/%s", __DIR__, $dataset),
+        ]);
+
+        $process->mustRun();
+    }
 }
