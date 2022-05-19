@@ -9,7 +9,7 @@
         "sshHost": "some random host",
         "user": "root",
         "keys": {
-           "#private": "%env(string:SSH_PRIVATE_KEY)%",
+          "#private": "%env(string:SSH_PRIVATE_KEY)%",
           "public": "%env(string:SSH_PUBLIC_KEY)%"
         },
         "remoteHost": "mongodb",
@@ -17,18 +17,16 @@
         "localPort": "1234"
       }
     },
-    "exports": [
-      {
-        "name": "bakeries",
-        "id": 123,
-        "enabled": true,
-        "collection": "restaurants",
-        "incremental": true,
-        "mapping": {
-          "_id.$oid": "id"
-        },
-        "mode": "mapping"
-      }
-    ]
+    "export": {
+      "name": "bakeries",
+      "id": 123,
+      "enabled": true,
+      "collection": "restaurants",
+      "incremental": true,
+      "mapping": {
+        "_id.$oid": "id"
+      },
+      "mode": "mapping"
+    }
   }
 }

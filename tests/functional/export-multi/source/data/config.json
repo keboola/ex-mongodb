@@ -5,28 +5,26 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "collection": "restaurants",
-        "query": "{borough : \"Bronx\", cuisine: \"Bakery\", \"address.zipcode\": \"10452\"}",
-        "name": "export-multi",
-        "mapping": {
-          "_id.$oid": {
-            "type": "column",
-            "mapping": {
-              "destination": "id"
-            }
-          },
-          "name": {
-            "type": "column",
-            "mapping": {
-              "destination": "name"
-            }
+    "export": {
+      "collection": "restaurants",
+      "query": "{borough : \"Bronx\", cuisine: \"Bakery\", \"address.zipcode\": \"10452\"}",
+      "name": "export-multi",
+      "mapping": {
+        "_id.$oid": {
+          "type": "column",
+          "mapping": {
+            "destination": "id"
           }
         },
-        "enabled": true,
-        "mode": "mapping"
-      }
-    ]
+        "name": {
+          "type": "column",
+          "mapping": {
+            "destination": "name"
+          }
+        }
+      },
+      "enabled": true,
+      "mode": "mapping"
+    }
   }
 }

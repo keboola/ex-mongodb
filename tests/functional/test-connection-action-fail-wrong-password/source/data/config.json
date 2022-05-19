@@ -8,16 +8,14 @@
       "user": "user",
       "password": "random-password"
     },
-    "exports": [
-      {
-        "name": "bakeries",
-        "id": 123,
-        "collection": "restaurants",
-        "incremental": true,
-        "mapping": {
-          "_id.$oid": "id"
-        }
+    "export": {
+      "name": "bakeries",
+      "id": 123,
+      "collection": "restaurants",
+      "incremental": true,
+      "mapping": {
+        "_id.$oid": "id"
       }
-    ]
+    }
   }
 }

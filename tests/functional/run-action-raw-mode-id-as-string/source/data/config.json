@@ -5,15 +5,13 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "name": "restaurants-id-as-string",
-        "id": 123,
-        "collection": "restaurantsIdAsString",
-        "sort": "{_id: 1}",
-        "incremental": true,
-        "mode": "raw"
-      }
-    ]
+    "export": {
+      "name": "restaurants-id-as-string",
+      "id": 123,
+      "collection": "restaurantsIdAsString",
+      "sort": "{_id: 1}",
+      "incremental": true,
+      "mode": "raw"
+    }
   }
 }

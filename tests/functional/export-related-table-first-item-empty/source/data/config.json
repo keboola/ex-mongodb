@@ -5,33 +5,31 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "collection": "restaurants",
-        "query": "{  \"_id\": {    \"$in\":[      {\"$oid\":\"5716054cee6e764c94fadb21\"},      {\"$oid\":\"5716054cee6e764c94fadb22\"},      {\"$oid\":\"5716054cee6e764c94fadb23\"}    ]  }}",
-        "sort": "{\"_id\": -1}",
-        "limit": 3,
-        "name": "export-related-table-first-item-empty",
-        "mapping": {
-          "_id.$oid": {
-            "type": "column",
-            "mapping": {
-              "destination": "id",
-              "primaryKey": true
-            }
-          },
-          "coords": {
-            "type": "table",
-            "destination": "export-related-table-first-item-empty-coord",
-            "tableMapping": {
-              "w": "w",
-              "n": "n"
-            }
+    "export": {
+      "collection": "restaurants",
+      "query": "{  \"_id\": {    \"$in\":[      {\"$oid\":\"5716054cee6e764c94fadb21\"},      {\"$oid\":\"5716054cee6e764c94fadb22\"},      {\"$oid\":\"5716054cee6e764c94fadb23\"}    ]  }}",
+      "sort": "{\"_id\": -1}",
+      "limit": 3,
+      "name": "export-related-table-first-item-empty",
+      "mapping": {
+        "_id.$oid": {
+          "type": "column",
+          "mapping": {
+            "destination": "id",
+            "primaryKey": true
           }
         },
-        "mode": "mapping",
-        "enabled": true
-      }
-    ]
+        "coords": {
+          "type": "table",
+          "destination": "export-related-table-first-item-empty-coord",
+          "tableMapping": {
+            "w": "w",
+            "n": "n"
+          }
+        }
+      },
+      "mode": "mapping",
+      "enabled": true
+    }
   }
 }
