@@ -85,11 +85,6 @@ class Component extends BaseComponent
         return ConfigRowDefinition::class;
     }
 
-    protected function getRawConfig(): array
-    {
-        return JsonHelper::readFile(sprintf("%s/config.json", $this->getDataDir()));
-    }
-
     /**
      * @param array<int, mixed> $exports
      */
