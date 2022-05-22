@@ -5,28 +5,26 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "collection": "restaurants",
-      "query": "{name: \"National Bakery\"}",
-      "sort": "{\"_id\": 1}",
-      "limit": 3,
-      "name": "export-multi-with-sort-and-limit",
-      "mapping": {
-        "_id.$oid": {
-          "type": "column",
-          "mapping": {
-            "destination": "id"
-          }
-        },
-        "name": {
-          "type": "column",
-          "mapping": {
-            "destination": "name"
-          }
+    "collection": "restaurants",
+    "query": "{name: \"National Bakery\"}",
+    "sort": "{\"_id\": 1}",
+    "limit": 3,
+    "name": "export-multi-with-sort-and-limit",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
         }
       },
-      "enabled": true,
-      "mode": "mapping"
-    }
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
+      }
+    },
+    "enabled": true,
+    "mode": "mapping"
   }
 }

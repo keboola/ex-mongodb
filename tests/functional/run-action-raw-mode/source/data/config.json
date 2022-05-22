@@ -5,15 +5,13 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "name": "restaurants",
-      "id": 123,
-      "collection": "restaurants",
-      "query": "{borough: \"Bronx\", \"address.street\": \"Westchester Avenue\"}",
-      "sort": "{_id: 1}",
-      "limit": 3,
-      "incremental": true,
-      "mode": "raw"
-    }
+    "name": "restaurants",
+    "id": 123,
+    "collection": "restaurants",
+    "query": "{borough: \"Bronx\", \"address.street\": \"Westchester Avenue\"}",
+    "sort": "{_id: 1}",
+    "limit": 3,
+    "incremental": true,
+    "mode": "raw"
   }
 }

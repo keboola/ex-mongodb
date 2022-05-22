@@ -13,6 +13,31 @@ class ConfigRowDefinition extends BaseConfigDefinition
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
         $parametersNode = parent::getParametersDefinition();
+
+        $parametersNode->validate()->always(function (array $v) {
+            if (isset($v['query'], $v['incrementalFetchingColumn']) && $v['query'] !== '') {
+                throw new InvalidConfigurationException(
+                    'Both incremental fetching and query cannot be set together.'
+                );
+            }
+            if (isset($v['sort'], $v['incrementalFetchingColumn']) && $v['sort'] !== '') {
+                $message = 'Both incremental fetching and sort cannot be set together.';
+                throw new InvalidConfigurationException($message);
+            }
+
+            // Normalize incrementalFetchingColumn:
+            // In mapping are dates exported as "PARENT.FIELD.$date",
+            // ... but for incremental fetching is needed to enter "PARENT.FIELD"
+            // Therefore, the user would not be confused,
+            // we support both variants: "PARENT.FIELD.$date" and "PARENT.FIELD"
+            if (isset($v['incrementalFetchingColumn'])) {
+                $v['incrementalFetchingColumn'] =
+                    preg_replace('~\.\$date$~', '', $v['incrementalFetchingColumn']);
+            }
+
+            return $v;
+        });
+
         // @formatter:off
         /** @noinspection NullPointerExceptionInspection */
         $parametersNode
@@ -21,60 +46,31 @@ class ConfigRowDefinition extends BaseConfigDefinition
                 ->booleanNode('quiet')
                     ->defaultFalse()
                 ->end()
-                ->arrayNode('export')
-                    ->validate()
-                    ->always(function ($v) {
-                        if (isset($v['query'], $v['incrementalFetchingColumn']) && $v['query'] !== '') {
-                            throw new InvalidConfigurationException(
-                                'Both incremental fetching and query cannot be set together.'
-                            );
-                        }
-                        if (isset($v['sort'], $v['incrementalFetchingColumn']) && $v['sort'] !== '') {
-                            $message = 'Both incremental fetching and sort cannot be set together.';
-                            throw new InvalidConfigurationException($message);
-                        }
-
-                        // Normalize incrementalFetchingColumn:
-                        // In mapping are dates exported as "PARENT.FIELD.$date",
-                        // ... but for incremental fetching is needed to enter "PARENT.FIELD"
-                        // Therefore, the user would not be confused,
-                        // we support both variants: "PARENT.FIELD.$date" and "PARENT.FIELD"
-                        if (isset($v['incrementalFetchingColumn'])) {
-                            $v['incrementalFetchingColumn'] =
-                                preg_replace('~\.\$date$~', '', $v['incrementalFetchingColumn']);
-                        }
-
-                        return $v;
-                    })
-                    ->end()
-                    ->children()
-                        ->scalarNode('id')->end()
-                        ->scalarNode('name')
-                            ->isRequired()
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('collection')
-                            ->isRequired()
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('query')->end()
-                        ->scalarNode('incrementalFetchingColumn')->end()
-                        ->scalarNode('sort')->end()
-                        ->scalarNode('limit')->end()
-                        ->enumNode('mode')
-                            ->values(['mapping', 'raw'])
-                            ->defaultValue('mapping')
-                        ->end()
-                        ->booleanNode('includeParentInPK')
-                            ->defaultValue(false)
-                        ->end()
-                        ->booleanNode('enabled')
-                            ->defaultValue(true)
-                        ->end()
-                        ->booleanNode('incremental')->end()
-                        ->variableNode('mapping')
-                        ->end()
-                    ->end()
+                ->scalarNode('id')->end()
+                ->scalarNode('name')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('collection')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('query')->end()
+                ->scalarNode('incrementalFetchingColumn')->end()
+                ->scalarNode('sort')->end()
+                ->scalarNode('limit')->end()
+                ->enumNode('mode')
+                    ->values(['mapping', 'raw'])
+                    ->defaultValue('mapping')
+                ->end()
+                ->booleanNode('includeParentInPK')
+                    ->defaultValue(false)
+                ->end()
+                ->booleanNode('enabled')
+                    ->defaultValue(true)
+                ->end()
+                ->booleanNode('incremental')->end()
+                ->variableNode('mapping')
                 ->end()
             ->end()
         ;

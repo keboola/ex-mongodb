@@ -8,26 +8,24 @@
       "user": "userInAuthDb",
       "#password": "p#a!s@sw:o&r%^d"
     },
-    "export": {
-      "collection": "restaurants",
-      "name": "export-all",
-      "mapping": {
-        "_id.$oid": {
-          "type": "column",
-          "mapping": {
-            "destination": "id"
-          }
-        },
-        "name": {
-          "type": "column",
-          "mapping": {
-            "destination": "name"
-          }
+    "collection": "restaurants",
+    "name": "export-all",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
         }
       },
-      "enabled": true,
-      "mode": "mapping",
-      "sort": "{_id: 1}"
-    }
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
+      }
+    },
+    "enabled": true,
+    "mode": "mapping",
+    "sort": "{_id: 1}"
   }
 }

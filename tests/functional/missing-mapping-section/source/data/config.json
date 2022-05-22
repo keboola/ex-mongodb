@@ -5,10 +5,8 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "name": "restaurants",
-      "id": 123,
-      "collection": "restaurants"
-    }
+    "name": "restaurants",
+    "id": 123,
+    "collection": "restaurants"
   }
 }

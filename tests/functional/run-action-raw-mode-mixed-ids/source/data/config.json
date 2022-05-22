@@ -5,13 +5,11 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "name": "dataset-mixed-ids",
-      "id": 123,
-      "collection": "mixedIds",
-      "sort": "{_id: 1}",
-      "incremental": false,
-      "mode": "raw"
-    }
+    "name": "dataset-mixed-ids",
+    "id": 123,
+    "collection": "mixedIds",
+    "sort": "{_id: 1}",
+    "incremental": false,
+    "mode": "raw"
   }
 }

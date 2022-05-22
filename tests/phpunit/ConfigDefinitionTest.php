@@ -365,18 +365,15 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'id' => 123,
-                                'collection' => 'restaurants',
-                                'query' => '{borough: "Bronx"}',
-                                'incremental' => false,
-                                'mapping' =>
-                                    [
-                                        '_id' => null,
-                                    ],
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'query' => '{borough: "Bronx"}',
+                            'incremental' => false,
+                            'mapping' =>
+                                [
+                                    '_id' => null,
+                                ],
                     ],
             ],
         ];
@@ -394,18 +391,15 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'id' => 123,
-                                'collection' => 'restaurants',
-                                'query' => '{borough: "Bronx"}',
-                                'incremental' => false,
-                                'mapping' =>
-                                    [
-                                        '_id' => null,
-                                    ],
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'query' => '{borough: "Bronx"}',
+                            'incremental' => false,
+                            'mapping' =>
+                                [
+                                    '_id' => null,
+                                ],
                     ],
             ],
         ];
@@ -421,12 +415,9 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'collection' => 'restaurants',
-                                'incrementalFetchingColumn' => 'someColumn',
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
+                            'incrementalFetchingColumn' => 'someColumn',
                     ],
             ],
         ];
@@ -466,7 +457,9 @@ class ConfigRowDefinitionTest extends TestCase
                             ],
                     ],
             ],
-            'expectedError' => 'Unrecognized option "exports" under "root.parameters". Did you mean "export"?',
+            'expectedError' => 'Unrecognized option "exports" under "root.parameters". Available options are ' .
+                '"collection", "db", "enabled", "id", "includeParentInPK", "incremental", "incrementalFetchingColumn"' .
+                ', "limit", "mapping", "mode", "name", "query", "quiet", "sort".',
         ];
 
         yield 'missing keys' => [
@@ -477,11 +470,8 @@ class ConfigRowDefinitionTest extends TestCase
                             [
                                 'host' => '127.0.0.1',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'collection' => 'restaurants',
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
                     ],
             ],
             'expectedError' => 'The child node "database" at path "parameters.db" must be configured.',
@@ -497,11 +487,8 @@ class ConfigRowDefinitionTest extends TestCase
                                 'database' => 'db',
                                 'password' => 'pass',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'collection' => 'restaurants',
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
                     ],
             ],
             'expectedError' => 'The child node "uri" at path "parameters.db" must be configured.',
@@ -520,18 +507,15 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'id' => 123,
-                                'collection' => 'restaurants',
-                                'query' => '{borough: "Bronx"}',
-                                'incremental' => false,
-                                'mapping' =>
-                                    [
-                                        '_id' => null,
-                                    ],
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'query' => '{borough: "Bronx"}',
+                            'incremental' => false,
+                            'mapping' =>
+                                [
+                                    '_id' => null,
+                                ],
                     ],
             ],
             'expectedError' => 'The value "mongodb+error" is not allowed for path "root.parameters.db.protocol".'
@@ -550,19 +534,16 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'id' => 123,
-                                'collection' => 'restaurants',
-                                'query' => '{borough: "Bronx"}',
-                                'incrementalFetchingColumn' => 'borough',
-                                'incremental' => false,
-                                'mapping' =>
-                                    [
-                                        '_id' => null,
-                                    ],
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'query' => '{borough: "Bronx"}',
+                            'incrementalFetchingColumn' => 'borough',
+                            'incremental' => false,
+                            'mapping' =>
+                                [
+                                    '_id' => null,
+                                ],
                     ],
             ],
             'expectedError' => 'Both incremental fetching and query cannot be set together.',
@@ -580,19 +561,16 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                        'export' =>
-                            [
-                                'name' => 'bronx-bakeries',
-                                'id' => 123,
-                                'collection' => 'restaurants',
-                                'sort' => '_id',
-                                'incrementalFetchingColumn' => 'borough',
-                                'incremental' => false,
-                                'mapping' =>
-                                    [
-                                        '_id' => null,
-                                    ],
-                            ],
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'sort' => '_id',
+                            'incrementalFetchingColumn' => 'borough',
+                            'incremental' => false,
+                            'mapping' =>
+                                [
+                                    '_id' => null,
+                                ],
                     ],
             ],
             'expectedError' => 'Both incremental fetching and sort cannot be set together.',
@@ -627,16 +605,16 @@ class ConfigRowDefinitionTest extends TestCase
                 }
             }
         } else {
-            if (!array_key_exists('mode', $configData['parameters']['export'])) {
-                $configData['parameters']['export']['mode'] = 'mapping';
+            if (!array_key_exists('mode', $configData['parameters'])) {
+                $configData['parameters']['mode'] = 'mapping';
             }
 
-            if (!array_key_exists('includeParentInPK', $configData['parameters']['export'])) {
-                $configData['parameters']['export']['includeParentInPK'] = false;
+            if (!array_key_exists('includeParentInPK', $configData['parameters'])) {
+                $configData['parameters']['includeParentInPK'] = false;
             }
 
-            if (!array_key_exists('enabled', $configData['parameters']['export'])) {
-                $configData['parameters']['export']['enabled'] = true;
+            if (!array_key_exists('enabled', $configData['parameters'])) {
+                $configData['parameters']['enabled'] = true;
             }
         }
 

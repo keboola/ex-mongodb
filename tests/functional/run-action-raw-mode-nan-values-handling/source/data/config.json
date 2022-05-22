@@ -5,12 +5,10 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "name": "export-with-nan-values",
-      "id": 123,
-      "collection": "invalidJSON",
-      "sort": "{_id: 1}",
-      "mode": "raw"
-    }
+    "name": "export-with-nan-values",
+    "id": 123,
+    "collection": "invalidJSON",
+    "sort": "{_id: 1}",
+    "mode": "raw"
   }
 }

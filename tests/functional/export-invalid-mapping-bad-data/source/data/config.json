@@ -5,14 +5,12 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "collection": "restaurants",
-      "name": "export-bad-mapping",
-      "mapping": {
-        "2": []
-      },
-      "enabled": true,
-      "mode": "mapping"
-    }
+    "collection": "restaurants",
+    "name": "export-bad-mapping",
+    "mapping": {
+      "2": []
+    },
+    "enabled": true,
+    "mode": "mapping"
   }
 }

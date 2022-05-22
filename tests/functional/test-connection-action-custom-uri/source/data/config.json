@@ -6,14 +6,12 @@
       "uri": "mongodb://user@mongodb-auth:27017/test",
       "password": "p#a!s@sw:o&r%^d"
     },
-    "export": {
-      "name": "bakeries",
-      "id": 123,
-      "collection": "restaurants",
-      "incremental": true,
-      "mapping": {
-        "_id.$oid": "id"
-      }
+    "name": "bakeries",
+    "id": 123,
+    "collection": "restaurants",
+    "incremental": true,
+    "mapping": {
+      "_id.$oid": "id"
     }
   }
 }

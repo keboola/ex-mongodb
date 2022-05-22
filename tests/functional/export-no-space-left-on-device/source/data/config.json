@@ -5,27 +5,25 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "collection": "restaurants",
-      "name": "export-one",
-      "query": "{_id: ObjectId(\"5716054bee6e764c94fa7ddd\")}",
-      "mapping": {
-        "_id.$oid": {
-          "type": "column",
-          "mapping": {
-            "destination": "id"
-          }
-        },
-        "name": {
-          "type": "column",
-          "mapping": {
-            "destination": "name"
-          }
+    "collection": "restaurants",
+    "name": "export-one",
+    "query": "{_id: ObjectId(\"5716054bee6e764c94fa7ddd\")}",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
         }
       },
-      "enabled": true,
-      "mode": "mapping",
-      "sort": "{_id: 1}"
-    }
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
+      }
+    },
+    "enabled": true,
+    "mode": "mapping",
+    "sort": "{_id: 1}"
   }
 }

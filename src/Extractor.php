@@ -86,7 +86,7 @@ class Extractor
         $count = 0;
 
         $lastFetchedValues = [];
-        $exports = $this->parameters['exports'] ?? [$this->parameters['export']];
+        $exports = $this->parameters['exports'] ?? [$this->parameters];
         foreach ($exports as $exportOptions) {
             $incrementalFetching = (isset($exportOptions['incrementalFetchingColumn']) &&
                 $exportOptions['incrementalFetchingColumn'] !== '');

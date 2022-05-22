@@ -5,16 +5,14 @@
       "port": 27017,
       "database": "test"
     },
-    "export": {
-      "name": "bakeries",
-      "id": 123,
-      "enabled": true,
-      "collection": "restaurants",
-      "incremental": true,
-      "mapping": {
-        "_id.$oid": "id"
-      },
-      "mode": "mapping"
-    }
+    "name": "bakeries",
+    "id": 123,
+    "enabled": true,
+    "collection": "restaurants",
+    "incremental": true,
+    "mapping": {
+      "_id.$oid": "id"
+    },
+    "mode": "mapping"
   }
 }
