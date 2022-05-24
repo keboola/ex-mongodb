@@ -8,22 +8,34 @@ use MongoExtractor\Config\DbNode;
 
 class ExportCommandFactory
 {
-    private UriFactory $uriFactory;
 
-    private bool $quiet;
+    public function __construct(private UriFactory $uriFactory, private bool $quiet) {}
 
-    public function __construct(UriFactory $uriFactory, bool $quiet)
-    {
-        $this->uriFactory = $uriFactory;
-        $this->quiet = $quiet;
-    }
-
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public function create(array $params): string
     {
         $protocol = $params['protocol'] ?? DbNode::PROTOCOL_MONGO_DB;
         $command = ['mongoexport'];
 
-        // Connection options
+        [$command, $params] = $this->connectionOptions($protocol, $params, $command);
+
+        $command = $this->exportOptions($params, $command);
+
+        return implode(' ', $command);
+    }
+
+    protected function addDefaultSort(): string
+    {
+        return '--sort ' . escapeshellarg('{_id: 1}');
+    }
+
+    /**
+     * @throws \Keboola\Component\UserException
+     */
+    protected function connectionOptions(string $protocol, array $params, array $command): array
+    {
         if (in_array($protocol, [
             DbNode::PROTOCOL_MONGO_DB_SRV,
             DbNode::PROTOCOL_CUSTOM_URI,
@@ -49,42 +61,37 @@ class ExportCommandFactory
             }
 
             if (isset($params['authenticationDatabase'])
-                && !empty(trim((string) $params['authenticationDatabase']))
+                && !empty(trim((string)$params['authenticationDatabase']))
             ) {
                 $command[] = '--authenticationDatabase ' . escapeshellarg($params['authenticationDatabase']);
             }
         }
 
-        // Export options
+        return [$command, $params];
+    }
+
+    protected function exportOptions(array $params, array $command): array
+    {
         $command[] = '--collection ' . escapeshellarg($params['collection']);
 
         foreach (['query', 'sort', 'limit', 'skip'] as $option) {
-            if (isset($params[$option]) && !empty(trim((string) $params[$option]))) {
+            if (isset($params[$option]) && !empty(trim((string)$params[$option]))) {
                 if ($option === 'query') {
                     $params[$option] = ExportHelper::addQuotesToJsonKeys($params[$option]);
                     $params[$option] = ExportHelper::convertStringIdToObjectId($params[$option]);
                 }
-                $command[] = '--' . $option . ' ' . escapeshellarg((string) $params[$option]);
-            } elseif ($option === 'sort') {
+                $command[] = '--' . $option . ' ' . escapeshellarg((string)$params[$option]);
+            } else if ($option === 'sort') {
                 $command[] = $this->addDefaultSort();
             }
         }
 
         $command[] = '--type ' . escapeshellarg('json');
 
-        if (isset($params['out'])) {
-            $command[] = '--out ' . escapeshellarg($params['out']);
-        }
-
         if ($this->quiet) {
             $command[] = '--quiet';
         }
 
-        return implode(' ', $command);
-    }
-
-    protected function addDefaultSort(): string
-    {
-        return '--sort ' . escapeshellarg('{_id: 1}');
+        return $command;
     }
 }

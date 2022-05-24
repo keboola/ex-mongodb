@@ -10,56 +10,37 @@ use Keboola\SSHTunnel\SSHException;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
+use MongoExtractor\Config\Config;
+use MongoExtractor\Config\ExportOptions;
 
 class Extractor
 {
-    private array $parameters;
 
-    private UriFactory $uriFactory;
-
-    private ExportCommandFactory $exportCommandFactory;
-
-    private array $inputState;
-
-    private array $dbParamsMapping = [
-        '#password' => 'password',
-    ];
-
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public function __construct(
-        UriFactory $uriFactory,
-        ExportCommandFactory $exportCommandFactory,
-        array $parameters,
-        array $inputState = []
+        private UriFactory $uriFactory,
+        private ExportCommandFactory $exportCommandFactory,
+        private Config $config,
+        private array $inputState = []
     ) {
-        $this->uriFactory = $uriFactory;
-        $this->exportCommandFactory = $exportCommandFactory;
-        $this->parameters = $parameters;
-        $this->inputState = $inputState;
-
-        foreach ($this->dbParamsMapping as $from => $to) {
-            if (isset($this->parameters['db'][$from])) {
-                $this->parameters['db'][$to] = $this->parameters['db'][$from];
-            }
-        }
-
-        if (isset($this->parameters['db']['ssh']['enabled']) && $this->parameters['db']['ssh']['enabled'] === true) {
-            $sshOptions = $this->parameters['db']['ssh'];
+        if ($config->isSshEnabled()) {
+            $sshOptions = $this->config->getSshOptions();
             $sshOptions['privateKey'] = $sshOptions['keys']['#private'] ?? $sshOptions['keys']['private'];
             $sshOptions['sshPort'] = 22;
 
             $this->createSshTunnel($sshOptions);
-
-            $this->parameters['db']['host'] = '127.0.0.1';
-            $this->parameters['db']['port'] = $sshOptions['localPort'];
         }
     }
 
     /**
      * Sends listCollections command to test connection/credentials
+     * @throws \Keboola\Component\UserException
      */
     public function testConnection(): void
     {
-        $uri = $this->uriFactory->create($this->parameters['db']);
+        $uri = $this->uriFactory->create($this->config->getDb());
         try {
             $manager = new Manager((string) $uri);
         } catch (Exception $exception) {
@@ -75,64 +56,58 @@ class Extractor
 
     /**
      * Creates exports and runs extraction
-     * @param $outputPath
-     * @return bool
      * @throws \Exception
+     * @throws \Throwable
      */
-    public function extract(string $outputPath): bool
+    public function extract(string $outputPath): void
     {
         $this->testConnection();
 
         $count = 0;
-
         $lastFetchedValues = [];
-        $exports = $this->parameters['exports'] ?? [$this->parameters];
-        foreach ($exports as $exportOptions) {
-            $incrementalFetching = (isset($exportOptions['incrementalFetchingColumn']) &&
-                $exportOptions['incrementalFetchingColumn'] !== '');
-            if ($incrementalFetching) {
-                $lastFetchedValue = $this->inputState['lastFetchedRow'][$exportOptions['id']] ?? null;
-                $exportOptions = Export::buildIncrementalFetchingParams(
-                    $exportOptions,
-                    $lastFetchedValue
-                );
+        foreach ($this->config->getExportOptions() as $exportOptions) {
+            $hasIncrementalFetchingColumn = $exportOptions->hasIncrementalFetchingColumn();
+            if ($hasIncrementalFetchingColumn) {
+                $lastFetchedValue = $this->inputState['lastFetchedRow'][$exportOptions->getId()] ?? null;
+                $exportOptions = Export::buildIncrementalFetchingParams($exportOptions, $lastFetchedValue);
             }
-            $export = new Export(
-                $this->exportCommandFactory,
-                $this->parameters['db'],
-                $exportOptions,
-                $outputPath,
-                $exportOptions['name'],
-                $exportOptions['mapping'] ?? []
-            );
 
-            if ($export->isEnabled()) {
+            $export = new Export($this->exportCommandFactory, $this->config->getDb(), $exportOptions);
+            if ($exportOptions->isEnabled()) {
                 $count++;
-                if ($incrementalFetching) {
-                    $lastFetchedValues[$exportOptions['id']] = $export->getLastFetchedValue() ?? $lastFetchedValue;
+                if ($hasIncrementalFetchingColumn) {
+                    $lastFetchedValues[$exportOptions->getId()] = $export->getLastFetchedValue() ?? $lastFetchedValue;
                 }
-                $export->export();
-                $export->parseAndCreateManifest();
+                $manifestData = (new Parse($exportOptions, $outputPath))->parse($export->export());
+                $this->generateManifests($manifestData, $exportOptions);
             }
         }
 
         if (!empty($lastFetchedValues)) {
-            Export::saveStateFile($outputPath, $lastFetchedValues);
+            Parse::saveStateFile($outputPath, $lastFetchedValues);
         }
 
         if ($count === 0) {
             throw new UserException('Please enable at least one export');
         }
-
-        return true;
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     private function createSshTunnel(array $sshOptions): void
     {
         try {
             (new SSH())->openTunnel($sshOptions);
         } catch (SSHException $e) {
             throw new UserException($e->getMessage());
+        }
+    }
+
+    protected function generateManifests(array $manifestsData, ExportOptions $exportOptions): void
+    {
+        foreach ($manifestsData as $manifestData) {
+            (new Manifest($exportOptions, $manifestData['path'], $manifestData['primaryKey']))->generate();
         }
     }
 }

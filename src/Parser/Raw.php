@@ -9,32 +9,23 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-class Raw
+class Raw implements ParserInterface
 {
     private CsvWriter $outputFile;
-
-    private Filesystem $filesystem;
-
-    private JsonEncode $jsonEncode;
-
     private string $filename;
-
-    private array $manifestOptions;
-
     private bool $setIdAsPrimaryKey = true;
 
-    public function __construct(string $name, string $outputPath, array $manifestOptions)
+    /**
+     * @throws \Keboola\Csv\InvalidArgumentException
+     * @throws \Keboola\Csv\Exception
+     */
+    public function __construct(string $name, string $outputPath)
     {
         $this->filename = $outputPath . '/' . $name . '.csv';
 
         // create csv file and its header
         $this->outputFile = new CsvWriter($this->filename);
         $this->outputFile->writeRow(['id', 'data']);
-
-        $this->manifestOptions = $manifestOptions;
-
-        $this->filesystem = new Filesystem;
-        $this->jsonEncode = new JsonEncode;
     }
 
     /**
@@ -48,19 +39,6 @@ class Raw
         if (!empty($data)) {
             $this->writerRowToOutputFile($item);
         }
-    }
-
-    public function writeManifestFile(): void
-    {
-        $manifest = [
-            'primary_key' => $this->setIdAsPrimaryKey ? ['id']: [],
-            'incremental' => $this->manifestOptions['incremental'],
-        ];
-
-        $this->filesystem->dumpFile(
-            $this->filename . '.manifest',
-            $this->jsonEncode->encode($manifest, JsonEncoder::FORMAT)
-        );
     }
 
     private function writerRowToOutputFile(object $item): void
@@ -91,5 +69,10 @@ class Raw
             ]);
             $this->setIdAsPrimaryKey = false;
         }
+    }
+
+    public function getManifestData(): array
+    {
+        return [['path' => $this->filename . '.manifest', 'primaryKey' => $this->setIdAsPrimaryKey ? ['id']: []]];
     }
 }
