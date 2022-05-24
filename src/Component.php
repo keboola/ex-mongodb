@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace MongoExtractor;
 
 use Keboola\Component\BaseComponent;
+use Keboola\Component\JsonHelper;
 use Keboola\Component\UserException;
 use MongoExtractor\Config\Config;
-use MongoExtractor\Config\ConfigDefinition;
+use MongoExtractor\Config\ConfigRowDefinition;
+use MongoExtractor\Config\OldConfigDefinition;
 use Psr\Log\LoggerInterface;
 
 class Component extends BaseComponent
@@ -23,12 +25,8 @@ class Component extends BaseComponent
         parent::__construct($logger);
 
         $parameters = $this->getConfig()->getParameters();
-        if (empty($parameters)) {
-            throw new UserException('Missing config');
-        }
-
-        if (count($parameters['exports'])
-            !== count(array_unique(array_column($parameters['exports'], 'name')))) {
+        if ($this->getConfigDefinitionClass() === OldConfigDefinition::class
+            && $this->areExportsDuplicated($parameters['exports'])) {
             throw new UserException('Please remove duplicate export names');
         }
 
@@ -70,8 +68,28 @@ class Component extends BaseComponent
         return Config::class;
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     protected function getConfigDefinitionClass(): string
     {
-        return ConfigDefinition::class;
+        $rawConfig = $this->getRawConfig();
+        if (empty($rawConfig) || empty($rawConfig['parameters'])) {
+            throw new UserException('Missing config');
+        }
+
+        if (array_key_exists('exports', $rawConfig['parameters'])) {
+            return OldConfigDefinition::class;
+        }
+
+        return ConfigRowDefinition::class;
+    }
+
+    /**
+     * @param array<int, mixed> $exports
+     */
+    protected function areExportsDuplicated(array $exports): bool
+    {
+        return count($exports) !== count(array_unique(array_column($exports, 'name')));
     }
 }

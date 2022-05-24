@@ -5,26 +5,22 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "name": "incremental",
-        "id": "export-id",
-        "collection": "incremental",
-        "incremental": true,
-        "incrementalFetchingColumn": "nested.date",
-        "mapping": {
-          "nested": {
-            "type": "table",
-            "destination": "table_nested",
-            "parentKey": {
-              "disable": true
-            },
-            "tableMapping": {
-              "date.$date": "value"
-            }
-          }
+    "name": "incremental",
+    "id": "export-id",
+    "collection": "incremental",
+    "incremental": true,
+    "incrementalFetchingColumn": "nested.date",
+    "mapping": {
+      "nested": {
+        "type": "table",
+        "destination": "table_nested",
+        "parentKey": {
+          "disable": true
+        },
+        "tableMapping": {
+          "date.$date": "value"
         }
       }
-    ]
+    }
   }
 }

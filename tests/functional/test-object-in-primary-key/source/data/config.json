@@ -5,32 +5,28 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "name": "object-in-primary-key",
-        "id": 123,
-        "enabled": true,
-        "collection": "restaurants",
-        "incremental": true,
-        "mode": "mapping",
+    "name": "object-in-primary-key",
+    "id": 123,
+    "enabled": true,
+    "collection": "restaurants",
+    "incremental": true,
+    "mode": "mapping",
+    "mapping": {
+      "_id": {
+        "type": "column",
         "mapping": {
-          "_id": {
-            "type": "column",
-            "mapping": {
-              "destination": "id",
-              "primaryKey": true
-            }
-          },
-          "coord": {
-            "type": "table",
-            "destination": "coord",
-            "tableMapping": {
-              "0": "lat",
-              "1": "lat"
-            }
-          }
+          "destination": "id",
+          "primaryKey": true
+        }
+      },
+      "coord": {
+        "type": "table",
+        "destination": "coord",
+        "tableMapping": {
+          "0": "lat",
+          "1": "lat"
         }
       }
-    ]
+    }
   }
 }

@@ -6,28 +6,24 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "collection": "restaurants",
-        "name": "export-all",
+    "collection": "restaurants",
+    "name": "export-all",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
         "mapping": {
-          "_id.$oid": {
-            "type": "column",
-            "mapping": {
-              "destination": "id"
-            }
-          },
-          "name": {
-            "type": "column",
-            "mapping": {
-              "destination": "name"
-            }
-          }
-        },
-        "enabled": true,
-        "mode": "mapping",
-        "sort": "{_id: 1}"
+          "destination": "id"
+        }
+      },
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
       }
-    ]
+    },
+    "enabled": true,
+    "mode": "mapping",
+    "sort": "{_id: 1}"
   }
 }

@@ -1,16 +1,12 @@
 {
   "parameters": {
     "db": {},
-    "exports": [
-      {
-        "name": "bakeries",
-        "id": 123,
-        "collection": "restaurants",
-        "incremental": true,
-        "mapping": {
-          "_id.$oid": "id"
-        }
-      }
-    ]
+    "name": "bakeries",
+    "id": 123,
+    "collection": "restaurants",
+    "incremental": true,
+    "mapping": {
+      "_id.$oid": "id"
+    }
   }
 }

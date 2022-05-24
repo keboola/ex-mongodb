@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MongoExtractor;
 
 use Keboola\Component\UserException;
-use MongoExtractor\Config\ConfigDefinition;
+use MongoExtractor\Config\DbNode;
 use League\Uri\Exceptions\SyntaxError;
 
 class UriFactory
@@ -15,10 +15,10 @@ class UriFactory
      */
     public function create(array $params): Uri
     {
-        $protocol = $params['protocol']  ?? ConfigDefinition::PROTOCOL_MONGO_DB;
+        $protocol = $params['protocol']  ?? DbNode::PROTOCOL_MONGO_DB;
 
         try {
-            return $protocol === ConfigDefinition::PROTOCOL_CUSTOM_URI ?
+            return $protocol === DbNode::PROTOCOL_CUSTOM_URI ?
                 $this->fromCustomUri($params) :
                 $this->fromParams($protocol, $params);
         } catch (SyntaxError $e) {
@@ -60,12 +60,12 @@ class UriFactory
      */
     private function fromParams(string $protocol, array $params): Uri
     {
-        if ($protocol === ConfigDefinition::PROTOCOL_MONGO_DB && empty($params['port'])) {
+        if ($protocol === DbNode::PROTOCOL_MONGO_DB && empty($params['port'])) {
             // Validate port, required for mongodb://, optional/ignored for mongodb+srv://
             throw new UserException('Missing connection parameter "port".');
         }
 
-        if ($protocol === ConfigDefinition::PROTOCOL_MONGO_DB_SRV) {
+        if ($protocol === DbNode::PROTOCOL_MONGO_DB_SRV) {
             // URI starting with mongodb+srv:// must not include a port number
             $params['port'] = null;
         }

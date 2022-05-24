@@ -5,20 +5,16 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "name": "incremental",
-        "id": "export-id",
-        "collection": "incremental",
-        "incremental": true,
-        "incrementalFetchingColumn": "unexists.column",
-        "mapping": {
-          "id": "id",
-          "decimal": "decimal",
-          "date.$date": "date",
-          "timestamp": "timestamp"
-        }
-      }
-    ]
+    "name": "incremental",
+    "id": "export-id",
+    "collection": "incremental",
+    "incremental": true,
+    "incrementalFetchingColumn": "unexists.column",
+    "mapping": {
+      "id": "id",
+      "decimal": "decimal",
+      "date.$date": "date",
+      "timestamp": "timestamp"
+    }
   }
 }

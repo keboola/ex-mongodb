@@ -5,28 +5,24 @@
       "port": 27017,
       "database": "test"
     },
-    "exports": [
-      {
-        "collection": "restaurants",
-        "query": "{_id: ObjectId(\"5716054bee6e764c94fa7ddd\")}",
-        "name": "_Reštaurácia s IDčkom 5716054bee6e764c94fa7ddd",
+    "collection": "restaurants",
+    "query": "{_id: ObjectId(\"5716054bee6e764c94fa7ddd\")}",
+    "name": "_Reštaurácia s IDčkom 5716054bee6e764c94fa7ddd",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
         "mapping": {
-          "_id.$oid": {
-            "type": "column",
-            "mapping": {
-              "destination": "id"
-            }
-          },
-          "name": {
-            "type": "column",
-            "mapping": {
-              "destination": "name"
-            }
-          }
-        },
-        "enabled": true,
-        "mode": "mapping"
+          "destination": "id"
+        }
+      },
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
       }
-    ]
+    },
+    "enabled": true,
+    "mode": "mapping"
   }
 }

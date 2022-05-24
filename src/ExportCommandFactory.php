@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MongoExtractor;
 
-use MongoExtractor\Config\ConfigDefinition;
+use MongoExtractor\Config\DbNode;
 
 class ExportCommandFactory
 {
@@ -20,13 +20,13 @@ class ExportCommandFactory
 
     public function create(array $params): string
     {
-        $protocol = $params['protocol'] ?? ConfigDefinition::PROTOCOL_MONGO_DB;
+        $protocol = $params['protocol'] ?? DbNode::PROTOCOL_MONGO_DB;
         $command = ['mongoexport'];
 
         // Connection options
         if (in_array($protocol, [
-            ConfigDefinition::PROTOCOL_MONGO_DB_SRV,
-            ConfigDefinition::PROTOCOL_CUSTOM_URI,
+            DbNode::PROTOCOL_MONGO_DB_SRV,
+            DbNode::PROTOCOL_CUSTOM_URI,
         ], true)) {
             // mongodb+srv:// can be used only in URI parameter
             $uri = (string) $this->uriFactory->create($params);
