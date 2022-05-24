@@ -1,4 +1,3 @@
-%sconnected to: mongodb://mongodb:27017/
-%sexported 6 records
-Parsing "/tmp/%s/out/tables/export-with-nan-values.json"
-Done "/tmp/%s/out/tables/export-with-nan-values.json"
+Exported 6 records
+Parsing "export-with-nan-values"
+Done "export-with-nan-values"

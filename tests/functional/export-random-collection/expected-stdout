@@ -1,4 +1,3 @@
-%sconnected to: mongodb://mongodb:27017/
-%sexported 0 records
-Parsing "/tmp/%s/out/tables/export-random-database.json"
-Done "/tmp/%s/out/tables/export-random-database.json"
+Exported 0 records
+Parsing "export-random-database"
+Done "export-random-database"

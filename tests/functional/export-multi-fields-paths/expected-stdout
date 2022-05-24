@@ -1,4 +1,3 @@
-%sconnected to: mongodb://mongodb:27017/
-%sexported 3 records
-Parsing "/tmp/%s/out/tables/export-multi-fields-paths.json"
-Done "/tmp/%s/out/tables/export-multi-fields-paths.json"
+Exported 3 records
+Parsing "export-multi-fields-paths"
+Done "export-multi-fields-paths"

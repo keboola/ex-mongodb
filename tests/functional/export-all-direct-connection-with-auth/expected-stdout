@@ -1,4 +1,3 @@
-%sconnected to: mongodb://mongodb-auth:27017/
-%sexported 73 records
-Parsing "/tmp/%s/out/tables/export-all.json"
-Done "/tmp/%s/out/tables/export-all.json"
+Exported 73 records
+Parsing "export-all"
+Done "export-all"
