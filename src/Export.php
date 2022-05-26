@@ -7,6 +7,10 @@ namespace MongoExtractor;
 use Keboola\Component\UserException;
 use MongoExtractor\Config\ExportOptions;
 use PhpParser\JsonDecoder;
+use Retry\BackOff\ExponentialBackOffPolicy;
+use Retry\Policy\CallableRetryPolicy;
+use Retry\Policy\RetryPolicyInterface;
+use Retry\RetryProxy;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -19,6 +23,7 @@ class Export
     private string $name;
     private ConsoleOutput $consoleOutput;
     private JsonDecoder $jsonDecoder;
+    private RetryProxy $retryProxy;
 
     public function __construct(
         private ExportCommandFactory $exportCommandFactory,
@@ -26,6 +31,7 @@ class Export
         private ExportOptions $exportOptions,
     ) {
         $this->name = Strings::webalize($exportOptions->getName());
+        $this->retryProxy = new RetryProxy($this->getRetryPolicy(), new ExponentialBackOffPolicy());
         $this->consoleOutput = new ConsoleOutput;
         $this->jsonDecoder = new JsonDecoder();
     }
@@ -42,11 +48,13 @@ class Export
         $cliCommand = $this->exportCommandFactory->create($options);
         $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
 
-        try {
-            $process->mustRun();
-        } catch (ProcessFailedException $e) {
-            $this->handleMongoExportFails($e);
-        }
+        $this->retryProxy->call(function () use ($process) {
+            try {
+                $process->mustRun();
+            } catch (ProcessFailedException $e) {
+                $this->handleMongoExportFails($e);
+            }
+        });
 
         $exportedRows = $this->getExportedRowsAsArrayFromOutput($process->getOutput());
 
@@ -166,5 +174,16 @@ class Export
             return $data;
         }
         return null;
+    }
+
+    private function getRetryPolicy(): RetryPolicyInterface
+    {
+        return new CallableRetryPolicy(function (Throwable $e) {
+            if ($e instanceof UserException) {
+                return false;
+            }
+
+            return true;
+        }, Extractor::RETRY_MAX_ATTEMPTS);
     }
 }

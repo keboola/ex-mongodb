@@ -12,9 +12,15 @@ use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
+use Retry\BackOff\ExponentialBackOffPolicy;
+use Retry\Policy\SimpleRetryPolicy;
+use Retry\RetryProxy;
 
 class Extractor
 {
+    public const RETRY_MAX_ATTEMPTS = 5;
+
+    private RetryProxy $retryProxy;
 
     /**
      * @throws \Keboola\Component\UserException
@@ -25,6 +31,9 @@ class Extractor
         private Config $config,
         private array $inputState = []
     ) {
+        $simpleRetryPolicy = new SimpleRetryPolicy(self::RETRY_MAX_ATTEMPTS);
+        $this->retryProxy = new RetryProxy($simpleRetryPolicy, new ExponentialBackOffPolicy());
+
         if ($config->isSshEnabled()) {
             $sshOptions = $this->config->getSshOptions();
             $sshOptions['privateKey'] = $sshOptions['keys']['#private'] ?? $sshOptions['keys']['private'];
@@ -47,11 +56,14 @@ class Extractor
             throw new UserException($exception->getMessage(), 0, $exception);
         }
 
-        try {
-            $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
-        } catch (Exception $exception) {
-            throw new UserException($exception->getMessage(), 0, $exception);
-        }
+        $this->retryProxy->call(function () use ($manager, $uri) {
+            try {
+                $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
+            } catch (Exception $exception) {
+                echo sprintf("Retrying (%sx)...%s", $this->retryProxy->getTryCount(), PHP_EOL);
+                throw new UserException($exception->getMessage(), 0, $exception);
+            }
+        });
     }
 
     /**
