@@ -57,6 +57,9 @@ class Component extends BaseComponent
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getSyncActions(): array
     {
         return [

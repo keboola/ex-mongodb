@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MongoExtractor\Config;
 
 use Keboola\Component\UserException;
@@ -13,9 +15,11 @@ class ExportOptions
     private bool $enabled;
     private bool $incrementalFetching;
     private string $name;
+    /** @var array<mixed, mixed> */
     private array $mapping;
     private string $mode;
     private ?int $limit;
+    /** @var array<string, int|string|false> */
     private array $lastValueOptions;
     private ?string $incrementalFetchingColumn;
     private ?string $query;
@@ -31,7 +35,7 @@ class ExportOptions
     public function __construct(array $exportOptions)
     {
         $this->enabled = (bool) ($exportOptions['enabled'] ?? false);
-        $this->id = $exportOptions['id'] ?? null;
+        $this->id = isset($exportOptions['id']) ? (string) $exportOptions['id'] : null;
         $this->incrementalFetchingColumn = $exportOptions['incrementalFetchingColumn'] ?? null;
         $this->incrementalFetching = $exportOptions['incremental'] ?? false;
         $this->name = $exportOptions['name'];
@@ -65,6 +69,9 @@ class ExportOptions
         return $this->name;
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     public function getMapping(): array
     {
         return $this->mapping;
@@ -106,10 +113,10 @@ class ExportOptions
 
     public function getIncrementalFetchingColumn(): string
     {
-        return $this->incrementalFetchingColumn;
+        return $this->incrementalFetchingColumn ?? '';
     }
 
-    public function getQuery(): string
+    public function getQuery(): ?string
     {
         return $this->query;
     }
@@ -119,7 +126,7 @@ class ExportOptions
         $this->query = $query;
     }
 
-    public function getSort(): string
+    public function getSort(): ?string
     {
         return $this->sort;
     }

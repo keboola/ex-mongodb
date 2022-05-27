@@ -7,6 +7,7 @@ namespace MongoExtractor;
 use InvalidArgumentException;
 use Keboola\Component\UserException;
 use League\Uri\Components\Query;
+use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
 use League\Uri\UriString;
 
@@ -14,7 +15,7 @@ class Uri
 {
     private const HOSTS_PLACEHOLDER = 'uri_host_placeholder.hosts';
 
-    private LeagueUri $uri;
+    private UriInterface $uri;
 
     // User and password in connection string must be URL encoded,
     // otherwise an error occurs:
@@ -26,6 +27,9 @@ class Uri
     // LeagueUri cannot parse multiple guests in one URI, so they are replaced in URI by a placeholder.
     private ?string $hostPart;
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public static function createFromString(string $str): self
     {
         // LeagueUri cannot parse multiple guests in one URI, so they are replaced in URI by a placeholder, see GROUP 2
@@ -61,6 +65,11 @@ class Uri
         return new self($uri->withUserInfo(null), $user, $password, $hostPart);
     }
 
+    /**
+
+     * @param array<int, array{0:string, 1:string|null}> $query
+     * @throws \Keboola\Component\UserException
+     */
     public static function createFromParts(
         string $protocol,
         ?string $user,
@@ -82,7 +91,7 @@ class Uri
     /**
      * @throws \Keboola\Component\UserException
      */
-    private function __construct(LeagueUri $uri, ?string $user, ?string $password, ?string $hostPart)
+    private function __construct(UriInterface $uri, ?string $user, ?string $password, ?string $hostPart)
     {
         $this->uri = LeagueUri::createFromString($uri);
         $this->user = $user;
@@ -117,7 +126,7 @@ class Uri
         $authority = $this->uri->getAuthority();
 
         // Replace members hosts placeholder
-        $authority = str_replace(self::HOSTS_PLACEHOLDER, $this->hostPart, $authority);
+        $authority = str_replace(self::HOSTS_PLACEHOLDER, $this->hostPart ?? '', $authority ?? '');
 
         // Percent-encode username and password according to RFC 3986
         if ($this->user) {

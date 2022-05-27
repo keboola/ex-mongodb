@@ -9,9 +9,12 @@ use MongoExtractor\Config\DbNode;
 class ExportCommandFactory
 {
 
-    public function __construct(private UriFactory $uriFactory, private bool $quiet) {}
+    public function __construct(private UriFactory $uriFactory, private bool $quiet)
+    {
+    }
 
     /**
+     * @param array<string, mixed> $params
      * @throws \Keboola\Component\UserException
      */
     public function create(array $params): string
@@ -32,6 +35,9 @@ class ExportCommandFactory
     }
 
     /**
+     * @param array<string, mixed> $params
+     * @param array<int, string> $command
+     * @return array<int, mixed>
      * @throws \Keboola\Component\UserException
      */
     protected function connectionOptions(string $protocol, array $params, array $command): array
@@ -61,7 +67,7 @@ class ExportCommandFactory
             }
 
             if (isset($params['authenticationDatabase'])
-                && !empty(trim((string)$params['authenticationDatabase']))
+                && !empty(trim((string) $params['authenticationDatabase']))
             ) {
                 $command[] = '--authenticationDatabase ' . escapeshellarg($params['authenticationDatabase']);
             }
@@ -70,18 +76,23 @@ class ExportCommandFactory
         return [$command, $params];
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @param array<int, string> $command
+     * @return array<int, string>
+     */
     protected function exportOptions(array $params, array $command): array
     {
         $command[] = '--collection ' . escapeshellarg($params['collection']);
 
         foreach (['query', 'sort', 'limit', 'skip'] as $option) {
-            if (isset($params[$option]) && !empty(trim((string)$params[$option]))) {
+            if (isset($params[$option]) && !empty(trim((string) $params[$option]))) {
                 if ($option === 'query') {
                     $params[$option] = ExportHelper::addQuotesToJsonKeys($params[$option]);
                     $params[$option] = ExportHelper::convertStringIdToObjectId($params[$option]);
                 }
-                $command[] = '--' . $option . ' ' . escapeshellarg((string)$params[$option]);
-            } else if ($option === 'sort') {
+                $command[] = '--' . $option . ' ' . escapeshellarg((string) $params[$option]);
+            } elseif ($option === 'sort') {
                 $command[] = $this->addDefaultSort();
             }
         }

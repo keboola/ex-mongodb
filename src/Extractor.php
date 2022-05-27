@@ -23,6 +23,7 @@ class Extractor
     private RetryProxy $retryProxy;
 
     /**
+     * @param array<mixed, mixed> $inputState
      * @throws \Keboola\Component\UserException
      */
     public function __construct(
@@ -36,7 +37,8 @@ class Extractor
 
         if ($config->isSshEnabled()) {
             $sshOptions = $this->config->getSshOptions();
-            $sshOptions['privateKey'] = $sshOptions['keys']['#private'] ?? $sshOptions['keys']['private'];
+            $sshKeys = $this->config->getSshKeys();
+            $sshOptions['privateKey'] = $sshKeys['#private'] ?? $sshKeys['private'];
             $sshOptions['sshPort'] = 22;
 
             $this->createSshTunnel($sshOptions);
@@ -56,11 +58,11 @@ class Extractor
             throw new UserException($exception->getMessage(), 0, $exception);
         }
 
-        $this->retryProxy->call(function () use ($manager, $uri) {
+        $this->retryProxy->call(function () use ($manager, $uri): void {
             try {
                 $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
             } catch (Exception $exception) {
-                echo sprintf("Retrying (%sx)...%s", $this->retryProxy->getTryCount(), PHP_EOL);
+                echo sprintf('Retrying (%sx)...%s', $this->retryProxy->getTryCount(), PHP_EOL);
                 throw new UserException($exception->getMessage(), 0, $exception);
             }
         });
@@ -77,6 +79,7 @@ class Extractor
 
         $count = 0;
         $lastFetchedValues = [];
+        $lastFetchedValue = null;
         foreach ($this->config->getExportOptions() as $exportOptions) {
             $hasIncrementalFetchingColumn = $exportOptions->hasIncrementalFetchingColumn();
             if ($hasIncrementalFetchingColumn) {
@@ -105,6 +108,7 @@ class Extractor
     }
 
     /**
+     * @param array<string, string|int|bool|array<string,string>> $sshOptions
      * @throws \Keboola\Component\UserException
      */
     private function createSshTunnel(array $sshOptions): void
@@ -116,6 +120,9 @@ class Extractor
         }
     }
 
+    /**
+     * @param array<int, array{path: string, primaryKey: array<int, string>|string|null}> $manifestsData
+     */
     protected function generateManifests(array $manifestsData, ExportOptions $exportOptions): void
     {
         foreach ($manifestsData as $manifestData) {

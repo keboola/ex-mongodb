@@ -5,28 +5,26 @@ declare(strict_types=1);
 namespace MongoExtractor;
 
 use Keboola\Component\UserException;
-use MongoExtractor\Config\DbNode;
 use League\Uri\Exceptions\SyntaxError;
+use MongoExtractor\Config\DbNode;
 
 class UriFactory
 {
     /**
+     * @param array<string, mixed> $params
      * @throws \Keboola\Component\UserException
      */
     public function create(array $params): Uri
     {
         $protocol = $params['protocol']  ?? DbNode::PROTOCOL_MONGO_DB;
 
-        try {
-            return $protocol === DbNode::PROTOCOL_CUSTOM_URI ?
+        return $protocol === DbNode::PROTOCOL_CUSTOM_URI ?
                 $this->fromCustomUri($params) :
                 $this->fromParams($protocol, $params);
-        } catch (SyntaxError $e) {
-            throw new UserException('Failed to parse MongoDB URI: ' . $e->getMessage(), 0, $e);
-        }
     }
 
     /**
+     * @param array<string, mixed> $params
      * @throws \Keboola\Component\UserException
      */
     private function fromCustomUri(array $params): Uri
@@ -56,6 +54,7 @@ class UriFactory
     }
 
     /**
+     * @param array<string, mixed> $params
      * @throws \Keboola\Component\UserException
      */
     private function fromParams(string $protocol, array $params): Uri

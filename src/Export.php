@@ -6,6 +6,7 @@ namespace MongoExtractor;
 
 use Keboola\Component\UserException;
 use MongoExtractor\Config\ExportOptions;
+use Nette\Utils\Strings;
 use PhpParser\JsonDecoder;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\CallableRetryPolicy;
@@ -14,8 +15,6 @@ use Retry\RetryProxy;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Nette\Utils\Strings;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Throwable;
 
 class Export
@@ -25,6 +24,9 @@ class Export
     private JsonDecoder $jsonDecoder;
     private RetryProxy $retryProxy;
 
+    /**
+     * @param array<string, mixed> $connectionOptions
+     */
     public function __construct(
         private ExportCommandFactory $exportCommandFactory,
         private array $connectionOptions,
@@ -48,7 +50,7 @@ class Export
         $cliCommand = $this->exportCommandFactory->create($options);
         $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
 
-        $this->retryProxy->call(function () use ($process) {
+        $this->retryProxy->call(function () use ($process): void {
             try {
                 $process->mustRun();
             } catch (ProcessFailedException $e) {
@@ -60,19 +62,22 @@ class Export
 
         $recordsCount = count($exportedRows);
         $this->consoleOutput->writeln(sprintf(
-                "Exported %d %s",
-                $recordsCount,
-                $recordsCount === 1 ? 'record' : 'records')
-        );
+            'Exported %d %s',
+            $recordsCount,
+            $recordsCount === 1 ? 'record' : 'records'
+        ));
 
         return $exportedRows;
     }
 
+    /**
+     * @return array<int, string>
+     */
     protected function getExportedRowsAsArrayFromOutput(string $output): array
     {
         $exportedRows = preg_split("/((\r?\n)|(\r\n?))/", $output);
 
-        return array_filter($exportedRows);
+        return $exportedRows ? array_filter($exportedRows) : [];
     }
 
     /**
@@ -100,12 +105,11 @@ class Export
         throw $e;
     }
 
-    /**
-     * @param string|int|null $inputState
-     */
-    public static function buildIncrementalFetchingParams(ExportOptions $exportOptions, $inputState): ExportOptions
-    {
-        $query = (object)[];
+    public static function buildIncrementalFetchingParams(
+        ExportOptions $exportOptions,
+        string|int|float|null $inputState
+    ): ExportOptions {
+        $query = (object) [];
         if (!is_null($inputState)) {
             $query = [
                 $exportOptions->getIncrementalFetchingColumn() => [
@@ -114,8 +118,8 @@ class Export
             ];
         }
 
-        $exportOptions->setQuery(ExportHelper::fixSpecialColumnsInGteQuery(json_encode($query)));
-        $exportOptions->setSort(json_encode([$exportOptions->getIncrementalFetchingColumn() => 1]));
+        $exportOptions->setQuery(ExportHelper::fixSpecialColumnsInGteQuery(json_encode($query) ?: ''));
+        $exportOptions->setSort(json_encode([$exportOptions->getIncrementalFetchingColumn() => 1]) ?: '');
 
         return $exportOptions;
     }
@@ -142,7 +146,7 @@ class Export
             // Replace e.g. {"$date":"DATE"} to "ISODate("DATE")"
             $output = ExportHelper::convertSpecialColumnsToString($output);
 
-            $data = $this->jsonDecoder->decode($output, JsonEncoder::FORMAT, ['json_decode_associative' => true]);
+            $data = $this->jsonDecoder->decode($output);
             $incrementalFetchingColumn = explode('.', $this->exportOptions->getIncrementalFetchingColumn());
             foreach ($incrementalFetchingColumn as $item) {
                 if (!isset($data[$item])) {

@@ -18,13 +18,18 @@ use TypeError;
 
 class Mapping implements ParserInterface
 {
+    /** @var array<int|string, mixed> */
     private array $mapping;
     private bool $includeParentInPK;
     private string $path;
     private string $name;
     private Filesystem $filesystem;
+    /** @var array<int, array{path: string, primaryKey: array<int, string>|string}> */
     private array $manifestData = [];
 
+    /**
+     * @param array<int|string, mixed> $mapping
+     */
     public function __construct(
         string $name,
         array $mapping,
@@ -40,6 +45,7 @@ class Mapping implements ParserInterface
 
     /**
      * Parses provided data and writes to output files
+     * @param array<int, object> $data
      * @throws \Keboola\Component\UserException
      * @throws \Exception
      */
@@ -74,7 +80,6 @@ class Mapping implements ParserInterface
                     throw new Exception('Failed write to file "' . $outputCsv . '"');
                 }
 
-
                 $this->manifestData[] = [
                     'path' => $outputCsv . '.manifest',
                     'primaryKey' => $file->getPrimaryKey(true),
@@ -85,12 +90,12 @@ class Mapping implements ParserInterface
         }
     }
 
-    protected function prependHeader(Table $file, &$content): void
+    protected function prependHeader(Table $file, string &$content): void
     {
         $header = $file->getHeader();
         if ($header !== []) {
             $content = sprintf(
-                "\"%s\"%s%s",
+                '"%s"%s%s',
                 implode('"' . $file->getDelimiter() . '"', $file->getHeader()),
                 PHP_EOL,
                 $content
@@ -98,6 +103,9 @@ class Mapping implements ParserInterface
         }
     }
 
+    /**
+     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
+     */
     public function getManifestData(): array
     {
         return $this->manifestData;

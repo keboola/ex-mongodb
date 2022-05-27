@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MongoExtractor\Tests\Unit;
 
+use MongoExtractor\ExportCommandFactory;
 use MongoExtractor\UriFactory;
 use PHPUnit\Framework\TestCase;
-use MongoExtractor\ExportCommandFactory;
 
 class ExportCommandFactoryTest extends TestCase
 {

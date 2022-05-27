@@ -9,6 +9,9 @@ use Keboola\Component\Config\BaseConfig;
 
 class Config extends BaseConfig
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function getDb(): array
     {
         $db = $this->getArrayValue(['parameters', 'db']);
@@ -19,14 +22,26 @@ class Config extends BaseConfig
 
         return  $db;
     }
+
     public function isSshEnabled(): bool
     {
         return (bool) $this->getValue(['parameters', 'db', 'ssh', 'enabled'], false);
     }
 
+    /**
+     * @return array<string, string|int|bool|array<string,string>>
+     */
     public function getSshOptions(): array
     {
         return $this->getArrayValue(['parameters', 'db', 'ssh']);
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getSshKeys(): array
+    {
+        return $this->getArrayValue(['parameters', 'db', 'ssh', 'keys']);
     }
 
     /**

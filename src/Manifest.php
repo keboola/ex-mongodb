@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MongoExtractor;
 
 use MongoExtractor\Config\ExportOptions;
@@ -12,8 +14,14 @@ class Manifest
     protected Filesystem $fs;
     private JsonEncode $jsonEncode;
 
-    public function __construct(private ExportOptions $exportOptions, private string $path, private mixed $primaryKey)
-    {
+    /**
+     * @param array<int, string>|string|null $primaryKey
+     */
+    public function __construct(
+        private ExportOptions $exportOptions,
+        private string $path,
+        private array|string|null $primaryKey
+    ) {
         $this->fs = new Filesystem();
         $this->jsonEncode = new JsonEncode;
     }

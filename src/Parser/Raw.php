@@ -8,6 +8,7 @@ use Keboola\Csv\CsvWriter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use function json_encode;
 
 class Raw implements ParserInterface
 {
@@ -30,13 +31,12 @@ class Raw implements ParserInterface
 
     /**
      * Parses provided data and writes to output files
-     * @param array $data
+     * @param array<int, object> $data
      */
     public function parse(array $data): void
     {
-        $item = reset($data);
-
         if (!empty($data)) {
+            $item = reset($data);
             $this->writerRowToOutputFile($item);
         }
     }
@@ -48,29 +48,32 @@ class Raw implements ParserInterface
             if ($type === 'object' && property_exists($item->{'_id'}, '$oid')) {
                 $this->outputFile->writeRow([
                     $item->{'_id'}->{'$oid'},
-                    \json_encode($item),
+                    json_encode($item),
                 ]);
-            } else if (in_array($type, ['double', 'string', 'integer'])) {
+            } elseif (in_array($type, ['double', 'string', 'integer'])) {
                 $this->outputFile->writeRow([
                     $item->{'_id'},
-                    \json_encode($item),
+                    json_encode($item),
                 ]);
             } else {
                 $this->outputFile->writeRow([
                     '',
-                    \json_encode($item),
+                    json_encode($item),
                 ]);
                 $this->setIdAsPrimaryKey = false;
             }
         } else {
             $this->outputFile->writeRow([
                 '',
-                \json_encode($item),
+                json_encode($item),
             ]);
             $this->setIdAsPrimaryKey = false;
         }
     }
 
+    /**
+     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
+     */
     public function getManifestData(): array
     {
         return [['path' => $this->filename . '.manifest', 'primaryKey' => $this->setIdAsPrimaryKey ? ['id']: []]];

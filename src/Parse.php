@@ -8,8 +8,8 @@ use MongoExtractor\Config\ExportOptions;
 use MongoExtractor\Parser\Mapping;
 use MongoExtractor\Parser\ParserInterface;
 use MongoExtractor\Parser\Raw;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Nette\Utils\Strings;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 class Parse
 {
     private string $name;
+    /** @var array<int|string, mixed> */
     private array $mapping;
     private ConsoleOutput $consoleOutput;
     private JsonDecode $jsonDecoder;
@@ -34,6 +35,7 @@ class Parse
     /**
      * Parses exported json and creates .csv and .manifest files
      * @param array<int, string> $exportOutput
+     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
      * @throws \Keboola\Csv\Exception
      * @throws \Keboola\Csv\InvalidArgumentException
      */
@@ -73,6 +75,9 @@ class Parse
         return $parser->getManifestData();
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function saveStateFile(string $outputPath, array $data): void
     {
         $filename = $outputPath . '/../state.json';
