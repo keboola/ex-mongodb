@@ -1,4 +1,4 @@
-%sconnected to: mongodb://mongodb:27017/
-%sexported 9 records
-Parsing "/tmp/%s/out/tables/dataset-mixed-ids.json"
-Done "/tmp/%s/out/tables/dataset-mixed-ids.json"
+Connected to mongodb://mongodb:27017/test
+Exported 9 records
+Parsing "dataset-mixed-ids"
+Done "dataset-mixed-ids"

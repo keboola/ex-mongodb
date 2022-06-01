@@ -1,4 +1,4 @@
-%sconnected to: mongodb://127.0.0.1:1234/
-%sexported 73 records
-Parsing "/tmp/%s/out/tables/export-all.json"
-Done "/tmp/%s/out/tables/export-all.json"
+Connected to mongodb://userInAuthDb@127.0.0.1:1234/test
+Exported 73 records
+Parsing "export-all"
+Done "export-all"

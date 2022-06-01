@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MongoExtractor\Tests\Unit;
 
 use Keboola\Component\UserException;
-use PHPUnit\Framework\TestCase;
 use MongoExtractor\UriFactory;
+use PHPUnit\Framework\TestCase;
 
 class UriFactoryTest extends TestCase
 {
@@ -20,6 +20,7 @@ class UriFactoryTest extends TestCase
 
     /**
      * @dataProvider paramsDataProvider
+     * @param array<string,array<int,string|array<string,string|int>>> $params
      */
     public function testUriFactory(string $expected, array $params): void
     {
@@ -28,6 +29,7 @@ class UriFactoryTest extends TestCase
 
     /**
      * @dataProvider invalidCustomUriProvider
+     * @param array<string,array<int,string|array<string,string>>> $params
      */
     public function testInvalidCustomUri(array $params, string $expectedMsg): void
     {
@@ -36,6 +38,9 @@ class UriFactoryTest extends TestCase
         $this->uriFactory->create($params);
     }
 
+    /**
+     * @return array<string,array<int,string|array<string,string|int>>>
+     */
     public function paramsDataProvider(): array
     {
         return [
@@ -158,6 +163,9 @@ class UriFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<string,array<int,string|array<string,string>>>
+     */
     public function invalidCustomUriProvider(): array
     {
         return [

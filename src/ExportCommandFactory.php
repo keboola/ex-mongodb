@@ -8,22 +8,40 @@ use MongoExtractor\Config\DbNode;
 
 class ExportCommandFactory
 {
-    private UriFactory $uriFactory;
 
-    private bool $quiet;
-
-    public function __construct(UriFactory $uriFactory, bool $quiet)
+    public function __construct(private UriFactory $uriFactory, private bool $quiet)
     {
-        $this->uriFactory = $uriFactory;
-        $this->quiet = $quiet;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @throws \Keboola\Component\UserException
+     */
     public function create(array $params): string
     {
         $protocol = $params['protocol'] ?? DbNode::PROTOCOL_MONGO_DB;
         $command = ['mongoexport'];
 
-        // Connection options
+        [$command, $params] = $this->connectionOptions($protocol, $params, $command);
+
+        $command = $this->exportOptions($params, $command);
+
+        return implode(' ', $command);
+    }
+
+    protected function addDefaultSort(): string
+    {
+        return '--sort ' . escapeshellarg('{_id: 1}');
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @param array<int, string> $command
+     * @return array<int, mixed>
+     * @throws \Keboola\Component\UserException
+     */
+    protected function connectionOptions(string $protocol, array $params, array $command): array
+    {
         if (in_array($protocol, [
             DbNode::PROTOCOL_MONGO_DB_SRV,
             DbNode::PROTOCOL_CUSTOM_URI,
@@ -55,7 +73,16 @@ class ExportCommandFactory
             }
         }
 
-        // Export options
+        return [$command, $params];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @param array<int, string> $command
+     * @return array<int, string>
+     */
+    protected function exportOptions(array $params, array $command): array
+    {
         $command[] = '--collection ' . escapeshellarg($params['collection']);
 
         foreach (['query', 'sort', 'limit', 'skip'] as $option) {
@@ -72,19 +99,10 @@ class ExportCommandFactory
 
         $command[] = '--type ' . escapeshellarg('json');
 
-        if (isset($params['out'])) {
-            $command[] = '--out ' . escapeshellarg($params['out']);
-        }
-
         if ($this->quiet) {
             $command[] = '--quiet';
         }
 
-        return implode(' ', $command);
-    }
-
-    protected function addDefaultSort(): string
-    {
-        return '--sort ' . escapeshellarg('{_id: 1}');
+        return $command;
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MongoExtractor\Tests\Traits;
 
-
 use Symfony\Component\Process\Process;
 
 trait ImportDatasetTrait
@@ -22,7 +21,7 @@ trait ImportDatasetTrait
             '--drop',
             '--jsonArray',
             '--file',
-            sprintf("%s/../datasets/%s", __DIR__, $dataset),
+            sprintf('%s/../datasets/%s', __DIR__, $dataset),
         ]);
 
         $process->mustRun();
@@ -45,7 +44,7 @@ trait ImportDatasetTrait
             '--drop',
             '--jsonArray',
             '--file',
-            sprintf("%s/../datasets/%s", __DIR__, $dataset),
+            sprintf('%s/../datasets/%s', __DIR__, $dataset),
         ]);
 
         $process->mustRun();
@@ -65,7 +64,7 @@ trait ImportDatasetTrait
             '--drop',
             '--jsonArray',
             '--file',
-            sprintf("%s/../datasets/%s", __DIR__, $dataset),
+            sprintf('%s/../datasets/%s', __DIR__, $dataset),
         ]);
 
         $process->mustRun();

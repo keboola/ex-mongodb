@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace MongoExtractor;
 
 use Keboola\Component\BaseComponent;
-use Keboola\Component\JsonHelper;
 use Keboola\Component\UserException;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ConfigRowDefinition;
+use MongoExtractor\Config\ExportOptions;
 use MongoExtractor\Config\OldConfigDefinition;
 use Psr\Log\LoggerInterface;
 
@@ -24,19 +24,20 @@ class Component extends BaseComponent
     {
         parent::__construct($logger);
 
-        $parameters = $this->getConfig()->getParameters();
+        $config = $this->getConfig();
         if ($this->getConfigDefinitionClass() === OldConfigDefinition::class
-            && $this->areExportsDuplicated($parameters['exports'])) {
+            && $this->areExportsDuplicated($config->getExportOptions())) {
             throw new UserException('Please remove duplicate export names');
         }
 
         $uriFactory = new UriFactory();
-        $exportCommandFactory = new ExportCommandFactory($uriFactory, $parameters['quiet']);
-        $this->extractor = new Extractor($uriFactory, $exportCommandFactory, $parameters, $this->getInputState());
+        $exportCommandFactory = new ExportCommandFactory($uriFactory, $config->isQuietModeEnabled());
+        $this->extractor = new Extractor($uriFactory, $exportCommandFactory, $config, $this->getInputState());
     }
 
     /**
      * @throws \Exception
+     * @throws \Throwable
      */
     protected function run(): void
     {
@@ -56,6 +57,9 @@ class Component extends BaseComponent
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getSyncActions(): array
     {
         return [
@@ -66,6 +70,13 @@ class Component extends BaseComponent
     protected function getConfigClass(): string
     {
         return Config::class;
+    }
+
+    public function getConfig(): Config
+    {
+        /** @var Config $config */
+        $config = parent::getConfig();
+        return $config;
     }
 
     /**
@@ -86,10 +97,12 @@ class Component extends BaseComponent
     }
 
     /**
-     * @param array<int, mixed> $exports
+     * @param ExportOptions[] $exports
      */
     protected function areExportsDuplicated(array $exports): bool
     {
-        return count($exports) !== count(array_unique(array_column($exports, 'name')));
+        $exportNames = array_map(fn(ExportOptions $export): string => $export->getName(), $exports);
+
+        return count($exports) !== count(array_unique($exportNames));
     }
 }

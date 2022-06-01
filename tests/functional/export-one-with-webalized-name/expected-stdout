@@ -1,4 +1,4 @@
-%sconnected to: mongodb://mongodb:27017/
-%sexported 1 record
-Parsing "/tmp/%s/out/tables/restauracia-s-idckom-5716054bee6e764c94fa7ddd.json"
-Done "/tmp/%s/out/tables/restauracia-s-idckom-5716054bee6e764c94fa7ddd.json"
+Connected to mongodb://mongodb:27017/test
+Exported 1 record
+Parsing "restauracia-s-idckom-5716054bee6e764c94fa7ddd"
+Done "restauracia-s-idckom-5716054bee6e764c94fa7ddd"

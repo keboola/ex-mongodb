@@ -8,57 +8,57 @@ use Exception;
 use Keboola\Component\UserException;
 use Keboola\CsvMap\Exception\BadConfigException;
 use Keboola\CsvMap\Mapper;
+use Keboola\CsvTable\Table;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Throwable;
+use TypeError;
 
-class Mapping
+class Mapping implements ParserInterface
 {
+    /** @var array<int|string, mixed> */
     private array $mapping;
-
     private bool $includeParentInPK;
-
     private string $path;
-
-    private Filesystem $filesystem;
-
-    private JsonEncode $jsonEncode;
-
     private string $name;
+    private Filesystem $filesystem;
+    /** @var array<int, array{path: string, primaryKey: array<int, string>|string}> */
+    private array $manifestData = [];
 
-    private array $manifestOptions;
-
+    /**
+     * @param array<int|string, mixed> $mapping
+     */
     public function __construct(
         string $name,
         array $mapping,
         bool $includeParentInPK,
         string $outputPath,
-        array $manifestOptions
     ) {
         $this->name = $name;
         $this->mapping = $mapping;
         $this->includeParentInPK = $includeParentInPK;
         $this->path = $outputPath;
-        $this->manifestOptions = $manifestOptions;
-
-        $this->filesystem = new Filesystem;
-        $this->jsonEncode = new JsonEncode;
+        $this->filesystem = new Filesystem();
     }
 
     /**
      * Parses provided data and writes to output files
+     * @param array<int, object> $data
      * @throws \Keboola\Component\UserException
+     * @throws \Exception
      */
     public function parse(array $data): void
     {
         $userData = $this->includeParentInPK ? ['parentId' => md5(serialize($data))] : [];
-        $mapper = new Mapper($this->mapping, true, $this->name);
+        $mapper = new Mapper($this->mapping, false, $this->name);
         try {
             $mapper->parse($data, $userData);
         } catch (BadConfigException $e) {
             throw new UserException($e->getMessage());
+        } catch (TypeError $e) {
+            throw new UserException('CSV writing error. Header and mapped documents must be scalar values.');
         }
 
         foreach ($mapper->getCsvFiles() as $file) {
@@ -68,12 +68,8 @@ class Mapping
 
                 $content = file_get_contents($file->getPathname());
 
-                // csv-map doesn't have option to skip header yet,
-                // so we skip header if file exists
-                if ($this->filesystem->exists($outputCsv)) {
-                    $contentArr = explode("\n", $content);
-                    array_shift($contentArr);
-                    $content = implode("\n", $contentArr);
+                if (!$this->filesystem->exists($outputCsv)) {
+                    $this->prependHeader($file, $content);
                 }
 
                 try {
@@ -84,21 +80,34 @@ class Mapping
                     throw new Exception('Failed write to file "' . $outputCsv . '"');
                 }
 
-
-                $manifest = [
-                    'primary_key' => $file->getPrimaryKey(true),
-                    'incremental' => isset($this->manifestOptions['incremental']) && $this->manifestOptions['incremental'],
+                $this->manifestData[] = [
+                    'path' => $outputCsv . '.manifest',
+                    'primaryKey' => $file->getPrimaryKey(true),
                 ];
-
-                if (!$this->filesystem->exists($outputCsv . '.manifest')) {
-                    $this->filesystem->dumpFile(
-                        $outputCsv . '.manifest',
-                        $this->jsonEncode->encode($manifest, JsonEncoder::FORMAT)
-                    );
-                }
 
                 $this->filesystem->remove($file->getPathname());
             }
         }
+    }
+
+    protected function prependHeader(Table $file, string &$content): void
+    {
+        $header = $file->getHeader();
+        if ($header !== []) {
+            $content = sprintf(
+                '"%s"%s%s',
+                implode('"' . $file->getDelimiter() . '"', $file->getHeader()),
+                PHP_EOL,
+                $content
+            );
+        }
+    }
+
+    /**
+     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
+     */
+    public function getManifestData(): array
+    {
+        return $this->manifestData;
     }
 }

@@ -1,2 +1,4 @@
-Parsing "/tmp/%s/out/tables/bakeries.json"
-Done "/tmp/%s/out/tables/bakeries.json"
+Connected to mongodb://mongodb:27017/test
+Exported 6 records
+Parsing "bakeries"
+Done "bakeries"

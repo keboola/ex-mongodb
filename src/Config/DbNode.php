@@ -27,55 +27,55 @@ class DbNode extends ArrayNodeDefinition
                 $sshTunnelEnabled = $v['ssh']['enabled'] ?? false;
                 $v['password'] = $v['password'] ?? $v['#password'] ?? null;
 
-                if ($protocol === self::PROTOCOL_CUSTOM_URI) {
-                    // Validation for "custom_uri" protocol
-                    if (!isset($v['uri'])) {
-                        throw new InvalidConfigurationException(
-                            'The child node "uri" at path "parameters.db" must be configured.'
-                        );
-                    }
-
-                    // SSH tunnel cannot be used with custom URI
-                    if ($sshTunnelEnabled) {
-                        throw new InvalidConfigurationException(
-                            'Custom URI is not compatible with SSH tunnel support.'
-                        );
-                    }
-
-                    // Check incompatible keys
-                    foreach (['host', 'port', 'database', 'authenticationDatabase'] as $key) {
-                        if (isset($v[$key])) {
-                            throw new InvalidConfigurationException(sprintf(
-                                'Configuration node "db.%s" is not compatible with custom URI.',
-                                $key
-                            ));
-                        }
-                    }
-                } else {
-                    // Validation for "mongodb" or "mongodb+srv" protocol
-                    if (!isset($v['host'])) {
-                        throw new InvalidConfigurationException(
-                            'The child node "host" at path "parameters.db" must be configured.'
-                        );
-                    }
-
-                    if (!isset($v['database'])) {
-                        throw new InvalidConfigurationException(
-                            'The child node "database" at path "parameters.db" must be configured.'
-                        );
-                    }
-
-                    // Validate auth options: both or none
-                    if (isset($v['user']) xor isset($v['password'])) {
-                        throw new InvalidConfigurationException(
-                            'When passing authentication details,' .
-                            ' both "user" and "password" params are required'
-                        );
-                    }
+            if ($protocol === self::PROTOCOL_CUSTOM_URI) {
+                // Validation for "custom_uri" protocol
+                if (!isset($v['uri'])) {
+                    throw new InvalidConfigurationException(
+                        'The child node "uri" at path "parameters.db" must be configured.'
+                    );
                 }
 
+                // SSH tunnel cannot be used with custom URI
+                if ($sshTunnelEnabled) {
+                    throw new InvalidConfigurationException(
+                        'Custom URI is not compatible with SSH tunnel support.'
+                    );
+                }
+
+                // Check incompatible keys
+                foreach (['host', 'port', 'database', 'authenticationDatabase'] as $key) {
+                    if (isset($v[$key])) {
+                        throw new InvalidConfigurationException(sprintf(
+                            'Configuration node "db.%s" is not compatible with custom URI.',
+                            $key
+                        ));
+                    }
+                }
+            } else {
+                // Validation for "mongodb" or "mongodb+srv" protocol
+                if (!isset($v['host'])) {
+                    throw new InvalidConfigurationException(
+                        'The child node "host" at path "parameters.db" must be configured.'
+                    );
+                }
+
+                if (!isset($v['database'])) {
+                    throw new InvalidConfigurationException(
+                        'The child node "database" at path "parameters.db" must be configured.'
+                    );
+                }
+
+                // Validate auth options: both or none
+                if (isset($v['user']) xor isset($v['password'])) {
+                    throw new InvalidConfigurationException(
+                        'When passing authentication details,' .
+                        ' both "user" and "password" params are required'
+                    );
+                }
+            }
+
                 return $v;
-            })->end()->end();
+        })->end()->end();
         $this->isRequired();
         $this->init($this->children());
     }
@@ -104,28 +104,28 @@ class DbNode extends ArrayNodeDefinition
         // @formatter:on
     }
 
-     private function addSshNode(): ArrayNodeDefinition
+    private function addSshNode(): ArrayNodeDefinition
     {
         $sshNode = new ArrayNodeDefinition('ssh');
         // @formatter:off
         /** @noinspection NullPointerExceptionInspection */
         $sshNode
-            ->children()
-                ->booleanNode('enabled')->end()
-                ->arrayNode('keys')
-                    ->children()
-                        ->scalarNode('private')->end()
-                        ->scalarNode('#private')->end()
-                        ->scalarNode('public')->end()
-                    ->end()
-                ->end()
-                ->scalarNode('sshHost')->end()
-                ->scalarNode('sshPort')->end()
-                ->scalarNode('remoteHost')->end()
-                ->scalarNode('remotePort')->end()
-                ->scalarNode('localPort')->end()
-                ->scalarNode('user')->end()
-            ->end()
+           ->children()
+               ->booleanNode('enabled')->end()
+               ->arrayNode('keys')
+                   ->children()
+                       ->scalarNode('private')->end()
+                       ->scalarNode('#private')->end()
+                       ->scalarNode('public')->end()
+                   ->end()
+               ->end()
+               ->scalarNode('sshHost')->end()
+               ->scalarNode('sshPort')->end()
+               ->scalarNode('remoteHost')->end()
+               ->scalarNode('remotePort')->end()
+               ->scalarNode('localPort')->end()
+               ->scalarNode('user')->end()
+           ->end()
         ;
 
         return $sshNode;

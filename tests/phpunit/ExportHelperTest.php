@@ -59,6 +59,9 @@ class ExportHelperTest extends TestCase
         );
     }
 
+    /**
+     * @return array<string,array<int,string|boolean>>
+     */
     public function getConvertDatesDataProvider(): array
     {
         // Note: Unreal cases are also tested to make it clear that REGEXP is working properly.
@@ -126,6 +129,9 @@ class ExportHelperTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<string,array<int,string>>
+     */
     public function getFixIsoDateDataProvider(): array
     {
         // Note: Unreal cases are also tested to make it clear that REGEXP is working properly.
@@ -164,16 +170,16 @@ class ExportHelperTest extends TestCase
     public function testAddQuotesToJsonKeys(): void
     {
         $this->assertSame(
-            "{\"borough\": \"Bronx\",\"cuisine\": \"Bakery\", \"address.zipcode\": \"10452\"}",
+            '{"borough": "Bronx","cuisine": "Bakery", "address.zipcode": "10452"}',
             ExportHelper::addQuotesToJsonKeys(
-                "{borough : \"Bronx\", cuisine: \"Bakery\", \"address.zipcode\": \"10452\"}"
+                '{borough : "Bronx", cuisine: "Bakery", "address.zipcode": "10452"}'
             )
         );
 
         $this->assertSame(
-            "{\"date\":{\"\$gte\":ISODate(\"2020-05-18T16:00:00Z\")}}",
+            '{"date":{"$gte":ISODate("2020-05-18T16:00:00Z")}}',
             ExportHelper::addQuotesToJsonKeys(
-                "{\"date\":{\"\$gte\":ISODate(\"2020-05-18T16:00:00Z\")}}"
+                '{"date":{"$gte":ISODate("2020-05-18T16:00:00Z")}}'
             )
         );
     }
