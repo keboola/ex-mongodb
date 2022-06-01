@@ -189,4 +189,17 @@ class Uri
     {
         $this->uri = $this->uri->withQuery($query->getContent());
     }
+
+    public function getConnectionString(): string
+    {
+        $authority = $this->uri->getAuthority();
+        $authority = str_replace(self::HOSTS_PLACEHOLDER, $this->hostPart ?? '', $authority ?? '');
+
+        if ($this->user) {
+            $userInfo = urlencode($this->user);
+            $authority = sprintf('%s@%s', $userInfo, $authority);
+        }
+
+        return sprintf('%s://%s%s', $this->uri->getScheme(), $authority, $this->uri->getPath());
+    }
 }

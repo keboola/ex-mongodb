@@ -1,3 +1,4 @@
+Connected to mongodb://mongodb:27017/test
 Exported 3 records
 Parsing "export-related-table-first-item-empty"
 Done "export-related-table-first-item-empty"

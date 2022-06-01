@@ -1,3 +1,4 @@
+Connected to mongodb://mongodb:27017/test
 Exported 3 records
 Parsing "export-multi-with-sort-and-limit"
 Done "export-multi-with-sort-and-limit"

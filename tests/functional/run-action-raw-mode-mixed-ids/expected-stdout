@@ -1,3 +1,4 @@
+Connected to mongodb://mongodb:27017/test
 Exported 9 records
 Parsing "dataset-mixed-ids"
 Done "dataset-mixed-ids"

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MongoExtractor;
 
 use Keboola\Component\UserException;
+use MongoExtractor\Config\DbNode;
 use MongoExtractor\Config\ExportOptions;
 use Nette\Utils\Strings;
 use PhpParser\JsonDecoder;
@@ -23,6 +24,7 @@ class Export
     private ConsoleOutput $consoleOutput;
     private JsonDecoder $jsonDecoder;
     private RetryProxy $retryProxy;
+    private UriFactory $uriFactory;
 
     /**
      * @param array<string, mixed> $connectionOptions
@@ -36,6 +38,7 @@ class Export
         $this->retryProxy = new RetryProxy($this->getRetryPolicy(), new ExponentialBackOffPolicy());
         $this->consoleOutput = new ConsoleOutput;
         $this->jsonDecoder = new JsonDecoder();
+        $this->uriFactory = new UriFactory();
     }
 
     /**
@@ -50,9 +53,13 @@ class Export
         $cliCommand = $this->exportCommandFactory->create($options);
         $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
 
-        $this->retryProxy->call(function () use ($process): void {
+        $this->retryProxy->call(function () use ($process, $options): void {
             try {
                 $process->mustRun();
+                $this->consoleOutput->writeln(sprintf(
+                    'Connected to %s',
+                    $this->uriFactory->create($options)->getConnectionString()
+                ));
             } catch (ProcessFailedException $e) {
                 $this->handleMongoExportFails($e);
             }
