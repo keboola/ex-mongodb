@@ -36,12 +36,7 @@ class Extractor
         $this->retryProxy = new RetryProxy($simpleRetryPolicy, new ExponentialBackOffPolicy());
 
         if ($config->isSshEnabled()) {
-            $sshOptions = $this->config->getSshOptions();
-            $sshKeys = $this->config->getSshKeys();
-            $sshOptions['privateKey'] = $sshKeys['#private'] ?? $sshKeys['private'];
-            $sshOptions['sshPort'] = 22;
-
-            $this->createSshTunnel($sshOptions);
+            $this->createSshTunnel($this->config->getSshOptions());
         }
     }
 

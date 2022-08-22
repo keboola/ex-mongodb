@@ -121,9 +121,6 @@ class DbNode extends ArrayNodeDefinition
                ->end()
                ->scalarNode('sshHost')->end()
                ->scalarNode('sshPort')->end()
-               ->scalarNode('remoteHost')->end()
-               ->scalarNode('remotePort')->end()
-               ->scalarNode('localPort')->end()
                ->scalarNode('user')->end()
            ->end()
         ;
