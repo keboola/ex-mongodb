@@ -27,6 +27,26 @@ trait ImportDatasetTrait
         $process->mustRun();
     }
 
+    public static function importDatatasetNoAuthDbSsl(string $collection, string $dataset): void
+    {
+        $process = new Process([
+            'mongoimport',
+            '--host',
+            'mongodb-ssl',
+            '--ssl',
+            '--db',
+            'test',
+            '--collection',
+            $collection,
+            '--drop',
+            '--jsonArray',
+            '--file',
+            sprintf('%s/../datasets/%s', __DIR__, $dataset),
+        ]);
+
+        $process->mustRun();
+    }
+
     public static function importDatatasetAuthDb(string $collection, string $dataset): void
     {
         $process = new Process([

@@ -54,7 +54,7 @@ COPY . /code/
 RUN composer install $COMPOSER_FLAGS
 
 # Make self-signed certificate trusted
-COPY docker/certificates/ca.crt /usr/local/share/ca-certificates/ca.crt
+COPY docker/certificates/ca-cert.pem /usr/local/share/ca-certificates/ca-cert.pem
 RUN update-ca-certificates
 
 CMD ["php", "/code/src/run.php"]
