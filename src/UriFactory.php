@@ -16,11 +16,11 @@ class UriFactory
      */
     public function create(array $params): Uri
     {
-        $protocol = $params['protocol']  ?? DbNode::PROTOCOL_MONGO_DB;
+        $protocol = $params['protocol'] ?? DbNode::PROTOCOL_MONGO_DB;
 
         return $protocol === DbNode::PROTOCOL_CUSTOM_URI ?
-                $this->fromCustomUri($params) :
-                $this->fromParams($protocol, $params);
+            $this->fromCustomUri($params) :
+            $this->fromParams($protocol, $params);
     }
 
     /**
@@ -76,12 +76,22 @@ class UriFactory
             $query[] = ['authSource', $params['authenticationDatabase']];
         }
 
+        if (($params['ssl']['enabled'] ?? false)) {
+            $query[] = ['ssl', 'true'];
+            if (isset($params['ssl']['caFile'])) {
+                $query[] = ['tlsCAFile', $params['ssl']['caFile']];
+            }
+            if (isset($params['ssl']['certKeyFile'])) {
+                $query[] = ['tlsCertificateKeyFile', $params['ssl']['certKeyFile']];
+            }
+        }
+
         return Uri::createFromParts(
             $protocol,
             $params['user'] ?? null,
             $params['password'] ?? null,
             $params['host'],
-            !empty($params['port']) ? (int) $params['port']  : null,
+            !empty($params['port']) ? (int) $params['port'] : null,
             $params['database'],
             $query
         );
