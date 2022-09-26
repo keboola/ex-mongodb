@@ -7,6 +7,7 @@ namespace MongoExtractor;
 use Keboola\Component\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
+use Keboola\Temp\Temp;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
@@ -21,6 +22,16 @@ class Extractor
     public const RETRY_MAX_ATTEMPTS = 5;
 
     private RetryProxy $retryProxy;
+
+    /** @var mixed[] */
+    private array $dbParams;
+
+    private static function createSSLFile(Temp $temp, string $fileContent): string
+    {
+        $filename = $temp->createTmpFile('ssl');
+        file_put_contents((string) $filename, $fileContent);
+        return (string) $filename->getRealPath();
+    }
 
     /**
      * @param array<mixed, mixed> $inputState
@@ -38,6 +49,19 @@ class Extractor
         if ($config->isSshEnabled()) {
             $this->createSshTunnel($this->config->getSshOptions());
         }
+
+        // Write SSL files
+        $this->dbParams = $this->config->getDb();
+        if (($this->dbParams['ssl']['enabled'] ?? false)) {
+            $ssl = $this->dbParams['ssl'];
+            $temp = new Temp('mongodb-ssl'); // TODO remove temp
+            if (isset($ssl['ca'])) {
+                $this->dbParams['ssl']['caFile'] = self::createSSLFile($temp, $ssl['ca']);
+            }
+            if (isset($ssl['cert']) && isset($ssl['#key'])) {
+                $this->dbParams['ssl']['certKeyFile'] = self::createSSLFile($temp, $ssl['cert'] . "\n" . $ssl['#key']);
+            }
+        }
     }
 
     /**
@@ -46,7 +70,7 @@ class Extractor
      */
     public function testConnection(): void
     {
-        $uri = $this->uriFactory->create($this->config->getDb());
+        $uri = $this->uriFactory->create($this->dbParams);
         try {
             $manager = new Manager((string) $uri);
         } catch (Exception $exception) {
@@ -82,7 +106,7 @@ class Extractor
                 $exportOptions = Export::buildIncrementalFetchingParams($exportOptions, $lastFetchedValue);
             }
 
-            $export = new Export($this->exportCommandFactory, $this->config->getDb(), $exportOptions);
+            $export = new Export($this->exportCommandFactory, $this->dbParams, $exportOptions);
             if ($exportOptions->isEnabled()) {
                 $count++;
                 if ($hasIncrementalFetchingColumn) {
