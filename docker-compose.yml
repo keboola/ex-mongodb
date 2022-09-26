@@ -31,6 +31,7 @@ services:
       - ssh-keys:/root/.ssh
       - ./docker/certificates/ca-cert.pem:/tmp/ca-cert.pem:ro
       - ./docker/certificates/client-cert.pem:/tmp/client-cert.pem:ro
+      - ./docker/certificates/client-cert-and-key.pem:/tmp/client-cert-and-key.pem:ro
       - ./docker/certificates/client-key.pem:/tmp/client-key.pem:ro
 
   # DNS server for testing mongodb+srv:// connection

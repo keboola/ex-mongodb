@@ -52,5 +52,6 @@ openssl verify -purpose sslserver -CAfile ca-cert.pem mongodb-cert.pem
 openssl verify -purpose sslclient -CAfile ca-cert.pem client-cert.pem
 
 cat ca-cert.pem ca-key.pem > ca.pem
+cat client-cert.pem client-key.pem > client-cert-and-key.pem
 cat mongodb-cluster-cert.pem mongodb-cluster-key.pem > mongodb-cluster.pem
 cat mongodb-cert.pem mongodb-key.pem > mongodb.pem
