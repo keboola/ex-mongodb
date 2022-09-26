@@ -4,7 +4,13 @@
       "protocol": "mongodb+srv",
       "host": "mongodb.cluster.local",
       "port": 27017,
-      "database": "test"
+      "database": "test",
+      "ssl": {
+        "enabled": true,
+        "ca": "%env(string:SSL_CA)%",
+        "cert": "%env(string:SSL_CERT)%",
+        "#key": "%env(string:SSL_KEY)%"
+      }
     },
     "collection": "restaurants",
     "name": "export-all",
