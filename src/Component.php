@@ -6,6 +6,7 @@ namespace MongoExtractor;
 
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
+use Keboola\Temp\Temp;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ConfigRowDefinition;
 use MongoExtractor\Config\ExportOptions;
@@ -41,7 +42,11 @@ class Component extends BaseComponent
      */
     protected function run(): void
     {
-        $this->extractor->extract($this->getDataDir() . '/out/tables');
+        try {
+            $this->extractor->extract($this->getDataDir() . '/out/tables');
+        } finally {
+            (new Temp())->remove();
+        }
     }
 
     /**
@@ -51,7 +56,11 @@ class Component extends BaseComponent
      */
     public function testConnection(): array
     {
-        $this->extractor->testConnection();
+        try {
+            $this->extractor->testConnection();
+        } finally {
+            (new Temp())->remove();
+        }
         return [
             'status' => 'ok',
         ];

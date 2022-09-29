@@ -50,18 +50,7 @@ class Extractor
             $this->createSshTunnel($this->config->getSshOptions());
         }
 
-        // Write SSL files
-        $this->dbParams = $this->config->getDb();
-        if (($this->dbParams['ssl']['enabled'] ?? false)) {
-            $ssl = $this->dbParams['ssl'];
-            $temp = new Temp('mongodb-ssl'); // TODO remove temp
-            if (isset($ssl['ca'])) {
-                $this->dbParams['ssl']['caFile'] = self::createSSLFile($temp, $ssl['ca']);
-            }
-            if (isset($ssl['cert']) && isset($ssl['#key'])) {
-                $this->dbParams['ssl']['certKeyFile'] = self::createSSLFile($temp, $ssl['cert'] . "\n" . $ssl['#key']);
-            }
-        }
+        $this->writeSslFiles();
     }
 
     /**
@@ -146,6 +135,21 @@ class Extractor
     {
         foreach ($manifestsData as $manifestData) {
             (new Manifest($exportOptions, $manifestData['path'], $manifestData['primaryKey']))->generate();
+        }
+    }
+
+    protected function writeSslFiles(): void
+    {
+        $this->dbParams = $this->config->getDb();
+        if (($this->dbParams['ssl']['enabled'] ?? false)) {
+            $ssl = $this->dbParams['ssl'];
+            $temp = new Temp('mongodb-ssl');
+            if (isset($ssl['ca'])) {
+                $this->dbParams['ssl']['caFile'] = self::createSSLFile($temp, $ssl['ca']);
+            }
+            if (isset($ssl['cert']) && isset($ssl['#key'])) {
+                $this->dbParams['ssl']['certKeyFile'] = self::createSSLFile($temp, $ssl['cert'] . "\n" . $ssl['#key']);
+            }
         }
     }
 }
