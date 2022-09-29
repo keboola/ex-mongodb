@@ -94,7 +94,7 @@ services:
       - mongodb-ssl
       - node1.mongodb.cluster.local
     environment:
-      - TARGETS=mongodb:27017,mongodb-auth:27017,mongodb-ssl:27017node1.mongodb.cluster.local:27017
+      - TARGETS=mongodb:27017,mongodb-auth:27017,mongodb-ssl:27017,node1.mongodb.cluster.local:27017
       - TIMEOUT=120
 
 volumes:
