@@ -17,10 +17,10 @@ class Config extends BaseConfig
         $db = $this->getArrayValue(['parameters', 'db']);
         if ($this->isSshEnabled()) {
             $db['host'] = '127.0.0.1';
-            $db['port'] = $db['ssh']['localPort'];
+            $db['port'] = '33006';
         }
 
-        return  $db;
+        return $db;
     }
 
     public function isSshEnabled(): bool
@@ -33,15 +33,15 @@ class Config extends BaseConfig
      */
     public function getSshOptions(): array
     {
-        return $this->getArrayValue(['parameters', 'db', 'ssh']);
-    }
+        $db = $this->getArrayValue(['parameters', 'db']);
+        $sshOptions = $db['ssh'];
+        $sshOptions['privateKey'] = $db['ssh']['keys']['#private'] ?? $db['ssh']['keys']['private'];
+        $sshOptions['sshPort'] = 22;
+        $sshOptions['localPort'] = '33006';
+        $sshOptions['remoteHost'] = $db['host'];
+        $sshOptions['remotePort'] = $db['port'];
 
-    /**
-     * @return array<string,string>
-     */
-    public function getSshKeys(): array
-    {
-        return $this->getArrayValue(['parameters', 'db', 'ssh', 'keys']);
+        return $sshOptions;
     }
 
     /**

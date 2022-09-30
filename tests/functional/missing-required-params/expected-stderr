@@ -1,1 +1,1 @@
-%s php-component.ERROR: The child node "host" at path "parameters.db" must be configured. [] []
+The child node "host" at path "parameters.db" must be configured.

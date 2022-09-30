@@ -7,6 +7,7 @@ namespace MongoExtractor;
 use Keboola\Component\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
+use Keboola\Temp\Temp;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
@@ -22,6 +23,16 @@ class Extractor
 
     private RetryProxy $retryProxy;
 
+    /** @var mixed[] */
+    private array $dbParams;
+
+    private static function createSSLFile(Temp $temp, string $fileContent): string
+    {
+        $filename = $temp->createTmpFile('ssl');
+        file_put_contents((string) $filename, $fileContent);
+        return (string) $filename->getRealPath();
+    }
+
     /**
      * @param array<mixed, mixed> $inputState
      * @throws \Keboola\Component\UserException
@@ -36,13 +47,10 @@ class Extractor
         $this->retryProxy = new RetryProxy($simpleRetryPolicy, new ExponentialBackOffPolicy());
 
         if ($config->isSshEnabled()) {
-            $sshOptions = $this->config->getSshOptions();
-            $sshKeys = $this->config->getSshKeys();
-            $sshOptions['privateKey'] = $sshKeys['#private'] ?? $sshKeys['private'];
-            $sshOptions['sshPort'] = 22;
-
-            $this->createSshTunnel($sshOptions);
+            $this->createSshTunnel($this->config->getSshOptions());
         }
+
+        $this->writeSslFiles();
     }
 
     /**
@@ -51,7 +59,7 @@ class Extractor
      */
     public function testConnection(): void
     {
-        $uri = $this->uriFactory->create($this->config->getDb());
+        $uri = $this->uriFactory->create($this->dbParams);
         try {
             $manager = new Manager((string) $uri);
         } catch (Exception $exception) {
@@ -87,7 +95,7 @@ class Extractor
                 $exportOptions = Export::buildIncrementalFetchingParams($exportOptions, $lastFetchedValue);
             }
 
-            $export = new Export($this->exportCommandFactory, $this->config->getDb(), $exportOptions);
+            $export = new Export($this->exportCommandFactory, $this->dbParams, $exportOptions);
             if ($exportOptions->isEnabled()) {
                 $count++;
                 if ($hasIncrementalFetchingColumn) {
@@ -127,6 +135,21 @@ class Extractor
     {
         foreach ($manifestsData as $manifestData) {
             (new Manifest($exportOptions, $manifestData['path'], $manifestData['primaryKey']))->generate();
+        }
+    }
+
+    protected function writeSslFiles(): void
+    {
+        $this->dbParams = $this->config->getDb();
+        if (($this->dbParams['ssl']['enabled'] ?? false)) {
+            $ssl = $this->dbParams['ssl'];
+            $temp = new Temp('mongodb-ssl');
+            if (isset($ssl['ca'])) {
+                $this->dbParams['ssl']['caFile'] = self::createSSLFile($temp, $ssl['ca']);
+            }
+            if (isset($ssl['cert']) && isset($ssl['#key'])) {
+                $this->dbParams['ssl']['certKeyFile'] = self::createSSLFile($temp, $ssl['cert'] . "\n" . $ssl['#key']);
+            }
         }
     }
 }

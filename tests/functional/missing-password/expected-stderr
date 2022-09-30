@@ -1,1 +1,1 @@
-%s php-component.ERROR: When passing authentication details, both "user" and "password" params are required [] []
+When passing authentication details, both "user" and "password" params are required

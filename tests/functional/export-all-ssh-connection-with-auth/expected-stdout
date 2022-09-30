@@ -1,4 +1,4 @@
-Connected to mongodb://user@127.0.0.1:1234/test
+Connected to mongodb://user@127.0.0.1:33006/test
 Exported 73 records
 Parsing "export-all"
 Done "export-all"

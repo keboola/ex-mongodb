@@ -73,6 +73,16 @@ class ExportCommandFactory
             }
         }
 
+        if (($params['ssl']['enabled'] ?? false)) {
+            $command[] = '--ssl';
+            if (isset($params['ssl']['caFile'])) {
+                $command['tlsCAFile'] = '--sslCAFile=' . escapeshellarg($params['ssl']['caFile']);
+            }
+            if (isset($params['ssl']['certKeyFile'])) {
+                $command['tlsCertificateKeyFile'] = '--sslPEMKeyFile=' . escapeshellarg($params['ssl']['certKeyFile']);
+            }
+        }
+
         return [$command, $params];
     }
 

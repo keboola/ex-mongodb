@@ -2,11 +2,17 @@ version: '3'
 services:
   app: &main
     build: .
+    image: keboola/ex-mongodb
     volumes:
       - ssh-keys:/root/.ssh
+      - ./docker/certificates/ca-cert.pem:/tmp/ca-cert.pem:ro
+      - ./docker/certificates/client-cert.pem:/tmp/client-cert.pem:ro
+      - ./docker/certificates/client-cert-and-key.pem:/tmp/client-cert-and-key.pem:ro
+      - ./docker/certificates/client-key.pem:/tmp/client-key.pem:ro
     links:
       - mongodb
       - mongodb-auth
+      - mongodb-ssl
       - node1.mongodb.cluster.local
       - sshproxy
       - dns.local
@@ -28,6 +34,10 @@ services:
       - ./:/code
       - ./data:/data
       - ssh-keys:/root/.ssh
+      - ./docker/certificates/ca-cert.pem:/tmp/ca-cert.pem:ro
+      - ./docker/certificates/client-cert.pem:/tmp/client-cert.pem:ro
+      - ./docker/certificates/client-cert-and-key.pem:/tmp/client-cert-and-key.pem:ro
+      - ./docker/certificates/client-key.pem:/tmp/client-key.pem:ro
 
   # DNS server for testing mongodb+srv:// connection
   # https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format
@@ -46,6 +56,14 @@ services:
   mongodb: &mongodb
     image: mongo:${MONGODB_VERSION}
 
+  mongodb-ssl:
+    <<: *mongodb
+    volumes:
+      - ./docker/mongodb/ssl-config.conf:/etc/ssl/ssl-config.conf
+      - ./docker/certificates/mongodb.pem:/etc/ssl/mongodb.pem:ro
+      - ./docker/certificates/ca.pem:/etc/ssl/ca.pem:ro
+    command: [ mongod, --config=/etc/ssl/ssl-config.conf ]
+
   mongodb-auth:
     <<: *mongodb
     command: [--auth]
@@ -55,10 +73,10 @@ services:
   node1.mongodb.cluster.local:
     image: mongo:5
     volumes:
-      - ./docker/mongodb/ssl-config.conf:/etc/ssl/ssl-config.conf
-      - ./docker/certificates/mongodb.pem:/etc/ssl/mongodb.pem:ro
+      - ./docker/mongodb/ssl-config-cluster.conf:/etc/ssl/ssl-config-cluster.conf
+      - ./docker/certificates/mongodb-cluster.pem:/etc/ssl/mongodb-cluster.pem:ro
       - ./docker/certificates/ca.pem:/etc/ssl/ca.pem:ro
-    command: [mongod, --config=/etc/ssl/ssl-config.conf]
+    command: [mongod, --config=/etc/ssl/ssl-config-cluster.conf]
 
   sshproxy:
     image: keboola/db-component-ssh-proxy:latest
@@ -73,9 +91,10 @@ services:
     depends_on:
       - mongodb
       - mongodb-auth
+      - mongodb-ssl
       - node1.mongodb.cluster.local
     environment:
-      - TARGETS=mongodb:27017,mongodb-auth:27017,node1.mongodb.cluster.local:27017
+      - TARGETS=mongodb:27017,mongodb-auth:27017,mongodb-ssl:27017,node1.mongodb.cluster.local:27017
       - TIMEOUT=120
 
 volumes:

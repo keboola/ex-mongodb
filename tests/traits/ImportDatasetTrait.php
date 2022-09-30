@@ -27,6 +27,28 @@ trait ImportDatasetTrait
         $process->mustRun();
     }
 
+    public static function importDatatasetNoAuthDbSsl(string $collection, string $dataset): void
+    {
+        $process = new Process([
+            'mongoimport',
+            '--host',
+            'mongodb-ssl',
+            '--ssl',
+            '--sslCAFile=/tmp/ca-cert.pem',
+            '--sslPEMKeyFile=/tmp/client-cert-and-key.pem',
+            '--db',
+            'test',
+            '--collection',
+            $collection,
+            '--drop',
+            '--jsonArray',
+            '--file',
+            sprintf('%s/../datasets/%s', __DIR__, $dataset),
+        ]);
+
+        $process->mustRun();
+    }
+
     public static function importDatatasetAuthDb(string $collection, string $dataset): void
     {
         $process = new Process([
@@ -57,6 +79,8 @@ trait ImportDatasetTrait
             '--host',
             'node1.mongodb.cluster.local',
             '--ssl',
+            '--sslCAFile=/tmp/ca-cert.pem',
+            '--sslPEMKeyFile=/tmp/client-cert-and-key.pem',
             '--db',
             'test',
             '--collection',

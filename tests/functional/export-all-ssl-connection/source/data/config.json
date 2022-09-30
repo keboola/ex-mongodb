@@ -1,0 +1,34 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb-ssl",
+      "port": 27017,
+      "database": "test",
+      "ssl": {
+        "enabled": true,
+        "ca": "%env(string:SSL_CA)%",
+        "cert": "%env(string:SSL_CERT)%",
+        "#key": "%env(string:SSL_KEY)%"
+      }
+    },
+    "collection": "restaurants",
+    "name": "export-all",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
+      }
+    },
+    "enabled": true,
+    "mode": "mapping",
+    "sort": "{_id: 1}"
+  }
+}

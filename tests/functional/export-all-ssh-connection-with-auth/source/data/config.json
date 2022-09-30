@@ -13,10 +13,7 @@
           "public": "%env(string:SSH_PUBLIC_KEY)%"
         },
         "user": "root",
-        "sshHost": "sshproxy",
-        "remoteHost": "mongodb-auth",
-        "remotePort": "27017",
-        "localPort": "1234"
+        "sshHost": "sshproxy"
       }
     },
     "collection": "restaurants",

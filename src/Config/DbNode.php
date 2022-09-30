@@ -98,6 +98,7 @@ class DbNode extends ArrayNodeDefinition
             ->scalarNode('password')->end()
             ->scalarNode('#password')->end()
             ->append($this->addSshNode())
+            ->append($this->addSslNode())
         ->end()
         ;
 
@@ -121,13 +122,29 @@ class DbNode extends ArrayNodeDefinition
                ->end()
                ->scalarNode('sshHost')->end()
                ->scalarNode('sshPort')->end()
-               ->scalarNode('remoteHost')->end()
-               ->scalarNode('remotePort')->end()
-               ->scalarNode('localPort')->end()
                ->scalarNode('user')->end()
            ->end()
         ;
 
         return $sshNode;
+    }
+
+    public function addSslNode(): ArrayNodeDefinition
+    {
+        $sslNode = new ArrayNodeDefinition('ssl');
+        // @formatter:off
+        /** @noinspection NullPointerExceptionInspection */
+        $sslNode
+            ->children()
+            ->booleanNode('enabled')->end()
+            ->scalarNode('ca')->end()
+            ->scalarNode('cert')->end()
+            ->scalarNode('#key')->end()
+            ->scalarNode('cipher')->end()
+            ->booleanNode('verifyServerCert')->defaultTrue()->end()
+            ->end()
+        ;
+
+        return $sslNode;
     }
 }

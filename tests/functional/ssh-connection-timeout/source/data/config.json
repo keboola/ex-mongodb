@@ -11,10 +11,7 @@
         "keys": {
           "#private": "%env(string:SSH_PRIVATE_KEY)%",
           "public": "%env(string:SSH_PUBLIC_KEY)%"
-        },
-        "remoteHost": "mongodb",
-        "remotePort": "27017",
-        "localPort": "1234"
+        }
       }
     },
     "name": "bakeries",
