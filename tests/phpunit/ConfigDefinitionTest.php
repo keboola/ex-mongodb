@@ -588,20 +588,17 @@ class ConfigRowDefinitionTest extends TestCase
         }
 
         if ($oldConfig) {
-            if (!array_key_exists('migrateConfiguration', $configData['parameters'])) {
-                $configData['parameters']['migrateConfiguration'] = false;
-                foreach ($configData['parameters']['exports'] as $key => $value) {
-                    if (!array_key_exists('mode', $value)) {
-                        $configData['parameters']['exports'][$key]['mode'] = 'mapping';
-                    }
+            foreach ($configData['parameters']['exports'] as $key => $value) {
+                if (!array_key_exists('mode', $value)) {
+                    $configData['parameters']['exports'][$key]['mode'] = 'mapping';
+                }
 
-                    if (!array_key_exists('includeParentInPK', $value)) {
-                        $configData['parameters']['exports'][$key]['includeParentInPK'] = false;
-                    }
+                if (!array_key_exists('includeParentInPK', $value)) {
+                    $configData['parameters']['exports'][$key]['includeParentInPK'] = false;
+                }
 
-                    if (!array_key_exists('enabled', $value)) {
-                        $configData['parameters']['exports'][$key]['enabled'] = true;
-                    }
+                if (!array_key_exists('enabled', $value)) {
+                    $configData['parameters']['exports'][$key]['enabled'] = true;
                 }
             }
         } else {

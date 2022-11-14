@@ -17,7 +17,6 @@ class OldConfigDefinition extends BaseConfigDefinition
         /** @noinspection NullPointerExceptionInspection */
         $parametersNode
             ->children()
-                ->booleanNode('migrateConfiguration')->defaultFalse()->end()
                 ->append(new DbNode())
                 ->booleanNode('quiet')
                     ->defaultFalse()
