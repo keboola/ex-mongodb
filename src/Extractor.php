@@ -13,6 +13,7 @@ use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
+use MongoExtractor\Config\OldConfigDefinition;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
@@ -90,8 +91,13 @@ class Extractor
         $lastFetchedValue = null;
         foreach ($this->config->getExportOptions() as $exportOptions) {
             $hasIncrementalFetchingColumn = $exportOptions->hasIncrementalFetchingColumn();
+            $id = $exportOptions->getId();
             if ($hasIncrementalFetchingColumn) {
-                $lastFetchedValue = $this->inputState['lastFetchedRow'][$exportOptions->getId()] ?? null;
+                if ($this->config->isOldConfig()) {
+                    $lastFetchedValue = $this->inputState['lastFetchedRow'][$id] ?? null;
+                } else {
+                    $lastFetchedValue = $this->inputState['lastFetchedRow'] ?? null;
+                }
                 $exportOptions = Export::buildIncrementalFetchingParams($exportOptions, $lastFetchedValue);
             }
 
@@ -99,7 +105,11 @@ class Extractor
             if ($exportOptions->isEnabled()) {
                 $count++;
                 if ($hasIncrementalFetchingColumn) {
-                    $lastFetchedValues[$exportOptions->getId()] = $export->getLastFetchedValue() ?? $lastFetchedValue;
+                    if ($this->config->isOldConfig()) {
+                        $lastFetchedValues[$id] = $export->getLastFetchedValue() ?? $lastFetchedValue;
+                    } else {
+                        $lastFetchedValues = $export->getLastFetchedValue() ?? $lastFetchedValue;
+                    }
                 }
                 $manifestData = (new Parse($exportOptions, $outputPath))->parse($export->export());
                 $this->generateManifests($manifestData, $exportOptions);

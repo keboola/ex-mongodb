@@ -8,8 +8,7 @@
       "user": "user",
       "password": "random-password"
     },
-    "name": "bakeries",
-    "id": 123,
+    "tableName": "bakeries",
     "collection": "restaurants",
     "incremental": true,
     "mapping": {

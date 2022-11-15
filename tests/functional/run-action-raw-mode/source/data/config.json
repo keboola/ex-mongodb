@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "restaurants",
-    "id": 123,
+    "tableName": "restaurants",
     "collection": "restaurants",
     "query": "{borough: \"Bronx\", \"address.street\": \"Westchester Avenue\"}",
     "sort": "{_id: 1}",

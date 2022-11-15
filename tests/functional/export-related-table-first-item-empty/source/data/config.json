@@ -9,7 +9,7 @@
     "query": "{  \"_id\": {    \"$in\":[      {\"$oid\":\"5716054cee6e764c94fadb21\"},      {\"$oid\":\"5716054cee6e764c94fadb22\"},      {\"$oid\":\"5716054cee6e764c94fadb23\"}    ]  }}",
     "sort": "{\"_id\": -1}",
     "limit": 3,
-    "name": "export-related-table-first-item-empty",
+    "tableName": "export-related-table-first-item-empty",
     "mapping": {
       "_id.$oid": {
         "type": "column",
@@ -27,7 +27,6 @@
         }
       }
     },
-    "mode": "mapping",
-    "enabled": true
+    "mode": "mapping"
   }
 }

@@ -6,7 +6,7 @@
       "database": "test"
     },
     "collection": "restaurants",
-    "name": "export-all",
+    "tableName": "export-all",
     "mapping": {
       "name": {
         "type": "column",
@@ -18,7 +18,6 @@
         }
       }
     },
-    "enabled": true,
     "mode": "mapping"
   }
 }

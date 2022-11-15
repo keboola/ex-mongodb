@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "root",
-    "id": 123,
+    "tableName": "root",
     "collection": "sameSubDocs",
     "includeParentInPK": true,
     "mapping": {

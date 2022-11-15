@@ -6,8 +6,7 @@
       "uri": "mongodb://user@mongodb-auth:27017/test",
       "password": "p#a!s@sw:o&r%^d"
     },
-    "name": "bakeries",
-    "id": 123,
+    "tableName": "bakeries",
     "collection": "restaurants",
     "incremental": true,
     "mapping": {

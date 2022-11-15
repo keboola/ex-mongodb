@@ -365,9 +365,8 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                            'name' => 'bronx-bakeries',
-                            'id' => 123,
                             'collection' => 'restaurants',
+                            'tableName' => 'bronx-bakeries',
                             'query' => '{borough: "Bronx"}',
                             'incremental' => false,
                             'mapping' =>
@@ -391,8 +390,7 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                            'name' => 'bronx-bakeries',
-                            'id' => 123,
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                             'query' => '{borough: "Bronx"}',
                             'incremental' => false,
@@ -415,7 +413,7 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                            'name' => 'bronx-bakeries',
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                             'incrementalFetchingColumn' => 'someColumn',
                     ],
@@ -458,8 +456,8 @@ class ConfigRowDefinitionTest extends TestCase
                     ],
             ],
             'expectedError' => 'Unrecognized option "exports" under "root.parameters". Available options are ' .
-                '"collection", "db", "enabled", "id", "includeParentInPK", "incremental", "incrementalFetchingColumn"' .
-                ', "limit", "mapping", "mode", "name", "query", "quiet", "sort".',
+                '"collection", "db", "includeParentInPK", "incremental", "incrementalFetchingColumn"' .
+                ', "limit", "mapping", "mode", "query", "quiet", "sort", "tableName".',
         ];
 
         yield 'missing keys' => [
@@ -470,7 +468,7 @@ class ConfigRowDefinitionTest extends TestCase
                             [
                                 'host' => '127.0.0.1',
                             ],
-                            'name' => 'bronx-bakeries',
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                     ],
             ],
@@ -487,7 +485,7 @@ class ConfigRowDefinitionTest extends TestCase
                                 'database' => 'db',
                                 'password' => 'pass',
                             ],
-                            'name' => 'bronx-bakeries',
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                     ],
             ],
@@ -507,8 +505,7 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                            'name' => 'bronx-bakeries',
-                            'id' => 123,
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                             'query' => '{borough: "Bronx"}',
                             'incremental' => false,
@@ -534,8 +531,7 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                            'name' => 'bronx-bakeries',
-                            'id' => 123,
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                             'query' => '{borough: "Bronx"}',
                             'incrementalFetchingColumn' => 'borough',
@@ -561,8 +557,7 @@ class ConfigRowDefinitionTest extends TestCase
                                 'user' => 'user',
                                 'password' => 'password',
                             ],
-                            'name' => 'bronx-bakeries',
-                            'id' => 123,
+                            'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                             'sort' => '_id',
                             'incrementalFetchingColumn' => 'borough',
@@ -608,10 +603,6 @@ class ConfigRowDefinitionTest extends TestCase
 
             if (!array_key_exists('includeParentInPK', $configData['parameters'])) {
                 $configData['parameters']['includeParentInPK'] = false;
-            }
-
-            if (!array_key_exists('enabled', $configData['parameters'])) {
-                $configData['parameters']['enabled'] = true;
             }
         }
 

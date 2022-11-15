@@ -7,7 +7,7 @@
     },
     "collection": "restaurants",
     "query": "{_id: ObjectId(\"5716054bee6e764c94fa7ddd\")}",
-    "name": "_Reštaurácia s IDčkom 5716054bee6e764c94fa7ddd",
+    "tableName": "_Reštaurácia s IDčkom 5716054bee6e764c94fa7ddd",
     "mapping": {
       "_id.$oid": {
         "type": "column",
@@ -22,7 +22,6 @@
         }
       }
     },
-    "enabled": true,
     "mode": "mapping"
   }
 }

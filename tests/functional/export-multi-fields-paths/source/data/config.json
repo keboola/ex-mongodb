@@ -7,7 +7,7 @@
     },
     "collection": "restaurants",
     "query": "{borough : \"Bronx\", cuisine: \"Bakery\", \"address.zipcode\": \"10452\"}",
-    "name": "export-multi-fields-paths",
+    "tableName": "export-multi-fields-paths",
     "mapping": {
       "_id.$oid": {
         "type": "column",
@@ -22,7 +22,6 @@
         }
       }
     },
-    "enabled": true,
     "mode": "mapping"
   }
 }

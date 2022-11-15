@@ -76,9 +76,9 @@ class Parse
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<string, mixed>|string|int|float $data
      */
-    public static function saveStateFile(string $outputPath, array $data): void
+    public static function saveStateFile(string $outputPath, array|string|int|float $data): void
     {
         $filename = $outputPath . '/../state.json';
         $saveData = [

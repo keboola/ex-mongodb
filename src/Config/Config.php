@@ -64,6 +64,16 @@ class Config extends BaseConfig
         return $exportOptions;
     }
 
+    public function isOldConfig(): bool
+    {
+        try {
+            $this->getArrayValue(['parameters', 'exports']);
+            return true;
+        } catch (InvalidArgumentException) {
+            return false;
+        }
+    }
+
     public function isQuietModeEnabled(): bool
     {
         return (bool) $this->getValue(['parameters', 'quiet'], false);

@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "incremental",
-    "id": "export-id",
+    "tableName": "incremental",
     "collection": "incremental",
     "incremental": true,
     "incrementalFetchingColumn": "_id",

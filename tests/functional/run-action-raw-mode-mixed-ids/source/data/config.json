@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "dataset-mixed-ids",
-    "id": 123,
+    "tableName": "dataset-mixed-ids",
     "collection": "mixedIds",
     "sort": "{_id: 1}",
     "incremental": false,

@@ -6,8 +6,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "bakeries",
-    "id": 123,
+    "tableName": "bakeries",
     "collection": "restaurants",
     "incremental": true,
     "mapping": {

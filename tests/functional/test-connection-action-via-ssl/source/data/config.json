@@ -12,8 +12,7 @@
         "#key": "%env(string:SSL_KEY)%"
       }
     },
-    "name": "bakeries",
-    "id": 123,
+    "tableName": "bakeries",
     "collection": "restaurants",
     "incremental": true,
     "mapping": {
