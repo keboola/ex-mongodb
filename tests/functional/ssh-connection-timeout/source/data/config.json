@@ -14,9 +14,7 @@
         }
       }
     },
-    "name": "bakeries",
-    "id": 123,
-    "enabled": true,
+    "tableName": "bakeries",
     "collection": "restaurants",
     "incremental": true,
     "mapping": {

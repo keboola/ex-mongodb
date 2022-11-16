@@ -5,9 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "object-in-primary-key",
-    "id": 123,
-    "enabled": true,
+    "tableName": "object-in-primary-key",
     "collection": "restaurants",
     "incremental": true,
     "mode": "mapping",

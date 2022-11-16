@@ -7,7 +7,7 @@
     },
     "collection": "restaurants",
     "query": "{a: b}",
-    "name": "export-bad-query",
+    "tableName": "export-bad-query",
     "mapping": {
       "_id.$oid": {
         "type": "column",
@@ -22,7 +22,6 @@
         }
       }
     },
-    "enabled": true,
     "mode": "mapping"
   }
 }

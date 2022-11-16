@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "incremental",
-    "id": 123,
+    "tableName": "incremental",
     "collection": "incremental",
     "incremental": true,
     "incrementalFetchingColumn": "id",

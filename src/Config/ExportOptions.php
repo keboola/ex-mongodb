@@ -34,11 +34,11 @@ class ExportOptions
      */
     public function __construct(array $exportOptions)
     {
-        $this->enabled = (bool) ($exportOptions['enabled'] ?? false);
+        $this->enabled = (bool) ($exportOptions['enabled'] ?? true);
         $this->id = isset($exportOptions['id']) ? (string) $exportOptions['id'] : null;
         $this->incrementalFetchingColumn = $exportOptions['incrementalFetchingColumn'] ?? null;
         $this->incrementalFetching = $exportOptions['incremental'] ?? false;
-        $this->name = $exportOptions['name'];
+        $this->name = $exportOptions['tableName'] ?? $exportOptions['name'];
         $this->mode = $exportOptions['mode'];
         $this->mapping = $exportOptions['mapping'] ?? [];
         $this->limit = !empty($exportOptions['limit']) ? (int) $exportOptions['limit'] : null;

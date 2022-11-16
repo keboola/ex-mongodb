@@ -8,7 +8,7 @@
       "#password": "p#a!s@sw:o&r%^d"
     },
     "collection": "restaurants",
-    "name": "export-all",
+    "tableName": "export-all",
     "mapping": {
       "_id.$oid": {
         "type": "column",
@@ -23,7 +23,6 @@
         }
       }
     },
-    "enabled": true,
     "mode": "mapping",
     "sort": "{_id: 1}"
   }

@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "restaurants-id-as-string",
-    "id": 123,
+    "tableName": "restaurants-id-as-string",
     "collection": "restaurantsIdAsString",
     "sort": "{_id: 1}",
     "incremental": true,

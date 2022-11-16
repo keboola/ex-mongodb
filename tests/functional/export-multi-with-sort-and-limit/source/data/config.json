@@ -9,7 +9,7 @@
     "query": "{name: \"National Bakery\"}",
     "sort": "{\"_id\": 1}",
     "limit": 3,
-    "name": "export-multi-with-sort-and-limit",
+    "tableName": "export-multi-with-sort-and-limit",
     "mapping": {
       "_id.$oid": {
         "type": "column",
@@ -24,7 +24,6 @@
         }
       }
     },
-    "enabled": true,
     "mode": "mapping"
   }
 }

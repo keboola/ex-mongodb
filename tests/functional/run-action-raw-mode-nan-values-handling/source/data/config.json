@@ -5,8 +5,7 @@
       "port": 27017,
       "database": "test"
     },
-    "name": "export-with-nan-values",
-    "id": 123,
+    "tableName": "export-with-nan-values",
     "collection": "invalidJSON",
     "sort": "{_id: 1}",
     "mode": "raw"

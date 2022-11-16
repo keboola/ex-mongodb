@@ -2,4 +2,3 @@ parameters:
     ignoreErrors:
         - '#Cannot call method scalarNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null.#'
         - '#Cannot call method arrayNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null.#'
-        - '#Cannot call method append\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null.#'

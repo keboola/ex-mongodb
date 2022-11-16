@@ -1,8 +1,7 @@
 {
   "parameters": {
     "db": {},
-    "name": "bakeries",
-    "id": 123,
+    "tableName": "bakeries",
     "collection": "restaurants",
     "incremental": true,
     "mapping": {

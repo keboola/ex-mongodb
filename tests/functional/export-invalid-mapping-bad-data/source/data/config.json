@@ -6,11 +6,10 @@
       "database": "test"
     },
     "collection": "restaurants",
-    "name": "export-bad-mapping",
+    "tableName": "export-bad-mapping",
     "mapping": {
       "2": []
     },
-    "enabled": true,
     "mode": "mapping"
   }
 }
