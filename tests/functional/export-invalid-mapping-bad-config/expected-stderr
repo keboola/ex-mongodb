@@ -1,1 +1,1 @@
-%sCRITICAL: Keboola\CsvMap\Exception\BadDataException:Error writing 'id' column: Cannot write data into column: (object) array(    '$oid' => '%s', ) {"errFile":"/code/vendor/keboola/csvmap/src/Keboola/CsvMap/Mapper.php"%a
+Invalid mapping configuration: Error writing 'id' column: Cannot write data into column: (object) array(    '$oid' => '%s', )
