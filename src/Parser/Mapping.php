@@ -7,6 +7,7 @@ namespace MongoExtractor\Parser;
 use Exception;
 use Keboola\Component\UserException;
 use Keboola\CsvMap\Exception\BadConfigException;
+use Keboola\CsvMap\Exception\BadDataException;
 use Keboola\CsvMap\Mapper;
 use Keboola\CsvTable\Table;
 use Nette\Utils\Strings;
@@ -55,8 +56,8 @@ class Mapping implements ParserInterface
         $mapper = new Mapper($this->mapping, false, $this->name);
         try {
             $mapper->parse($data, $userData);
-        } catch (BadConfigException $e) {
-            throw new UserException($e->getMessage());
+        } catch (BadConfigException|BadDataException $e) {
+            throw new UserException(sprintf('Invalid mapping configuration: %s', $e->getMessage()));
         } catch (TypeError $e) {
             throw new UserException('CSV writing error. Header and mapped documents must be scalar values.');
         }

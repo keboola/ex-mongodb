@@ -1,1 +1,1 @@
-Only scalar values are allowed in primary key. Primary key: [{"$oid":"%s"}]
+Invalid mapping configuration: Only scalar values are allowed in primary key. Primary key: [{"$oid":"%s"}]
