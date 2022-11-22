@@ -1,0 +1,23 @@
+Connected to mongodb://mongodb:27017/test
+Exporting "big-data"
+Parsed 5000 records.
+Parsed 10000 records.
+Parsed 15000 records.
+Parsed 20000 records.
+Parsed 25000 records.
+Parsed 30000 records.
+Parsed 35000 records.
+Parsed 40000 records.
+Parsed 45000 records.
+Parsed 50000 records.
+Parsed 55000 records.
+Parsed 60000 records.
+Parsed 65000 records.
+Parsed 70000 records.
+Parsed 75000 records.
+Parsed 80000 records.
+Parsed 85000 records.
+Parsed 90000 records.
+Parsed 95000 records.
+Parsed 100000 records.
+Done "big-data", parsed 100000 records in total
