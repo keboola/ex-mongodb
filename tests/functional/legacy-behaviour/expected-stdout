@@ -1,4 +1,3 @@
 Connected to mongodb://mongodb:27017/test
-Exported 4 records
-Parsing "root"
-Done "root"
+Exporting "root"
+Done "root", parsed 4 records in total

@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace MongoExtractor;
 
+use Generator;
 use MongoExtractor\Config\ExportOptions;
 use MongoExtractor\Parser\Mapping;
 use MongoExtractor\Parser\ParserInterface;
 use MongoExtractor\Parser\Raw;
 use Nette\Utils\Strings;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 class Parse
 {
@@ -20,7 +18,6 @@ class Parse
     /** @var array<int|string, mixed> */
     private array $mapping;
     private ConsoleOutput $consoleOutput;
-    private JsonDecode $jsonDecoder;
 
     public function __construct(
         private ExportOptions $exportOptions,
@@ -29,48 +26,46 @@ class Parse
         $this->name = Strings::webalize($exportOptions->getName());
         $this->mapping = $exportOptions->getMapping();
         $this->consoleOutput = new ConsoleOutput;
-        $this->jsonDecoder = new JsonDecode;
     }
 
     /**
      * Parses exported json and creates .csv and .manifest files
-     * @param array<int, string> $exportOutput
      * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
      * @throws \Keboola\Csv\Exception
      * @throws \Keboola\Csv\InvalidArgumentException
      */
-    public function parse(array $exportOutput): array
+    public function parse(Generator $exportOutput): array
     {
-        $this->consoleOutput->writeln('Parsing "' . $this->name . '"');
-
         $parser = $this->getParser();
         $parsedDocumentsCount = 0;
-        $skippedDocumentsCount = 0;
-        if (empty($exportOutput)) {
-            $parser->parse([]);
-        } else {
-            foreach ($exportOutput as $line) {
-                try {
-                    $data = trim($line) !== ''
-                        ? [$this->jsonDecoder->decode($line, JsonEncoder::FORMAT)]
-                        : [];
-                    $parser->parse($data);
-                    if ($parsedDocumentsCount % 5e3 === 0 && $parsedDocumentsCount !== 0) {
-                        $this->consoleOutput->writeln('Parsed ' . $parsedDocumentsCount . ' records.');
-                    }
-                } catch (NotEncodableValueException $notEncodableValueException) {
-                    $this->consoleOutput->writeln('Could not decode JSON: ' . substr($line, 0, 80) . '...');
-                    $skippedDocumentsCount++;
-                } finally {
+        $lastLoggedCount = null;
+
+        foreach ($exportOutput as $output) {
+            foreach ($output as $array) {
+                $parser->parse($array);
+                if (!empty($array)) {
                     $parsedDocumentsCount++;
+                }
+                if ($parsedDocumentsCount % 5e3 === 0
+                    && $parsedDocumentsCount !== 0
+                    && $parsedDocumentsCount !== $lastLoggedCount
+                ) {
+                    $lastLoggedCount = $parsedDocumentsCount;
+                    $this->consoleOutput->writeln('Parsed ' . $parsedDocumentsCount . ' records.');
                 }
             }
         }
 
-        if ($skippedDocumentsCount !== 0) {
-            $this->consoleOutput->writeln('Skipped documents: ' . $skippedDocumentsCount);
+        if ($parsedDocumentsCount === 0) {
+            $parser->parse([]); //create csv with headers only
         }
-        $this->consoleOutput->writeln('Done "' . $this->name . '"');
+
+        $this->consoleOutput->writeln(sprintf(
+            'Done "%s", parsed %d %s in total',
+            $this->name,
+            $parsedDocumentsCount,
+            $parsedDocumentsCount === 1 ? 'record' : 'records'
+        ));
 
         return $parser->getManifestData();
     }
