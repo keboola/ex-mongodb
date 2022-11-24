@@ -13,7 +13,6 @@ use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
-use MongoExtractor\Config\OldConfigDefinition;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
@@ -139,7 +138,7 @@ class Extractor
     }
 
     /**
-     * @param array<int, array{path: string, primaryKey: array<int, string>|string|null}> $manifestsData
+     * @param array<string, array{path: string, primaryKey: array<int, string>|string|null}> $manifestsData
      */
     protected function generateManifests(array $manifestsData, ExportOptions $exportOptions): void
     {
