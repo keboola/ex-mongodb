@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MongoExtractor;
 
+use Generator;
 use Keboola\Component\UserException;
-use MongoExtractor\Config\DbNode;
+use Keboola\Utils\Exception\JsonDecodeException;
 use MongoExtractor\Config\ExportOptions;
 use Nette\Utils\Strings;
-use PhpParser\JsonDecoder;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\CallableRetryPolicy;
 use Retry\Policy\RetryPolicyInterface;
@@ -16,13 +16,16 @@ use Retry\RetryProxy;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Throwable;
 
 class Export
 {
     private string $name;
     private ConsoleOutput $consoleOutput;
-    private JsonDecoder $jsonDecoder;
+    private JsonDecode $jsonDecoder;
     private RetryProxy $retryProxy;
     private UriFactory $uriFactory;
 
@@ -37,54 +40,57 @@ class Export
         $this->name = Strings::webalize($exportOptions->getName());
         $this->retryProxy = new RetryProxy($this->getRetryPolicy(), new ExponentialBackOffPolicy());
         $this->consoleOutput = new ConsoleOutput;
-        $this->jsonDecoder = new JsonDecoder();
+        $this->jsonDecoder = new JsonDecode;
         $this->uriFactory = new UriFactory();
     }
 
     /**
      * Runs export command
-     * @return array<int, string>
      * @throws \Keboola\Component\UserException
      * @throws \Throwable
      */
-    public function export(): array
+    public function export(): Generator
     {
         $options = array_merge($this->connectionOptions, $this->exportOptions->toArray());
         $cliCommand = $this->exportCommandFactory->create($options);
         $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
 
-        $this->retryProxy->call(function () use ($process, $options): void {
-            try {
-                $process->mustRun();
-                $this->consoleOutput->writeln(sprintf(
-                    'Connected to %s',
-                    $this->uriFactory->create($options)->getConnectionString()
-                ));
-            } catch (ProcessFailedException $e) {
-                $this->handleMongoExportFails($e);
-            }
+        $this->retryProxy->call(function () use ($process): void {
+            $process->start();
         });
 
-        $exportedRows = $this->getExportedRowsAsArrayFromOutput($process->getOutput());
-
-        $recordsCount = count($exportedRows);
         $this->consoleOutput->writeln(sprintf(
-            'Exported %d %s',
-            $recordsCount,
-            $recordsCount === 1 ? 'record' : 'records'
+            'Connected to %s',
+            $this->uriFactory->create($options)->getConnectionString()
         ));
+        $this->consoleOutput->writeln(sprintf('Exporting "%s"', $this->name));
 
-        return $exportedRows;
+        yield $this->decodeJsonFromOutput($process->getIterator(Process::ITER_SKIP_ERR));
+
+        if (!$process->isSuccessful()) {
+            $this->handleMongoExportFails(new ProcessFailedException($process));
+        }
     }
 
-    /**
-     * @return array<int, string>
-     */
-    protected function getExportedRowsAsArrayFromOutput(string $output): array
+    protected function decodeJsonFromOutput(Generator $outputIterator): Generator
     {
-        $exportedRows = preg_split("/((\r?\n)|(\r\n?))/", $output);
-
-        return $exportedRows ? array_filter($exportedRows) : [];
+        foreach ($outputIterator as $output) {
+            $exportedRows = preg_split("/((\r?\n)|(\r\n?))/", $output);
+            if ($exportedRows) {
+                foreach ($exportedRows as $exportedRow) {
+                    try {
+                        yield trim($exportedRow) !== ''
+                            ? [$this->jsonDecoder->decode($exportedRow, JsonEncoder::FORMAT)]
+                            : [];
+                    } catch (NotEncodableValueException $e) {
+                        $this->consoleOutput->writeln(sprintf(
+                            'Could not decode JSON: %s...',
+                            substr($exportedRow, 0, 80)
+                        ));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -153,7 +159,7 @@ class Export
             // Replace e.g. {"$date":"DATE"} to "ISODate("DATE")"
             $output = ExportHelper::convertSpecialColumnsToString($output);
 
-            $data = $this->jsonDecoder->decode($output);
+            $data = $this->jsonDecoder->decode($output, JsonEncoder::FORMAT, [JsonDecode::ASSOCIATIVE => true]);
             $incrementalFetchingColumn = explode('.', $this->exportOptions->getIncrementalFetchingColumn());
             foreach ($incrementalFetchingColumn as $item) {
                 if (!isset($data[$item])) {

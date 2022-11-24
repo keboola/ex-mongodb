@@ -1,4 +1,3 @@
 Connected to mongodb://userInAuthDb@127.0.0.1:33006/test
-Exported 73 records
-Parsing "export-all"
-Done "export-all"
+Exporting "export-all"
+Done "export-all", parsed 73 records in total

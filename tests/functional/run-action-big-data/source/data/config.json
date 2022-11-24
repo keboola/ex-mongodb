@@ -1,0 +1,39 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "collection": "big-data",
+    "tableName": "big-data",
+    "mapping": {
+      "id": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
+      },
+      "email": {
+        "type": "column",
+        "mapping": {
+          "destination": "email"
+        }
+      },
+      "phone": {
+        "type": "column",
+        "mapping": {
+          "destination": "phone"
+        }
+      }
+    },
+    "mode": "mapping",
+    "sort": "{id: 1}"
+  }
+}

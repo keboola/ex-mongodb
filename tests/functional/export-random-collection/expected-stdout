@@ -1,4 +1,3 @@
 Connected to mongodb://mongodb:27017/test
-Exported 0 records
-Parsing "export-random-database"
-Done "export-random-database"
+Exporting "export-random-database"
+Done "export-random-database", parsed 0 records in total
