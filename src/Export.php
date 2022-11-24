@@ -6,7 +6,6 @@ namespace MongoExtractor;
 
 use Generator;
 use Keboola\Component\UserException;
-use Keboola\Utils\Exception\JsonDecodeException;
 use MongoExtractor\Config\ExportOptions;
 use Nette\Utils\Strings;
 use Retry\BackOff\ExponentialBackOffPolicy;

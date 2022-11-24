@@ -30,7 +30,7 @@ class Parse
 
     /**
      * Parses exported json and creates .csv and .manifest files
-     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
+     * @return array<string, array{path: string, primaryKey: array<int, string>|string}>
      * @throws \Keboola\Csv\Exception
      * @throws \Keboola\Csv\InvalidArgumentException
      */

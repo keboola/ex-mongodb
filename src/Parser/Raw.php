@@ -72,10 +72,14 @@ class Raw implements ParserInterface
     }
 
     /**
-     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
+     * @return array<string, array{path: string, primaryKey: array<int, string>|string}>
      */
     public function getManifestData(): array
     {
-        return [['path' => $this->filename . '.manifest', 'primaryKey' => $this->setIdAsPrimaryKey ? ['id']: []]];
+        return [
+            $this->filename => [
+                'path' => $this->filename . '.manifest', 'primaryKey' => $this->setIdAsPrimaryKey ? ['id']: [],
+            ],
+        ];
     }
 }

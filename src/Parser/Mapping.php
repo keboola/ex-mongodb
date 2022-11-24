@@ -25,7 +25,7 @@ class Mapping implements ParserInterface
     private string $path;
     private string $name;
     private Filesystem $filesystem;
-    /** @var array<int, array{path: string, primaryKey: array<int, string>|string}> */
+    /** @var array<string, array{path: string, primaryKey: array<int, string>|string}> */
     private array $manifestData = [];
 
     /**
@@ -81,7 +81,7 @@ class Mapping implements ParserInterface
                     throw new Exception('Failed write to file "' . $outputCsv . '"');
                 }
 
-                $this->manifestData[] = [
+                $this->manifestData[$outputCsv] = [
                     'path' => $outputCsv . '.manifest',
                     'primaryKey' => $file->getPrimaryKey(true),
                 ];
@@ -105,7 +105,7 @@ class Mapping implements ParserInterface
     }
 
     /**
-     * @return array<int, array{path: string, primaryKey: array<int, string>|string}>
+     * @return array<string, array{path: string, primaryKey: array<int, string>|string}>
      */
     public function getManifestData(): array
     {
