@@ -127,4 +127,22 @@ class ExportHelper
 
         return $output;
     }
+
+    /**
+     * @param array<mixed, mixed> $mapping
+     */
+    public static function removeTypesInMappingKeys(array &$mapping): void
+    {
+        $final = [];
+        foreach ($mapping as $k => &$v) {
+            if (is_string($k)) {
+                $k = preg_replace('/(\.\$(numberDouble|numberInt|numberLong))$/', '', $k);
+            }
+            if (is_array($v)) {
+                self::removeTypesInMappingKeys($v);
+            }
+            $final[$k] = $v;
+        }
+        $mapping = $final;
+    }
 }

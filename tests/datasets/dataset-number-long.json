@@ -1,0 +1,23 @@
+[
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa7ddd"
+    },
+    "numberLong": 2090845886852,
+    "numberLongInObject": {"$numberLong": "2090845886852"}
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa8181"
+    },
+    "numberLong": 2000000000000,
+    "numberLongInObject": {"$numberLong": "2000000000000"}
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa8213"
+    },
+    "numberLong": 1050845886852,
+    "numberLongInObject": {"$numberLong": "1050845886852"}
+  }
+]

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MongoExtractor\Config;
 
 use Keboola\Component\UserException;
+use MongoExtractor\ExportHelper;
 
 class ExportOptions
 {
@@ -40,7 +41,12 @@ class ExportOptions
         $this->incrementalFetching = $exportOptions['incremental'] ?? false;
         $this->name = $exportOptions['tableName'] ?? $exportOptions['name'];
         $this->mode = $exportOptions['mode'];
-        $this->mapping = $exportOptions['mapping'] ?? [];
+        if (isset($exportOptions['mapping'])) {
+            ExportHelper::removeTypesInMappingKeys($exportOptions['mapping']);
+        } else {
+            $exportOptions['mapping'] = [];
+        }
+        $this->mapping = $exportOptions['mapping'];
         $this->limit = !empty($exportOptions['limit']) ? (int) $exportOptions['limit'] : null;
         $this->query = $exportOptions['query'] ?? null;
         $this->collection = $exportOptions['collection'] ?? null;
