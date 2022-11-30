@@ -1,0 +1,23 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "collection": "number-long",
+    "tableName": "number-long",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "numberLong.$numberLong": "numberLong",
+      "numberLongInObject.$numberLong": "numberLongInObject"
+    },
+    "mode": "mapping",
+    "sort": "{_id: 1}"
+  }
+}

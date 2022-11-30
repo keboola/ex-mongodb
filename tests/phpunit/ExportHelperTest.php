@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MongoExtractor\Tests\Unit;
 
+use Generator;
 use MongoExtractor\ExportHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -24,6 +25,17 @@ class ExportHelperTest extends TestCase
     public function testFixIsoDateInGteQuery(string $input, string $expectedOutput): void
     {
         Assert::assertSame($expectedOutput, ExportHelper::fixIsoDateInGteQuery($input));
+    }
+
+    /**
+     * @dataProvider getMappingsProvider
+     * @param array<mixed, mixed> $input
+     * @param array<mixed, mixed> $expected
+     */
+    public function testRemoveTypeFromMappingKeys(array $input, array $expected): void
+    {
+        ExportHelper::removeTypesInMappingKeys($input);
+        Assert::assertSame($expected, $input);
     }
 
     public function testConvertObjectIdToString(): void
@@ -71,17 +83,17 @@ class ExportHelperTest extends TestCase
                 false,
                 '{ "id" : 1, "date": "2020-05-18T16:00:00Z", "string":  "testString"}',
             ],
-            'prefix' =>[
+            'prefix' => [
                 '{ "id" : 1, "date": {"$date": "2020-05-18T16:00:00Z"}, "string":  "testString"}',
                 true,
                 '{ "id" : 1, "date": "ISODate(\"2020-05-18T16:00:00Z\")", "string":  "testString"}',
             ],
-            'escaping' =>[
+            'escaping' => [
                 '{ "id" : 1, "date": {"$date": "2020-05-\"\"\"18T16:00:00Z"}, "string":  "testString"}',
                 false,
                 '{ "id" : 1, "date": "2020-05-\"\"\"18T16:00:00Z", "string":  "testString"}',
             ],
-            'escaping-prefix' =>[
+            'escaping-prefix' => [
                 '{ "id" : 1, "date": {"$date": "2020-05-\"\"\"18T16:00:00Z"}, "string":  "testString"}',
                 true,
                 '{ "id" : 1, "date": "ISODate(\"2020-05-\\\\\"\\\\\"\\\\\"18T16:00:00Z\")", "string":  "testString"}',
@@ -91,7 +103,7 @@ class ExportHelperTest extends TestCase
                 false,
                 '{"id":1,"date":"2020-05-18T16:00:00Z","string":"testString"}',
             ],
-            'no-spaces-prefix' =>[
+            'no-spaces-prefix' => [
                 '{"id":1,"date":{"$date":"2020-05-18T16:00:00Z"},"string":"testString"}',
                 true,
                 '{"id":1,"date":"ISODate(\"2020-05-18T16:00:00Z\")","string":"testString"}',
@@ -101,7 +113,7 @@ class ExportHelperTest extends TestCase
                 false,
                 '{ "id" : 1, "date": "", "string":  "testString"}',
             ],
-            'empty-prefix' =>[
+            'empty-prefix' => [
                 '{ "id" : 1, "date": {"$date": ""}, "string":  "testString"}',
                 true,
                 '{ "id" : 1, "date": "ISODate(\"\")", "string":  "testString"}',
@@ -111,7 +123,7 @@ class ExportHelperTest extends TestCase
                 false,
                 '{ "id" : 1, "date": {"$date": "2020-05-18T16:00:00Z}, "string":  "testString"}',
             ],
-            'invalid-1-prefix' =>[
+            'invalid-1-prefix' => [
                 '{ "id" : 1, "date": {"$date": "2020-05-18T16:00:00Z}, "string":  "testString"}',
                 true,
                 '{ "id" : 1, "date": {"$date": "2020-05-18T16:00:00Z}, "string":  "testString"}',
@@ -121,7 +133,7 @@ class ExportHelperTest extends TestCase
                 false,
                 '{ "id" : 1, "date": {"$date": 1234, "string":  "testString"}',
             ],
-            'invalid-2-prefix' =>[
+            'invalid-2-prefix' => [
                 '{ "id" : 1, "date": {"$date": 1234, "string":  "testString"}',
                 true,
                 '{ "id" : 1, "date": {"$date": 1234, "string":  "testString"}',
@@ -182,5 +194,88 @@ class ExportHelperTest extends TestCase
                 '{"date":{"$gte":ISODate("2020-05-18T16:00:00Z")}}'
             )
         );
+    }
+
+    public function getMappingsProvider(): Generator
+    {
+        yield [
+            'inputJson' => json_decode('
+            {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "numberLong.$numberLong": "numberLong",
+      "numberLongInObject.$numberLong": "numberLongInObject"
+    }', true),
+            'expected' => [
+                '_id.$oid' => [
+                    'type' => 'column',
+                    'mapping' => [
+                        'destination' => 'id',
+                    ],
+                ],
+                'numberLong' => 'numberLong',
+                'numberLongInObject' => 'numberLongInObject',
+            ],
+        ];
+
+        yield [
+            'inputJson' => json_decode('
+            {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "numberLong": "numberLong",
+      "date.$date": "date"
+    }', true),
+            'expected' => [
+                '_id.$oid' => [
+                    'type' => 'column',
+                    'mapping' => [
+                        'destination' => 'id',
+                    ],
+                ],
+                'numberLong' => 'numberLong',
+                'date.$date' => 'date',
+            ],
+        ];
+
+        yield [
+            'inputJson' => json_decode('
+            {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "numberLong.$numberLong": "numberLong",
+      "numberInt.$numberInt": "numberInt",
+      "numberDouble.$numberDouble": "numberDouble",
+      "date.$date": "date",
+      "numberDecimal.$numberDecimal": "numberDecimal",
+      "binary.$binary.base64": "binary"
+    }', true),
+            'expected' => [
+                '_id.$oid' => [
+                    'type' => 'column',
+                    'mapping' => [
+                        'destination' => 'id',
+                    ],
+                ],
+                'numberLong' => 'numberLong',
+                'numberInt' => 'numberInt',
+                'numberDouble' => 'numberDouble',
+                'date.$date' => 'date',
+                'numberDecimal.$numberDecimal' => 'numberDecimal',
+                'binary.$binary.base64' => 'binary',
+            ],
+        ];
     }
 }
