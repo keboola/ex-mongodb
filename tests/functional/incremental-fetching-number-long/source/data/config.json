@@ -1,0 +1,24 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "tableName": "incremental",
+    "collection": "incremental",
+    "incremental": true,
+    "incrementalFetchingColumn": "numberLongInObject",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "numberLong.$numberLong": "numberLong",
+      "numberLongInObject.$numberLong": "numberLongInObject"
+    },
+    "mode": "mapping"
+  }
+}
