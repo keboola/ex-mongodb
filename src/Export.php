@@ -107,6 +107,12 @@ class Export
             ));
         }
 
+        if (str_contains($e->getMessage(), 'QueryExceededMemoryLimitNoDiskUseAllowed')) {
+            throw new UserException('Sort exceeded memory limit, but did not opt in to ' .
+                'external sorting. The field should be set as an index, so there will be no sorting in the ' .
+                'incremental fetching query, because the index will be used');
+        }
+
         if (preg_match('/query \'\\[[^\\]]*\\]\' is not valid JSON/i', $e->getMessage())) {
             throw new UserException(sprintf(
                 'Export "%s" failed. Query "' . $this->exportOptions->getQuery() . '" is not valid JSON',
