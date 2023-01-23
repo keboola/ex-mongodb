@@ -113,6 +113,11 @@ class Export
                 'incremental fetching query, because the index will be used');
         }
 
+        if (str_contains($e->getMessage(), 'dial tcp: i/o timeout')) {
+            throw new UserException('Could not connect to server: connection() error occurred during ' .
+                'connection handshake: dial tcp: i/o timeout');
+        }
+
         if (preg_match('/query \'\\[[^\\]]*\\]\' is not valid JSON/i', $e->getMessage())) {
             throw new UserException(sprintf(
                 'Export "%s" failed. Query "' . $this->exportOptions->getQuery() . '" is not valid JSON',
