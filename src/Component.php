@@ -33,7 +33,13 @@ class Component extends BaseComponent
 
         $uriFactory = new UriFactory();
         $exportCommandFactory = new ExportCommandFactory($uriFactory, $config->isQuietModeEnabled());
-        $this->extractor = new Extractor($uriFactory, $exportCommandFactory, $config, $this->getInputState());
+        $this->extractor = new Extractor(
+            $uriFactory,
+            $exportCommandFactory,
+            $config,
+            $this->getLogger(),
+            $this->getInputState()
+        );
     }
 
     /**
