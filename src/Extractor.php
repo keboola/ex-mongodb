@@ -13,6 +13,7 @@ use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
+use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
@@ -41,7 +42,8 @@ class Extractor
         private UriFactory $uriFactory,
         private ExportCommandFactory $exportCommandFactory,
         private Config $config,
-        private array $inputState = []
+        private LoggerInterface $logger,
+        private array $inputState = [],
     ) {
         $simpleRetryPolicy = new SimpleRetryPolicy(self::RETRY_MAX_ATTEMPTS);
         $this->retryProxy = new RetryProxy($simpleRetryPolicy, new ExponentialBackOffPolicy());
@@ -100,7 +102,7 @@ class Extractor
                 $exportOptions = Export::buildIncrementalFetchingParams($exportOptions, $lastFetchedValue);
             }
 
-            $export = new Export($this->exportCommandFactory, $this->dbParams, $exportOptions);
+            $export = new Export($this->exportCommandFactory, $this->dbParams, $exportOptions, $this->logger);
             if ($exportOptions->isEnabled()) {
                 $count++;
                 if ($hasIncrementalFetchingColumn) {

@@ -11,6 +11,7 @@ use MongoExtractor\Export;
 use MongoExtractor\ExportCommandFactory;
 use MongoExtractor\UriFactory;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -32,7 +33,12 @@ class HandleMongoExportFailsTest extends TestCase
         $class = new ReflectionClass(Export::class);
         $method = $class->getMethod('handleMongoExportFails');
         $exportOptions = new ExportOptions(['name' => '', 'mode' => '']);
-        $exportClass = new Export(new ExportCommandFactory(new UriFactory(), false), [], $exportOptions);
+        $exportClass = new Export(
+            new ExportCommandFactory(new UriFactory(), false),
+            [],
+            $exportOptions,
+            new NullLogger()
+        );
         $method->invoke($exportClass, $mongoException);
     }
 
