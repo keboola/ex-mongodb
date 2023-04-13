@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f2ea3403aa6c21895cc82671279c303",
+    "content-hash": "9be43f151fd2d1b2c28f1027202f62a1",
     "packages": [
         {
             "name": "keboola/common-exceptions",
@@ -48,16 +48,16 @@
         },
         {
             "name": "keboola/csv",
-            "version": "3.1.0",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-csv.git",
-                "reference": "82cc689c3bc6cea423e8431eea6e5523c2ddc74c"
+                "reference": "b97eb09eddbe30a0138c9dbc0cc028b4354ac381"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-csv/zipball/82cc689c3bc6cea423e8431eea6e5523c2ddc74c",
-                "reference": "82cc689c3bc6cea423e8431eea6e5523c2ddc74c",
+                "url": "https://api.github.com/repos/keboola/php-csv/zipball/b97eb09eddbe30a0138c9dbc0cc028b4354ac381",
+                "reference": "b97eb09eddbe30a0138c9dbc0cc028b4354ac381",
                 "shasum": ""
             },
             "require": {
@@ -69,7 +69,7 @@
                 "php-parallel-lint/php-parallel-lint": "^1.3",
                 "phpstan/phpdoc-parser": "1.5.*",
                 "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": ">=7.5"
+                "phpunit/phpunit": ">=7.5 <=9.6"
             },
             "type": "library",
             "autoload": {
@@ -95,28 +95,28 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-csv/issues",
-                "source": "https://github.com/keboola/php-csv/tree/3.1.0"
+                "source": "https://github.com/keboola/php-csv/tree/4.0.0"
             },
-            "time": "2022-06-21T11:47:22+00:00"
+            "time": "2023-04-06T07:48:35+00:00"
         },
         {
             "name": "keboola/csvmap",
-            "version": "2.1.0",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-csvmap.git",
-                "reference": "b818b565e7b42f0c19bb1f932537da6c1fecf3ae"
+                "reference": "0bbeed04b1232c36885ade2ace203bd7b8154e80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-csvmap/zipball/b818b565e7b42f0c19bb1f932537da6c1fecf3ae",
-                "reference": "b818b565e7b42f0c19bb1f932537da6c1fecf3ae",
+                "url": "https://api.github.com/repos/keboola/php-csvmap/zipball/0bbeed04b1232c36885ade2ace203bd7b8154e80",
+                "reference": "0bbeed04b1232c36885ade2ace203bd7b8154e80",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "keboola/csv": "^3.0",
-                "keboola/php-csvtable": "^2.1",
+                "keboola/csv": "^4.0",
+                "keboola/php-csvtable": "^2.2",
                 "keboola/php-utils": "^4.1",
                 "php": "^8.1"
             },
@@ -150,9 +150,9 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-csvmap/issues",
-                "source": "https://github.com/keboola/php-csvmap/tree/2.1.0"
+                "source": "https://github.com/keboola/php-csvmap/tree/2.2.0"
             },
-            "time": "2022-05-10T11:34:12+00:00"
+            "time": "2023-04-13T07:04:32+00:00"
         },
         {
             "name": "keboola/php-component",
@@ -216,20 +216,20 @@
         },
         {
             "name": "keboola/php-csvtable",
-            "version": "2.1.0",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-csvtable.git",
-                "reference": "11f5a00348dbd4e249cf0ae53f09b757201a18bd"
+                "reference": "1dbd32bb39e0b23f2efc0df75fbfd46b25b21a4c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-csvtable/zipball/11f5a00348dbd4e249cf0ae53f09b757201a18bd",
-                "reference": "11f5a00348dbd4e249cf0ae53f09b757201a18bd",
+                "url": "https://api.github.com/repos/keboola/php-csvtable/zipball/1dbd32bb39e0b23f2efc0df75fbfd46b25b21a4c",
+                "reference": "1dbd32bb39e0b23f2efc0df75fbfd46b25b21a4c",
                 "shasum": ""
             },
             "require": {
-                "keboola/csv": "^3.0",
+                "keboola/csv": "^4.0",
                 "keboola/php-temp": "^2.0",
                 "php": "^8.1"
             },
@@ -263,9 +263,9 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-csvtable/issues",
-                "source": "https://github.com/keboola/php-csvtable/tree/2.1.0"
+                "source": "https://github.com/keboola/php-csvtable/tree/2.2.0"
             },
-            "time": "2022-05-10T11:09:22+00:00"
+            "time": "2023-04-11T13:31:38+00:00"
         },
         {
             "name": "keboola/php-temp",
@@ -1450,16 +1450,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v5.4.11",
+            "version": "v5.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "6699fb0228d1bc35b12aed6dd5e7455457609ddd"
+                "reference": "e75960b1bbfd2b8c9e483e0d74811d555ca3de9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/6699fb0228d1bc35b12aed6dd5e7455457609ddd",
-                "reference": "6699fb0228d1bc35b12aed6dd5e7455457609ddd",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/e75960b1bbfd2b8c9e483e0d74811d555ca3de9f",
+                "reference": "e75960b1bbfd2b8c9e483e0d74811d555ca3de9f",
                 "shasum": ""
             },
             "require": {
@@ -1494,7 +1494,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v5.4.11"
+                "source": "https://github.com/symfony/filesystem/tree/v5.4.21"
             },
             "funding": [
                 {
@@ -1510,7 +1510,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-20T13:00:38+00:00"
+            "time": "2023-02-14T08:03:56+00:00"
         },
         {
             "name": "symfony/finder",
@@ -1577,16 +1577,16 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.26.0",
+            "version": "v1.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "6fd1b9a79f6e3cf65f9e679b23af304cd9e010d4"
+                "reference": "5bbc823adecdae860bb64756d639ecfec17b050a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/6fd1b9a79f6e3cf65f9e679b23af304cd9e010d4",
-                "reference": "6fd1b9a79f6e3cf65f9e679b23af304cd9e010d4",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/5bbc823adecdae860bb64756d639ecfec17b050a",
+                "reference": "5bbc823adecdae860bb64756d639ecfec17b050a",
                 "shasum": ""
             },
             "require": {
@@ -1601,7 +1601,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.27-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -1639,7 +1639,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.26.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.27.0"
             },
             "funding": [
                 {
@@ -1655,7 +1655,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-24T11:49:31+00:00"
+            "time": "2022-11-03T14:55:06+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
@@ -1824,16 +1824,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.26.0",
+            "version": "v1.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e"
+                "reference": "8ad114f6b39e2c98a8b0e3bd907732c207c2b534"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e",
-                "reference": "9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/8ad114f6b39e2c98a8b0e3bd907732c207c2b534",
+                "reference": "8ad114f6b39e2c98a8b0e3bd907732c207c2b534",
                 "shasum": ""
             },
             "require": {
@@ -1848,7 +1848,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.27-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -1887,7 +1887,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.26.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.27.0"
             },
             "funding": [
                 {
@@ -1903,7 +1903,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-24T11:49:31+00:00"
+            "time": "2022-11-03T14:55:06+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -1986,16 +1986,16 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.26.0",
+            "version": "v1.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "cfa0ae98841b9e461207c13ab093d76b0fa7bace"
+                "reference": "7a6ff3f1959bb01aefccb463a0f2cd3d3d2fd936"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/cfa0ae98841b9e461207c13ab093d76b0fa7bace",
-                "reference": "cfa0ae98841b9e461207c13ab093d76b0fa7bace",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/7a6ff3f1959bb01aefccb463a0f2cd3d3d2fd936",
+                "reference": "7a6ff3f1959bb01aefccb463a0f2cd3d3d2fd936",
                 "shasum": ""
             },
             "require": {
@@ -2004,7 +2004,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.27-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -2049,7 +2049,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.26.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.27.0"
             },
             "funding": [
                 {
@@ -2065,7 +2065,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-10T07:21:04+00:00"
+            "time": "2022-11-03T14:55:06+00:00"
         },
         {
             "name": "symfony/polyfill-php81",
