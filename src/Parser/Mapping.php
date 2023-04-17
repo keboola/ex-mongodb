@@ -19,17 +19,17 @@ use TypeError;
 
 class Mapping implements ParserInterface
 {
-    /** @var array<int|string, mixed> */
+    /** @var array<string, mixed> */
     private array $mapping;
     private bool $includeParentInPK;
     private string $path;
     private string $name;
     private Filesystem $filesystem;
-    /** @var array<string, array{path: string, primaryKey: array<int, string>|string}> */
+    /** @var array<string, array{path: string, primaryKey: array<string>|string|null}>. */
     private array $manifestData = [];
 
     /**
-     * @param array<int|string, mixed> $mapping
+     * @param array<string, mixed> $mapping
      */
     public function __construct(
         string $name,
@@ -58,7 +58,7 @@ class Mapping implements ParserInterface
             $mapper->parse($data, $userData);
         } catch (BadConfigException|BadDataException $e) {
             throw new UserException(sprintf('Invalid mapping configuration: %s', $e->getMessage()));
-        } catch (TypeError $e) {
+        } catch (TypeError) { // @phpstan-ignore-line
             throw new UserException('CSV writing error. Header and mapped documents must be scalar values.');
         }
 
@@ -105,7 +105,7 @@ class Mapping implements ParserInterface
     }
 
     /**
-     * @return array<string, array{path: string, primaryKey: array<int, string>|string}>
+     * @return array<string, array{path: string, primaryKey: array<string>|string|null}>
      */
     public function getManifestData(): array
     {

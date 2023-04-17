@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class Parse
 {
     private string $name;
-    /** @var array<int|string, mixed> */
+    /** @var array<string, mixed> */
     private array $mapping;
     private ConsoleOutput $consoleOutput;
 

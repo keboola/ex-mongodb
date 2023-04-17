@@ -16,7 +16,7 @@ class ExportOptions
     private bool $enabled;
     private bool $incrementalFetching;
     private string $name;
-    /** @var array<mixed, mixed> */
+    /** @var array<string, mixed> */
     private array $mapping;
     private string $mode;
     private ?int $limit;
@@ -76,7 +76,7 @@ class ExportOptions
     }
 
     /**
-     * @return array<int|string, mixed>
+     * @return array<string, mixed>
      */
     public function getMapping(): array
     {

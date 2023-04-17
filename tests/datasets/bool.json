@@ -1,0 +1,20 @@
+[
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa7ddd"
+    },
+    "bool": true
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa8181"
+    },
+    "bool": false
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa8213"
+    },
+    "bool": null
+  }
+]
