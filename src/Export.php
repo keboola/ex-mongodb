@@ -164,6 +164,7 @@ class Export
 
     /**
      * @throws \Keboola\Component\UserException
+     * @throws \Throwable
      */
     public function getLastFetchedValue(): mixed
     {
@@ -177,7 +178,11 @@ class Export
 
         $cliCommand = $this->exportCommandFactory->create($options);
         $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
-        $process->mustRun();
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $e) {
+            $this->handleMongoExportFails($e);
+        }
 
         $output = $process->getOutput();
         if (!empty($output)) {
