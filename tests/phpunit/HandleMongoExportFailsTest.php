@@ -60,6 +60,12 @@ class HandleMongoExportFailsTest extends TestCase
                 'external sorting. The field should be set as an index, so there will be no sorting in the ' .
                 'incremental fetching query, because the index will be used'),
         ];
+
+        yield 'InvalidSortKey' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2023-04-04T09:29:12.698+0000\t' .
+                'Failed: (Location15975) $sort key ordering must be 1 (for ascending) or -1 (for descending)')),
+            new UserException('$sort key ordering must be 1 (for ascending) or -1 (for descending)'),
+        ];
     }
 
     private function createMockInstanceOfProcess(string $errorOutput): Process

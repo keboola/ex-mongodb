@@ -133,6 +133,10 @@ class Export
                 'connection handshake: dial tcp: i/o timeout');
         }
 
+        if (str_contains($e->getMessage(), 'sort key ordering must be 1 (for ascending) or -1 (for descending)')) {
+            throw new UserException('$sort key ordering must be 1 (for ascending) or -1 (for descending)');
+        }
+
         if (preg_match('/query \'\\[[^\\]]*\\]\' is not valid JSON/i', $e->getMessage())) {
             throw new UserException(sprintf(
                 'Export "%s" failed. Query "' . $this->exportOptions->getQuery() . '" is not valid JSON',
