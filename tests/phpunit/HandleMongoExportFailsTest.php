@@ -66,6 +66,19 @@ class HandleMongoExportFailsTest extends TestCase
                 'Failed: (Location15975) $sort key ordering must be 1 (for ascending) or -1 (for descending)')),
             new UserException('$sort key ordering must be 1 (for ascending) or -1 (for descending)'),
         ];
+
+        yield 'Unauthorized' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2023-05-11T00:07:31.097+0000\t' .
+                'connected to: mongodb+srv://[**REDACTED**]@cl-shared-all-dev-web.3ebye.mongodb.net/slotManagementDB' .
+                'Test 2023-05-11T00:07:31.178+0000\tFailed: (Unauthorized) not authorized on slotManagementDBTest to ' .
+                'execute command { aggregate: \"settings\", cursor: {}, pipeline: [ { $collStats: { count: {} } }, { ' .
+                '$group: { _id: 1, n: { $sum: \"$count\" } } } ], lsid: { id: UUID(\"7a85274b-06b1-4314-b625-25b0a022' .
+                '2454\") }, $clusterTime: { clusterTime: Timestamp(1683763642, 1), signature: { hash: BinData(0, 4F8D' .
+                'EAC4648CBF6050C6CC7A397F6A0FAFC277EC), keyId: 7218577901191430149 } }, $db: \"slotManagementDBTest\"' .
+                ' $readPreference: { mode: \"primary\" } }')),
+            new UserException('Failed: (Unauthorized) not authorized on slotManagementDBTest to ' .
+                'execute command'),
+        ];
     }
 
     private function createMockInstanceOfProcess(string $errorOutput): Process
