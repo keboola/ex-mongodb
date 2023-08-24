@@ -79,6 +79,14 @@ class HandleMongoExportFailsTest extends TestCase
             new UserException('Failed: (Unauthorized) not authorized on slotManagementDBTest to ' .
                 'execute command'),
         ];
+
+        yield 'field names may not start with $' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2023-05-17T12:49:22.079+0000\t' .
+                'connected to: mongodb+srv://[**REDACTED**]@cl-shared-all-prod-web.x0u5m.mongodb.net/slotManagementDB' .
+                '2023-05-17T12:49:22.238+0000\tFailed: (Location16410) FieldPath field names may not start with \'$\'' .
+                'Consider using $getField or $setField.')),
+            new UserException('FieldPath field names may not start with \'$\''),
+        ];
     }
 
     private function createMockInstanceOfProcess(string $errorOutput): Process
