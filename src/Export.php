@@ -137,6 +137,10 @@ class Export
             throw new UserException('$sort key ordering must be 1 (for ascending) or -1 (for descending)');
         }
 
+        if (str_contains($e->getMessage(), 'FieldPath field names may not start with \'$\'')) {
+            throw new UserException('FieldPath field names may not start with \'$\'');
+        }
+
         if (preg_match('/(Failed:.*?command)/s', $e->getMessage(), $matches)) {
             if (isset($matches[1])) {
                 throw new UserException(trim($matches[1]));
