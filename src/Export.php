@@ -183,22 +183,34 @@ class Export
     public function getLastFetchedValue(): mixed
     {
         // Limit can be disabled with empty string
+        $lastValueOptions = [
+            $this->exportOptions->getLastValueOptions(),
+            [
+                'limit' => 1,
+                'sort' => json_encode([$this->exportOptions->getIncrementalFetchingColumn() => -1]),
+            ],
+        ];
+        foreach ($lastValueOptions as $lastValueOption) {
+            $options = array_merge(
+                $this->connectionOptions,
+                $this->exportOptions->toArray(),
+                $lastValueOption,
+            );
 
-        $options = array_merge(
-            $this->connectionOptions,
-            $this->exportOptions->toArray(),
-            $this->exportOptions->getLastValueOptions()
-        );
+            $cliCommand = $this->exportCommandFactory->create($options);
+            $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
+            try {
+                $process->mustRun();
+            } catch (ProcessFailedException $e) {
+                $this->handleMongoExportFails($e);
+            }
 
-        $cliCommand = $this->exportCommandFactory->create($options);
-        $process = Process::fromShellCommandline($cliCommand, null, null, null, null);
-        try {
-            $process->mustRun();
-        } catch (ProcessFailedException $e) {
-            $this->handleMongoExportFails($e);
+            $output = $process->getOutput();
+            if (!empty($output)) {
+                break;
+            }
         }
 
-        $output = $process->getOutput();
         if (!empty($output)) {
             // Replace e.g. {"$date":"DATE"} to "ISODate("DATE")"
             $output = ExportHelper::convertSpecialColumnsToString($output);
