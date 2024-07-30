@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use MongoExtractor\FunctionalTests\DatadirTest;
 use MongoExtractor\Tests\Traits\ImportDatasetTrait;
@@ -10,5 +10,7 @@ return static function (DatadirTest $test): void {
     putenv('SSL_CERT=' . file_get_contents('/tmp/client-cert.pem'));
     putenv('SSL_KEY=' . file_get_contents('/tmp/client-key.pem'));
 
-    (new class { use ImportDatasetTrait; })::importDatatasetNoAuthDbSsl('restaurants', 'dataset.json');
+    (new class { use ImportDatasetTrait;
+
+    })::importDatatasetNoAuthDbSsl('restaurants', 'dataset.json');
 };

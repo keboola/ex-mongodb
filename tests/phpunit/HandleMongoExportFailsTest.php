@@ -25,7 +25,7 @@ class HandleMongoExportFailsTest extends TestCase
      */
     public function testHandleMongoExportFails(
         ProcessFailedException $mongoException,
-        UserException $expectedException
+        UserException $expectedException,
     ): void {
         $this->expectException(get_class($expectedException));
         $this->expectExceptionMessage($expectedException->getMessage());
@@ -37,7 +37,7 @@ class HandleMongoExportFailsTest extends TestCase
             new ExportCommandFactory(new UriFactory(), false),
             [],
             $exportOptions,
-            new NullLogger()
+            new NullLogger(),
         );
         $method->invoke($exportClass, $mongoException);
     }

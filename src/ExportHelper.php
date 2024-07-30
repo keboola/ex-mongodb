@@ -39,7 +39,7 @@ class ExportHelper
             function (array $m) use ($isoDate): string {
                 return $isoDate ? '"ISODate(' . addslashes($m[1]) .')"' : $m[1];
             },
-            $input
+            $input,
         );
 
         if ($output === null) {
@@ -56,7 +56,7 @@ class ExportHelper
             function (array $m): string {
                 return '"ObjectId(' . addslashes($m[1]) .')"';
             },
-            $input
+            $input,
         );
 
         if ($output === null) {
@@ -73,7 +73,7 @@ class ExportHelper
             static function (array $m): string {
                 return str_replace($m[1], '{"$oid": "' . $m[2] . '"}', $m[0]);
             },
-            $input
+            $input,
         );
 
         if ($output === null) {
@@ -90,7 +90,7 @@ class ExportHelper
             function (array $m): string {
                 return '"$gte":{"$date": ' . stripslashes($m[1]) . '}';
             },
-            $input
+            $input,
         );
 
         if ($output === null) {
@@ -107,7 +107,7 @@ class ExportHelper
             function (array $m): string {
                 return '"$gte":{"$oid": ' . stripslashes($m[1]) . '}';
             },
-            $input
+            $input,
         );
 
         if ($output === null) {

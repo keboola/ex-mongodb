@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use MongoExtractor\FunctionalTests\DatadirTest;
 use Symfony\Component\Process\Process;
@@ -17,7 +17,7 @@ return static function (DatadirTest $test): void {
         '--legacy',
         '--drop',
         '--file',
-        sprintf("%s/../../datasets/%s", __DIR__, 'dataset-invalid-json-values.json'),
+        sprintf('%s/../../datasets/%s', __DIR__, 'dataset-invalid-json-values.json'),
     ]);
 
     $process->mustRun();
