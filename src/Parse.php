@@ -64,7 +64,7 @@ class Parse
             'Done "%s", parsed %d %s in total',
             $this->name,
             $parsedDocumentsCount,
-            $parsedDocumentsCount === 1 ? 'record' : 'records'
+            $parsedDocumentsCount === 1 ? 'record' : 'records',
         ));
 
         return $parser->getManifestData();

@@ -27,7 +27,7 @@ class OldConfigDefinition extends BaseConfigDefinition
                         ->always(function ($v) {
                             if (isset($v['query'], $v['incrementalFetchingColumn']) && $v['query'] !== '') {
                                 throw new InvalidConfigurationException(
-                                    'Both incremental fetching and query cannot be set together.'
+                                    'Both incremental fetching and query cannot be set together.',
                                 );
                             }
                             if (isset($v['sort'], $v['incrementalFetchingColumn']) && $v['sort'] !== '') {

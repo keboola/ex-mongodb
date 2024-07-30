@@ -17,7 +17,7 @@ class ConfigRowDefinition extends BaseConfigDefinition
         $parametersNode->validate()->always(function (array $v) {
             if (isset($v['query'], $v['incrementalFetchingColumn']) && $v['query'] !== '') {
                 throw new InvalidConfigurationException(
-                    'Both incremental fetching and query cannot be set together.'
+                    'Both incremental fetching and query cannot be set together.',
                 );
             }
             if (isset($v['sort'], $v['incrementalFetchingColumn']) && $v['sort'] !== '') {

@@ -53,6 +53,7 @@ class Uri
         }, $str);
 
         // Parse URI
+        assert(!is_null($str));
         $components = UriString::parse($str);
 
         // The name and password are processed separately
@@ -77,7 +78,7 @@ class Uri
         string $host,
         ?int $port,
         string $database,
-        array $query = []
+        array $query = [],
     ): self {
         return new self(LeagueUri::createFromComponents([
             'scheme' => $protocol,
@@ -107,7 +108,7 @@ class Uri
         // LeagueUri only encodes critical characters, so we have to do it manually for it to work.
         if ($uri->getUserInfo() !== null) {
             throw new InvalidArgumentException(
-                'The user and password must be specified separately, not as part of the URI.'
+                'The user and password must be specified separately, not as part of the URI.',
             );
         }
 
