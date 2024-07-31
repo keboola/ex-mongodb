@@ -45,7 +45,7 @@ class ExportHelperTest extends TestCase
 
         Assert::assertSame(
             $expected,
-            ExportHelper::convertObjectIdToString($input)
+            ExportHelper::convertObjectIdToString($input),
         );
     }
 
@@ -56,7 +56,7 @@ class ExportHelperTest extends TestCase
 
         Assert::assertSame(
             $expected,
-            ExportHelper::convertStringIdToObjectId($input)
+            ExportHelper::convertStringIdToObjectId($input),
         );
     }
 
@@ -67,7 +67,7 @@ class ExportHelperTest extends TestCase
 
         Assert::assertSame(
             $expected,
-            ExportHelper::fixObjectIdInGteQuery($input)
+            ExportHelper::fixObjectIdInGteQuery($input),
         );
     }
 
@@ -184,15 +184,15 @@ class ExportHelperTest extends TestCase
         $this->assertSame(
             '{"borough": "Bronx","cuisine": "Bakery", "address.zipcode": "10452"}',
             ExportHelper::addQuotesToJsonKeys(
-                '{borough : "Bronx", cuisine: "Bakery", "address.zipcode": "10452"}'
-            )
+                '{borough : "Bronx", cuisine: "Bakery", "address.zipcode": "10452"}',
+            ),
         );
 
         $this->assertSame(
             '{"date":{"$gte":ISODate("2020-05-18T16:00:00Z")}}',
             ExportHelper::addQuotesToJsonKeys(
-                '{"date":{"$gte":ISODate("2020-05-18T16:00:00Z")}}'
-            )
+                '{"date":{"$gte":ISODate("2020-05-18T16:00:00Z")}}',
+            ),
         );
     }
 

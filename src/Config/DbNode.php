@@ -31,14 +31,14 @@ class DbNode extends ArrayNodeDefinition
                 // Validation for "custom_uri" protocol
                 if (!isset($v['uri'])) {
                     throw new InvalidConfigurationException(
-                        'The child node "uri" at path "parameters.db" must be configured.'
+                        'The child node "uri" at path "parameters.db" must be configured.',
                     );
                 }
 
                 // SSH tunnel cannot be used with custom URI
                 if ($sshTunnelEnabled) {
                     throw new InvalidConfigurationException(
-                        'Custom URI is not compatible with SSH tunnel support.'
+                        'Custom URI is not compatible with SSH tunnel support.',
                     );
                 }
 
@@ -47,7 +47,7 @@ class DbNode extends ArrayNodeDefinition
                     if (isset($v[$key])) {
                         throw new InvalidConfigurationException(sprintf(
                             'Configuration node "db.%s" is not compatible with custom URI.',
-                            $key
+                            $key,
                         ));
                     }
                 }
@@ -55,13 +55,13 @@ class DbNode extends ArrayNodeDefinition
                 // Validation for "mongodb" or "mongodb+srv" protocol
                 if (!isset($v['host'])) {
                     throw new InvalidConfigurationException(
-                        'The child node "host" at path "parameters.db" must be configured.'
+                        'The child node "host" at path "parameters.db" must be configured.',
                     );
                 }
 
                 if (!isset($v['database'])) {
                     throw new InvalidConfigurationException(
-                        'The child node "database" at path "parameters.db" must be configured.'
+                        'The child node "database" at path "parameters.db" must be configured.',
                     );
                 }
 
@@ -69,7 +69,7 @@ class DbNode extends ArrayNodeDefinition
                 if (isset($v['user']) xor isset($v['password'])) {
                     throw new InvalidConfigurationException(
                         'When passing authentication details,' .
-                        ' both "user" and "password" params are required'
+                        ' both "user" and "password" params are required',
                     );
                 }
             }

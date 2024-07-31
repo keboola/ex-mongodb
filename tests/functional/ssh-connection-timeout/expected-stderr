@@ -1,1 +1,1 @@
-Unable to create ssh tunnel. Output:  ErrorOutput: ssh: Could not resolve hostname some random host: Name or service not known
+Unable to create ssh tunnel. Output:  ErrorOutput: hostname contains invalid characters

@@ -1,0 +1,1 @@
+{"incremental":true,"schema":[{"nullable":true,"primary_key":false,"name":"w"},{"nullable":true,"primary_key":false,"name":"n"},{"nullable":true,"primary_key":true,"name":"zipcode"},{"nullable":true,"primary_key":true,"name":"street"},{"nullable":true,"primary_key":false,"name":"bakeries_id"}]}

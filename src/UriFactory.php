@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MongoExtractor;
 
 use Keboola\Component\UserException;
-use League\Uri\Exceptions\SyntaxError;
 use MongoExtractor\Config\DbNode;
 
 class UriFactory
@@ -38,13 +37,13 @@ class UriFactory
         if ($uri->hasPassword()) {
             throw new UserException(
                 'Connection URI must not contain the password. ' .
-                'The password is a separate item for security reasons.'
+                'The password is a separate item for security reasons.',
             );
         }
 
         if (!$uri->hasDatabase()) {
             throw new UserException(
-                'Connection URI must contain the database, eg: "mongodb://user@hostname/database".'
+                'Connection URI must contain the database, eg: "mongodb://user@hostname/database".',
             );
         }
 
@@ -93,7 +92,7 @@ class UriFactory
             $params['host'],
             !empty($params['port']) ? (int) $params['port'] : null,
             $params['database'],
-            $query
+            $query,
         );
     }
 }

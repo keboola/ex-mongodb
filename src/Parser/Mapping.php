@@ -9,11 +9,8 @@ use Keboola\Component\UserException;
 use Keboola\CsvMap\Exception\BadConfigException;
 use Keboola\CsvMap\Exception\BadDataException;
 use Keboola\CsvMap\Mapper;
-use Keboola\CsvTable\Table;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Throwable;
 use TypeError;
 
@@ -25,7 +22,7 @@ class Mapping implements ParserInterface
     private string $path;
     private string $name;
     private Filesystem $filesystem;
-    /** @var array<string, array{path: string, primaryKey: array<string>|string|null}>. */
+    /** @var array<string, array{path: string, primaryKey: array<int, string>, columns: array<int, string>}> */
     private array $manifestData = [];
 
     /**
@@ -69,10 +66,6 @@ class Mapping implements ParserInterface
 
                 $content = file_get_contents($file->getPathname());
 
-                if (!$this->filesystem->exists($outputCsv)) {
-                    $this->prependHeader($file, $content);
-                }
-
                 try {
                     if (@file_put_contents($outputCsv, $content, FILE_APPEND | LOCK_EX) === false) {
                         throw new Exception('Failed write to file "' . $outputCsv . '"');
@@ -83,7 +76,8 @@ class Mapping implements ParserInterface
 
                 $this->manifestData[$outputCsv] = [
                     'path' => $outputCsv . '.manifest',
-                    'primaryKey' => $file->getPrimaryKey(true),
+                    'primaryKey' => (array) ($file->getPrimaryKey(true) ?? []),
+                    'columns' => $file->getHeader(),
                 ];
 
                 $this->filesystem->remove($file->getPathname());
@@ -91,21 +85,8 @@ class Mapping implements ParserInterface
         }
     }
 
-    protected function prependHeader(Table $file, string &$content): void
-    {
-        $header = $file->getHeader();
-        if ($header !== []) {
-            $content = sprintf(
-                '"%s"%s%s',
-                implode('"' . $file->getDelimiter() . '"', $file->getHeader()),
-                PHP_EOL,
-                $content
-            );
-        }
-    }
-
     /**
-     * @return array<string, array{path: string, primaryKey: array<string>|string|null}>
+     * @return array<string, array{path: string, primaryKey: array<int, string>, columns: array<int, string>}>
      */
     public function getManifestData(): array
     {

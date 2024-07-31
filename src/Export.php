@@ -34,7 +34,7 @@ class Export
         private ExportCommandFactory $exportCommandFactory,
         private array $connectionOptions,
         private ExportOptions $exportOptions,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
         $this->name = Strings::webalize($exportOptions->getName());
         $this->retryProxy = new RetryProxy($this->getRetryPolicy(), new ExponentialBackOffPolicy());
@@ -59,7 +59,7 @@ class Export
 
         $this->logger->info(sprintf(
             'Connected to %s',
-            $this->uriFactory->create($options)->getConnectionString()
+            $this->uriFactory->create($options)->getConnectionString(),
         ));
         $this->logger->info(sprintf('Exporting "%s"', $this->name));
 
@@ -102,7 +102,7 @@ class Export
         } catch (NotEncodableValueException $e) {
             $this->logger->warning(sprintf(
                 'Could not decode JSON: %s...',
-                substr($line, 0, 80)
+                substr($line, 0, 80),
             ));
         }
     }
@@ -118,7 +118,7 @@ class Export
                 'Export "%s" failed. Timeout occurred while waiting for data. ' .
                 'Please check your query. Problem can be a typo in the field name or missing index.' .
                 'In these cases, the full scan is made and it can take too long.',
-                $this->name
+                $this->name,
             ));
         }
 
@@ -150,7 +150,7 @@ class Export
         if (preg_match('/query \'\\[[^\\]]*\\]\' is not valid JSON/i', $e->getMessage())) {
             throw new UserException(sprintf(
                 'Export "%s" failed. Query "' . $this->exportOptions->getQuery() . '" is not valid JSON',
-                $this->name
+                $this->name,
             ));
         }
 
@@ -159,7 +159,7 @@ class Export
 
     public static function buildIncrementalFetchingParams(
         ExportOptions $exportOptions,
-        string|int|float|null $inputState
+        string|int|float|null $inputState,
     ): ExportOptions {
         $query = (object) [];
         if (!is_null($inputState)) {
@@ -223,15 +223,15 @@ class Export
                     if (count($incrementalFetchingColumn) > 1) {
                         $fullPathColumnMessage = sprintf(
                             ' ("%s")',
-                            $this->exportOptions->getIncrementalFetchingColumn()
+                            $this->exportOptions->getIncrementalFetchingColumn(),
                         );
                     }
                     throw new UserException(
                         sprintf(
                             'Column "%s"%s does not exists.',
                             $item,
-                            $fullPathColumnMessage
-                        )
+                            $fullPathColumnMessage,
+                        ),
                     );
                 }
                 $data = $data[$item];
@@ -240,7 +240,7 @@ class Export
             if (is_array($data)) {
                 throw new UserException(sprintf(
                     'Unexpected value "%s" in output of incremental fetching.',
-                    json_encode($data)
+                    json_encode($data),
                 ));
             }
 

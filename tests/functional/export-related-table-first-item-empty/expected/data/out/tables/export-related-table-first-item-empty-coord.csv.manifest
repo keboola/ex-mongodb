@@ -1,1 +1,1 @@
-{"primary_key":null,"incremental":false}
+{"incremental":false,"columns":["w","n","export-related-table-first-item-empty_pk"],"column_metadata":{"w":[{"key":"KBC.datatype.nullable","value":true}],"n":[{"key":"KBC.datatype.nullable","value":true}],"export-related-table-first-item-empty_pk":[{"key":"KBC.datatype.nullable","value":true}]}}

@@ -38,7 +38,7 @@ class Component extends BaseComponent
             $exportCommandFactory,
             $config,
             $this->getLogger(),
-            $this->getInputState()
+            $this->getInputState(),
         );
     }
 

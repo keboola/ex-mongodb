@@ -1,1 +1,1 @@
-{"primary_key":null,"incremental":false}
+{"incremental":false,"columns":["id","name","email","phone"],"column_metadata":{"id":[{"key":"KBC.datatype.nullable","value":true}],"name":[{"key":"KBC.datatype.nullable","value":true}],"email":[{"key":"KBC.datatype.nullable","value":true}],"phone":[{"key":"KBC.datatype.nullable","value":true}]}}

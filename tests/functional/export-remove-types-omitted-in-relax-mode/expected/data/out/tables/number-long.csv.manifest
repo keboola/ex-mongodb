@@ -1,1 +1,1 @@
-{"primary_key":null,"incremental":false}
+{"incremental":false,"columns":["id","numberLong","numberLongInObject"],"column_metadata":{"id":[{"key":"KBC.datatype.nullable","value":true}],"numberLong":[{"key":"KBC.datatype.nullable","value":true}],"numberLongInObject":[{"key":"KBC.datatype.nullable","value":true}]}}

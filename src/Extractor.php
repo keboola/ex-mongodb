@@ -140,12 +140,23 @@ class Extractor
     }
 
     /**
-     * @param array<string, array{path: string, primaryKey: array<int, string>|string|null}> $manifestsData
+     * @param array<string, array{
+     *     path: string,
+     *     primaryKey: array<int, string>,
+     *     columns: array<int, string>
+     * }> $manifestsData
      */
     protected function generateManifests(array $manifestsData, ExportOptions $exportOptions): void
     {
         foreach ($manifestsData as $manifestData) {
-            (new Manifest($exportOptions, $manifestData['path'], $manifestData['primaryKey']))->generate();
+            (new Manifest(
+                $this->config->getDataTypeSupport(),
+                $exportOptions->isIncrementalFetching(),
+                $manifestData['path'],
+                $manifestData['primaryKey'],
+                $manifestData['columns'],
+            )
+            )->generate();
         }
     }
 

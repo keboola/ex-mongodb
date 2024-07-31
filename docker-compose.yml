@@ -1,4 +1,3 @@
-version: '3'
 services:
   app: &main
     build: .
@@ -18,6 +17,7 @@ services:
       - dns.local
     environment:
       - GODEBUG="x509ignoreCN=0"
+      - KBC_DATA_TYPE_SUPPORT=none
     entrypoint:
       - sh
       - -c

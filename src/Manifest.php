@@ -4,39 +4,50 @@ declare(strict_types=1);
 
 namespace MongoExtractor;
 
-use MongoExtractor\Config\ExportOptions;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Keboola\Component\Config\DatatypeSupport;
+use Keboola\Component\Manifest\ManifestManager;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTable\ManifestOptions;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTable\ManifestOptionsSchema;
 
 class Manifest
 {
-    protected Filesystem $fs;
-    private JsonEncode $jsonEncode;
+    private ManifestManager $manifestManager;
 
     /**
-     * @param array<int, string>|string|null $primaryKey
+     * @param array<int, string> $primaryKey
+     * @param array<int, string> $columns
      */
     public function __construct(
-        private ExportOptions $exportOptions,
-        private string $path,
-        private array|string|null $primaryKey
+        private readonly DatatypeSupport $datatypeSupport,
+        private readonly bool $isIncrementalFetching,
+        private readonly string $path,
+        private readonly array $primaryKey,
+        private readonly array $columns,
     ) {
-        $this->fs = new Filesystem();
-        $this->jsonEncode = new JsonEncode;
+        $directoryPath = str_replace('/out/tables', '', pathinfo($this->path, PATHINFO_DIRNAME));
+        $this->manifestManager = new ManifestManager($directoryPath);
     }
 
+    /**
+     * @throws \Keboola\Component\Manifest\ManifestManager\Options\OptionsValidationException
+     */
     public function generate(): void
     {
-        $manifest = [
-            'primary_key' => $this->primaryKey,
-            'incremental' => $this->exportOptions->isIncrementalFetching(),
+        $manifest = new ManifestOptions();
+        $manifest->setIncremental($this->isIncrementalFetching);
+        foreach ($this->columns as $column) {
+            $manifest->addSchema(new ManifestOptionsSchema(
+                $column,
+                null,
+                true,
+                in_array($column, $this->primaryKey, true),
+            ));
+        }
 
-        ];
-
-        $this->fs->dumpFile(
-            $this->path,
-            $this->jsonEncode->encode($manifest, JsonEncoder::FORMAT)
+        $this->manifestManager->writeTableManifest(
+            pathinfo($this->path, PATHINFO_FILENAME),
+            $manifest,
+            $this->datatypeSupport->usingLegacyManifest(),
         );
     }
 }

@@ -1,1 +1,1 @@
-{"primary_key":null,"incremental":false}
+{"incremental":false,"columns":["a","b","level2-a","level2-b","root_pk"],"column_metadata":{"a":[{"key":"KBC.datatype.nullable","value":true}],"b":[{"key":"KBC.datatype.nullable","value":true}],"level2-a":[{"key":"KBC.datatype.nullable","value":true}],"level2-b":[{"key":"KBC.datatype.nullable","value":true}],"root_pk":[{"key":"KBC.datatype.nullable","value":true}]}}

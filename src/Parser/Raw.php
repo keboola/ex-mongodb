@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace MongoExtractor\Parser;
 
 use Keboola\Csv\CsvWriter;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use function json_encode;
 
 class Raw implements ParserInterface
@@ -26,7 +23,6 @@ class Raw implements ParserInterface
 
         // create csv file and its header
         $this->outputFile = new CsvWriter($this->filename);
-        $this->outputFile->writeRow(['id', 'data']);
     }
 
     /**
@@ -72,13 +68,15 @@ class Raw implements ParserInterface
     }
 
     /**
-     * @return array<string, array{path: string, primaryKey: array<int, string>|string}>
+     * @return array<string, array{path: string, primaryKey: array<int, string>, columns: array<int, string>}>
      */
     public function getManifestData(): array
     {
         return [
             $this->filename => [
-                'path' => $this->filename . '.manifest', 'primaryKey' => $this->setIdAsPrimaryKey ? ['id']: [],
+                'path' => $this->filename . '.manifest',
+                'primaryKey' => $this->setIdAsPrimaryKey ? ['id'] : [],
+                'columns' => ['id', 'data'],
             ],
         ];
     }

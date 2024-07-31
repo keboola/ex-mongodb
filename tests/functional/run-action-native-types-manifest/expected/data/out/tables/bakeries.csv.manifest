@@ -1,0 +1,1 @@
+{"incremental":true,"schema":[{"nullable":true,"primary_key":true,"name":"id"},{"nullable":true,"primary_key":false,"name":"name"}]}
