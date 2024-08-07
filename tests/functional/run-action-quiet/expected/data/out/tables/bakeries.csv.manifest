@@ -1,1 +1,1 @@
-{"incremental":true,"columns":["id","name"],"primary_key":["id"],"column_metadata":{"id":[{"key":"KBC.datatype.nullable","value":true}],"name":[{"key":"KBC.datatype.nullable","value":true}]}}
+{"incremental":true,"columns":["id","name"],"primary_key":["id"],"column_metadata":{"id":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}],"name":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}]}}

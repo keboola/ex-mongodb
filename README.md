@@ -200,14 +200,14 @@ Clone this repository and init the workspace with following command:
 ```
 git clone https://github.com/keboola/ex-mongodb.git
 cd ex-mongodb
-docker-compose build #On M1 Mac build image with "--platform linux/amd64" flag
-docker-compose run --rm dev composer install --no-scripts
+docker compose build #On M1 Mac build image with "--platform linux/amd64" flag
+docker compose run --rm dev composer install --no-scripts
 ```
 
 Run the test suite using this command:
 
 ```
-docker-compose run --rm dev composer tests
+docker compose run --rm dev composer tests
 ```
  
 # Integration
