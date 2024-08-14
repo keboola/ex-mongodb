@@ -1,1 +1,1 @@
-{"incremental":true,"columns":["value"],"column_metadata":{"value":[{"key":"KBC.datatype.nullable","value":true}]}}
+{"incremental":true,"columns":["value"],"column_metadata":{"value":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}]}}

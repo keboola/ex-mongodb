@@ -1,1 +1,1 @@
-{"incremental":true,"schema":[{"nullable":true,"primary_key":true,"name":"id"},{"nullable":true,"primary_key":false,"name":"name"}]}
+{"incremental":true,"schema":[{"nullable":true,"primary_key":true,"name":"id","data_type":{"base":{"type":"string"}}},{"nullable":true,"primary_key":false,"name":"name","data_type":{"base":{"type":"string"}}}]}

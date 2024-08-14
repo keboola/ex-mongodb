@@ -38,7 +38,7 @@ class Manifest
         foreach ($this->columns as $column) {
             $manifest->addSchema(new ManifestOptionsSchema(
                 $column,
-                null,
+                ['base' => ['type' => 'string']],
                 true,
                 in_array($column, $this->primaryKey, true),
             ));
