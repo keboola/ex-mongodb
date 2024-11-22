@@ -101,16 +101,16 @@
         },
         {
             "name": "keboola/csvmap",
-            "version": "2.2.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-csvmap.git",
-                "reference": "0bbeed04b1232c36885ade2ace203bd7b8154e80"
+                "reference": "b5019f2c07ba0de86ed83185a3ab94e1aec017df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-csvmap/zipball/0bbeed04b1232c36885ade2ace203bd7b8154e80",
-                "reference": "0bbeed04b1232c36885ade2ace203bd7b8154e80",
+                "url": "https://api.github.com/repos/keboola/php-csvmap/zipball/b5019f2c07ba0de86ed83185a3ab94e1aec017df",
+                "reference": "b5019f2c07ba0de86ed83185a3ab94e1aec017df",
                 "shasum": ""
             },
             "require": {
@@ -121,7 +121,7 @@
                 "php": "^8.1"
             },
             "require-dev": {
-                "keboola/coding-standard": "^13.0",
+                "keboola/coding-standard": "^15.0",
                 "php-parallel-lint/php-parallel-lint": "^1.3",
                 "phpstan/phpstan": "^1.4",
                 "phpunit/phpunit": ">=7.5"
@@ -150,9 +150,9 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-csvmap/issues",
-                "source": "https://github.com/keboola/php-csvmap/tree/2.2.0"
+                "source": "https://github.com/keboola/php-csvmap/tree/2.3.0"
             },
-            "time": "2023-04-13T07:04:32+00:00"
+            "time": "2024-11-22T10:24:40+00:00"
         },
         {
             "name": "keboola/php-component",
@@ -4833,7 +4833,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -4842,6 +4842,6 @@
         "ext-json": "*",
         "ext-mongodb": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
