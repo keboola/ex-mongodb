@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MongoExtractor;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use MongoDB\BSON\UTCDateTime;
 
 class DateNormalizer
 {
     public function __construct(
         private array $mapping = [],
-    )
-    {
+    ) {
     }
 
     public function normalize(array &$data): void
@@ -30,13 +33,13 @@ class DateNormalizer
                 }
 
                 if (is_string($current)) {
-                    $current = (new \DateTimeImmutable($current))->format(\DateTimeInterface::ATOM);
+                    $current = (new DateTimeImmutable($current))->format(DateTimeInterface::ATOM);
 
                     return;
                 }
 
                 if (property_exists($current, '$numberLong')) {
-                    $current = (new UTCDateTime((int) $current->{'$numberLong'}))->toDateTimeImmutable()->format(\DateTimeInterface::ATOM);
+                    $current = (new UTCDateTime((int) $current->{'$numberLong'}))->toDateTimeImmutable()->format(DateTimeInterface::ATOM);
 
                     return;
                 }
