@@ -6,7 +6,7 @@
       "database": "test",
       "ssh": {
         "enabled": true,
-        "sshHost": "some random host",
+        "sshHost": "some-random-host",
         "user": "root",
         "keys": {
            "#private": "%env(string:SSH_PRIVATE_KEY)%",
