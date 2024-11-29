@@ -4,9 +4,9 @@ name: 'GitHub Actions'
 concurrency: 'ci-${{ github.ref }}'
 env:
     APP_IMAGE: keboola/ex-mongodb
-    KBC_DEVELOPERPORTAL_VENDOR: keboola-test
-    KBC_DEVELOPERPORTAL_APP: keboola-test.ex-mongodb-v5
-    KBC_DEVELOPERPORTAL_USERNAME: keboola-test+ex_mongodb_v5_github_gha
+    KBC_DEVELOPERPORTAL_VENDOR: keboola
+    KBC_DEVELOPERPORTAL_APP: keboola.ex-mongodb
+    KBC_DEVELOPERPORTAL_USERNAME: keboola+ex_mongodb_gha
     KBC_DEVELOPERPORTAL_PASSWORD: '${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}'
     DOCKERHUB_USER: '${{ secrets.DOCKERHUB_USER }}'
     DOCKERHUB_TOKEN: '${{ secrets.DOCKERHUB_TOKEN }}'
@@ -22,7 +22,7 @@ jobs:
         steps:
             -
                 name: 'Check out the repo'
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
             -
                 name: 'Print Docker version'
                 run: 'docker -v'
@@ -40,8 +40,8 @@ jobs:
                     TAG="${GITHUB_REF##*/}"
                     IS_SEMANTIC_TAG=$(echo "$TAG" | grep -q '^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$' && echo true || echo false)
                     echo "Tag = '$TAG', is semantic tag = '$IS_SEMANTIC_TAG'"
-                    echo "::set-output name=app_image_tag::$TAG"
-                    echo "::set-output name=is_semantic_tag::$IS_SEMANTIC_TAG"
+                    echo "is_semantic_tag=$IS_SEMANTIC_TAG" >> $GITHUB_OUTPUT
+                    echo "app_image_tag=$TAG" >> $GITHUB_OUTPUT
             -
                 name: 'Push image to ECR'
                 uses: keboola/action-push-to-ecr@master
@@ -59,11 +59,11 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                mongodb: [ latest, 5.0, 4.4, 3.6 ]
+                mongodb: [ latest, 6.0, 5.0, 4.4, 3.6 ]
         steps:
             -
                 name: 'Check out the repo'
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
             -
                 name: 'Pull image from ECR'
                 uses: keboola/action-pull-from-ecr@master
@@ -79,8 +79,8 @@ jobs:
                 name: 'Run tests'
                 run: |
                     export MONGODB_VERSION="${{ matrix.mongodb }}"
-                    docker-compose run wait
-                    docker-compose run app composer ci
+                    docker compose run wait
+                    docker compose run app composer ci
     tests-in-kbc:
         needs: build
         runs-on: ubuntu-latest
