@@ -62,7 +62,7 @@ class Mapping implements ParserInterface
             $mapper->parse($data, $userData);
         } catch (BadConfigException|BadDataException $e) {
             throw new UserException(sprintf('Invalid mapping configuration: %s', $e->getMessage()));
-        } catch (TypeError) { // @phpstan-ignore-line
+        } catch (TypeError) {
             throw new UserException('CSV writing error. Header and mapped documents must be scalar values.');
         }
 
