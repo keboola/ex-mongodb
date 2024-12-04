@@ -1,0 +1,1 @@
+{"incremental":false,"columns":["id","timeColumn"],"column_metadata":{"id":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}],"timeColumn":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}]}}
