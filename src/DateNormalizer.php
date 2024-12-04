@@ -46,7 +46,7 @@ final class DateNormalizer implements DataNormalizer
 
                 if (property_exists($current, '$numberLong')) {
                     $current = (new UTCDateTime((int) $current->{'$numberLong'}))
-                        ->toDateTimeImmutable()->format(DateTimeInterface::ATOM);
+                        ->toDateTime()->format(DateTimeInterface::ATOM);
 
                     return;
                 }
