@@ -25,7 +25,7 @@ final class DateNormalizer implements DataNormalizer
     {
         foreach ($data as &$item) {
             foreach ($this->mapping as $path => $mapping) {
-                if ($mapping['type'] !== 'date') {
+                if (!isset($mapping['type']) || $mapping['type'] !== 'date') {
                     continue;
                 }
 
