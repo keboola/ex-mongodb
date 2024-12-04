@@ -8,13 +8,19 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use MongoDB\BSON\UTCDateTime;
 
-class DateNormalizer
+final class DateNormalizer implements DataNormalizer
 {
+    /**
+     * @param array<string, mixed> $mapping
+     */
     public function __construct(
         private array $mapping = [],
     ) {
     }
 
+    /**
+     * @inheritDoc
+     */
     public function normalize(array &$data): void
     {
         foreach ($data as &$item) {
@@ -39,7 +45,8 @@ class DateNormalizer
                 }
 
                 if (property_exists($current, '$numberLong')) {
-                    $current = (new UTCDateTime((int) $current->{'$numberLong'}))->toDateTimeImmutable()->format(DateTimeInterface::ATOM);
+                    $current = (new UTCDateTime((int) $current->{'$numberLong'}))
+                        ->toDateTimeImmutable()->format(DateTimeInterface::ATOM);
 
                     return;
                 }
