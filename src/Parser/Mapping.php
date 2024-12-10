@@ -9,6 +9,7 @@ use Keboola\Component\UserException;
 use Keboola\CsvMap\Exception\BadConfigException;
 use Keboola\CsvMap\Exception\BadDataException;
 use Keboola\CsvMap\Mapper;
+use MongoExtractor\DataNormalizer;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
@@ -25,6 +26,8 @@ class Mapping implements ParserInterface
     /** @var array<string, array{path: string, primaryKey: array<int, string>, columns: array<int, string>}> */
     private array $manifestData = [];
 
+    private DataNormalizer $dataNormalizer;
+
     /**
      * @param array<string, mixed> $mapping
      */
@@ -33,12 +36,14 @@ class Mapping implements ParserInterface
         array $mapping,
         bool $includeParentInPK,
         string $outputPath,
+        DataNormalizer $dataNormalizer,
     ) {
         $this->name = $name;
         $this->mapping = $mapping;
         $this->includeParentInPK = $includeParentInPK;
         $this->path = $outputPath;
         $this->filesystem = new Filesystem();
+        $this->dataNormalizer = $dataNormalizer;
     }
 
     /**
@@ -52,10 +57,12 @@ class Mapping implements ParserInterface
         $userData = $this->includeParentInPK ? ['parentId' => md5(serialize($data))] : [];
         $mapper = new Mapper($this->mapping, false, $this->name);
         try {
+            $this->dataNormalizer->normalize($data);
+
             $mapper->parse($data, $userData);
         } catch (BadConfigException|BadDataException $e) {
             throw new UserException(sprintf('Invalid mapping configuration: %s', $e->getMessage()));
-        } catch (TypeError) { // @phpstan-ignore-line
+        } catch (TypeError) {
             throw new UserException('CSV writing error. Header and mapped documents must be scalar values.');
         }
 

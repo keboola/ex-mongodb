@@ -200,7 +200,8 @@ Clone this repository and init the workspace with following command:
 ```
 git clone https://github.com/keboola/ex-mongodb.git
 cd ex-mongodb
-docker compose build #On M1 Mac build image with "--platform linux/amd64" flag
+cp .env.dist .env
+docker compose build #On M1 Mac build image: "DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose build"
 docker compose run --rm dev composer install --no-scripts
 ```
 

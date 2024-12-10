@@ -96,6 +96,7 @@ class Parse
                 $this->mapping,
                 $this->exportOptions->isIncludeParentInPK(),
                 $this->path,
+                new DateNormalizer($this->mapping),
             );
         }
 
