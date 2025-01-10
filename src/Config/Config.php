@@ -39,9 +39,14 @@ class Config extends BaseConfig
         $sshOptions['sshPort'] = 22;
         $sshOptions['localPort'] = '33006';
         $sshOptions['remoteHost'] = $db['host'];
-        $sshOptions['remotePort'] = $db['port'];
+        $sshOptions['remotePort'] = $db['port'] ?? '33006';
 
         return $sshOptions;
+    }
+
+    public function isMongoSrvProtocol(): bool
+    {
+        return $this->getValue(['parameters', 'db', 'protocol']) === DbNode::PROTOCOL_MONGO_DB_SRV;
     }
 
     /**
