@@ -39,7 +39,7 @@ class Config extends BaseConfig
         $sshOptions['sshPort'] = 22;
         $sshOptions['localPort'] = '33006';
         $sshOptions['remoteHost'] = $db['host'];
-        $sshOptions['remotePort'] = $this->isMongoSrvProtocol() ? '' : $db['port'];
+        $sshOptions['remotePort'] = $db['port'] ?? '33006';
 
         return $sshOptions;
     }
