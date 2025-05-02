@@ -28,6 +28,7 @@ class ExportOptions
     private ?string $sort;
     private ?int $skip;
     private bool $includeParentInPK;
+    private bool $incrementalUseGreaterThanOperator;
 
     /**
      * @param array<string, mixed> $exportOptions
@@ -53,6 +54,7 @@ class ExportOptions
         $this->sort = $exportOptions['sort'] ?? null;
         $this->skip = !empty($exportOptions['skip']) ? (int) $exportOptions['skip'] : null;
         $this->includeParentInPK = (bool) ($exportOptions['includeParentInPK'] ?? false);
+        $this->incrementalUseGreaterThanOperator = (bool) ($exportOptions['incrementalUseGreaterThanOperator'] ?? false);
         $this->setLastValueOptions();
 
         if ($this->mode === ExportOptions::MODE_MAPPING && empty($this->mapping)) {
@@ -164,5 +166,10 @@ class ExportOptions
             'limit' => $this->limit,
             'skip' => $this->skip,
         ];
+    }
+
+    public function useIncrementalGreaterOperator(): bool
+    {
+        return $this->incrementalUseGreaterThanOperator;
     }
 }

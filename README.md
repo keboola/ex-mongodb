@@ -43,6 +43,9 @@ The configuration `config.json` contains following properties in `parameters` ke
         - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
     - `incremental` - boolean (optional): Enables [Incremental Loading](https://help.keboola.com/storage/tables/#incremental-loading). Default `false`.
     - `incrementalFetchingColumn` - string (optional): Name of column for [Incremental Fetching](https://help.keboola.com/components/extractors/database/#incremental-fetching)
+    - `incrementalUseGreaterThanOperator` - boolean (optional): Default `false`.
+        - If `true`, uses `$gt` (greater than) operator for incremental fetching.
+        - If `false`, uses `$gte` (greater than or equal) operator for incremental fetching.
     - `sort`- string (optional):
         - JSON string specifying the order of documents in exported data.
         - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).

@@ -163,14 +163,16 @@ class Export
     ): ExportOptions {
         $query = (object) [];
         if (!is_null($inputState)) {
+            $operator = $exportOptions->useIncrementalGreaterOperator() ? '$gt' : '$gte';
             $query = [
                 $exportOptions->getIncrementalFetchingColumn() => [
-                    '$gte' => $inputState,
+                    $operator => $inputState,
                 ],
             ];
         }
 
-        $exportOptions->setQuery(ExportHelper::fixSpecialColumnsInGteQuery(json_encode($query) ?: ''));
+        $fixedQuery = ExportHelper::fixSpecialColumnsInQuery(json_encode($query) ?: '', $exportOptions->getQuery());
+        $exportOptions->setQuery($fixedQuery);
         $exportOptions->setSort(json_encode([$exportOptions->getIncrementalFetchingColumn() => 1]) ?: '');
 
         return $exportOptions;
@@ -258,5 +260,60 @@ class Export
 
             return true;
         }, Extractor::RETRY_MAX_ATTEMPTS);
+    }
+
+    /**
+     * This function fix invalid type in $gte query, specific for incremental fetching
+     *
+     * Example:
+     * User define incremental fetching column "id" (numeric) and last state value is "123".
+     * Query `{"id":{"$gte":123}}` will be generated correctly.
+     *
+     * User define incremental fetching column "sub.id" (numeric), but sub document not exists in last row.
+     * Query `{"sub.id":{"$gte":null}}` will be generated, but `null` value will be converted to `""` (empty string).
+     * This is invalid query, because `mongoexport` expects number, not string.
+     * So, we need load original query from config and use it to fix types.
+     *
+     * @param string $query Generated query by incremental fetching.
+     * @param string|null $originalQuery Original query defined in config.
+     * @return string Fixed query string.
+     */
+    public static function fixSpecialColumnsInQuery(string $query, ?string $originalQuery): string
+    {
+        // Replace eg. {"updated":{"$gte":{"$date":"2020-11-20T13:37:04+00:00"}}} to {"updated":{"$gte":ISODate("2020-11-20T13:37:04+00:00")}}.
+        // Note: ISODate is not valid Extended JSON v2, we expect that mongoexport handle it.
+        $query = ExportHelper::convertSpecialColumnsToString($query);
+
+        // Fix types based on original query
+        if ($originalQuery) {
+            $query = self::fixTypesInQueryRecursive(json_decode($query, true), json_decode($originalQuery, true));
+            $query = json_encode($query) ?: '';
+        }
+
+        return $query;
+    }
+
+    private static function fixTypesInQueryRecursive(mixed $queryData, mixed $originalQueryData): mixed
+    {
+        if (!is_array($queryData) || !is_array($originalQueryData)) {
+            return $queryData; // Cannot determine type from original query, use query data as is
+        }
+
+        foreach ($queryData as $key => $value) {
+            if (!isset($originalQueryData[$key])) {
+                continue; // Key not present in original query, skip
+            }
+
+            $originalValue = $originalQueryData[$key];
+            if (is_array($value) && is_array($originalValue)) {
+                // Recursively fix types in nested arrays/objects
+                $queryData[$key] = self::fixTypesInQueryRecursive($value, $originalValue);
+            } elseif (gettype($value) !== gettype($originalValue) && !is_array($value) && !is_array($originalValue)) {
+                // Fix type if types mismatch and values are scalar
+                settype($queryData[$key], gettype($originalValue));
+            }
+        }
+
+        return $queryData;
     }
 }
