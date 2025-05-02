@@ -280,7 +280,8 @@ class Export
      */
     public static function fixSpecialColumnsInQuery(string $query, ?string $originalQuery): string
     {
-        // Replace eg. {"updated":{"$gte":{"$date":"2020-11-20T13:37:04+00:00"}}} to {"updated":{"$gte":ISODate("2020-11-20T13:37:04+00:00")}}.
+        // Replace eg. {"updated":{"$gte":{"$date":"2020-11-20T13:37:04+00:00"}}}
+        // to {"updated":{"$gte":ISODate("2020-11-20T13:37:04+00:00")}}.
         // Note: ISODate is not valid Extended JSON v2, we expect that mongoexport handle it.
         $query = ExportHelper::convertSpecialColumnsToString($query);
 

@@ -54,7 +54,8 @@ class ExportOptions
         $this->sort = $exportOptions['sort'] ?? null;
         $this->skip = !empty($exportOptions['skip']) ? (int) $exportOptions['skip'] : null;
         $this->includeParentInPK = (bool) ($exportOptions['includeParentInPK'] ?? false);
-        $this->incrementalUseGreaterThanOperator = (bool) ($exportOptions['incrementalUseGreaterThanOperator'] ?? false);
+        $this->incrementalUseGreaterThanOperator =
+            (bool) ($exportOptions['incrementalUseGreaterThanOperator'] ?? false);
         $this->setLastValueOptions();
 
         if ($this->mode === ExportOptions::MODE_MAPPING && empty($this->mapping)) {
