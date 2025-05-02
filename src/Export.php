@@ -171,7 +171,7 @@ class Export
             ];
         }
 
-        $fixedQuery = ExportHelper::fixSpecialColumnsInQuery(json_encode($query) ?: '', $exportOptions->getQuery());
+        $fixedQuery = self::fixSpecialColumnsInQuery(json_encode($query) ?: '', $exportOptions->getQuery());
         $exportOptions->setQuery($fixedQuery);
         $exportOptions->setSort(json_encode([$exportOptions->getIncrementalFetchingColumn() => 1]) ?: '');
 
