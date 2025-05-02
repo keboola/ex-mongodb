@@ -419,6 +419,23 @@ class ConfigRowDefinitionTest extends TestCase
                     ],
             ],
         ];
+
+        yield 'incremental fetching with GT operator' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'database' => 'test',
+                            ],
+                            'tableName' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
+                            'incrementalFetchingColumn' => 'someColumn',
+                            'incrementalUseGreaterThanOperator' => true,
+                    ],
+            ],
+        ];
     }
 
     /**
@@ -456,8 +473,8 @@ class ConfigRowDefinitionTest extends TestCase
                     ],
             ],
             'expectedError' => 'Unrecognized option "exports" under "root.parameters". Available options are ' .
-                '"collection", "db", "includeParentInPK", "incremental", "incrementalFetchingColumn"' .
-                ', "limit", "mapping", "mode", "query", "quiet", "sort", "tableName".',
+                '"collection", "db", "includeParentInPK", "incremental", "incrementalFetchingColumn", ' .
+                '"incrementalUseGreaterThanOperator", "limit", "mapping", "mode", "query", "quiet", "sort", "tableName".',
         ];
 
         yield 'missing keys' => [
@@ -603,6 +620,10 @@ class ConfigRowDefinitionTest extends TestCase
 
             if (!array_key_exists('includeParentInPK', $configData['parameters'])) {
                 $configData['parameters']['includeParentInPK'] = false;
+            }
+
+            if (!array_key_exists('incrementalUseGreaterThanOperator', $configData['parameters'])) {
+                $configData['parameters']['incrementalUseGreaterThanOperator'] = false;
             }
         }
 
