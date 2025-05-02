@@ -474,7 +474,8 @@ class ConfigRowDefinitionTest extends TestCase
             ],
             'expectedError' => 'Unrecognized option "exports" under "root.parameters". Available options are ' .
                 '"collection", "db", "includeParentInPK", "incremental", "incrementalFetchingColumn", ' .
-                '"incrementalUseGreaterThanOperator", "limit", "mapping", "mode", "query", "quiet", "sort", "tableName".',
+                '"incrementalUseGreaterThanOperator", "limit", "mapping", "mode", "query", "quiet", ' .
+                '"sort", "tableName".',
         ];
 
         yield 'missing keys' => [
