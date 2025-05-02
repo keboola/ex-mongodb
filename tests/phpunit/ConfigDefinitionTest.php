@@ -626,6 +626,16 @@ class ConfigRowDefinitionTest extends TestCase
             if (!array_key_exists('incrementalUseGreaterThanOperator', $configData['parameters'])) {
                 $configData['parameters']['incrementalUseGreaterThanOperator'] = false;
             }
+
+            // Add default nulls for user/password if not set and protocol is not custom_uri
+            if ($configData['parameters']['db']['protocol'] !== DbNode::PROTOCOL_CUSTOM_URI) {
+                if (!array_key_exists('user', $configData['parameters']['db'])) {
+                    $configData['parameters']['db']['user'] = null;
+                }
+                if (!array_key_exists('password', $configData['parameters']['db'])) {
+                    $configData['parameters']['db']['password'] = null;
+                }
+            }
         }
 
         if (!array_key_exists('quiet', $configData['parameters'])) {
