@@ -428,6 +428,8 @@ class ConfigRowDefinitionTest extends TestCase
                             [
                                 'host' => '127.0.0.1',
                                 'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
                             ],
                             'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
