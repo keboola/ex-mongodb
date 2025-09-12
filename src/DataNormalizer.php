@@ -7,7 +7,7 @@ namespace MongoExtractor;
 interface DataNormalizer
 {
     /**
-     * @param array<string, mixed> $data
+     * @param array<int, array<string, mixed>|object> $data
      */
     public function normalize(array &$data): void;
 }
