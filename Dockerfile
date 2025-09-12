@@ -1,4 +1,4 @@
-FROM php:8.1-cli
+FROM php:8.4-cli-bookworm
 
 ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ARG DEBIAN_FRONTEND=noninteractive
@@ -28,10 +28,10 @@ ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-RUN wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian10-x86_64-100.5.2.deb \
-    && wget https://downloads.mongodb.com/compass/mongodb-mongosh_1.3.1_amd64.deb \
-    && apt install ./mongodb-database-tools-debian10-x86_64-100.5.2.deb \
-    && apt install ./mongodb-mongosh_1.3.1_amd64.deb
+RUN wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.13.0.deb \
+    && wget https://downloads.mongodb.com/compass/mongodb-mongosh_2.5.8_amd64.deb \
+    && apt install ./mongodb-database-tools-debian12-x86_64-100.13.0.deb \
+    && apt install ./mongodb-mongosh_2.5.8_amd64.deb
 
 # Intl is required for league/uri
 RUN docker-php-ext-configure intl \
