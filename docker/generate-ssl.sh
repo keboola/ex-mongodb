@@ -25,14 +25,14 @@ openssl genrsa -out mongodb-cluster-key.pem 4096
 openssl req -subj "/CN=${SSL_HOST_CLUSTER}" -new -key mongodb-cluster-key.pem -out mongodb-cluster.csr -addext "subjectAltName = DNS:localhost,DNS:${SSL_HOST_CLUSTER}"
 
 # We're self signing our own cluster server cert here.  This is a no-no in production.
-openssl x509 -req -days $DAYS -sha256 -in mongodb-cluster.csr -CA ca-cert.pem -CAkey ca-key.pem -set_serial 01 -out mongodb-cluster-cert.pem
+openssl x509 -req -days $DAYS -sha256 -in mongodb-cluster.csr -CA ca-cert.pem -CAkey ca-key.pem -set_serial 01 -extensions v3_req -extfile <(printf "[v3_req]\nsubjectAltName=DNS:localhost,DNS:${SSL_HOST_CLUSTER}") -out mongodb-cluster-cert.pem
 
 # Create the Server Key, CSR, and Certificate
 openssl genrsa -out mongodb-key.pem 4096
 openssl req -subj "/CN=${SSL_HOST}" -new -key mongodb-key.pem -out mongodb.csr -addext "subjectAltName = DNS:localhost,DNS:${SSL_HOST}"
 
 # We're self signing our own server cert here.  This is a no-no in production.
-openssl x509 -req -days $DAYS -sha256 -in mongodb.csr -CA ca-cert.pem -CAkey ca-key.pem -set_serial 01 -out mongodb-cert.pem
+openssl x509 -req -days $DAYS -sha256 -in mongodb.csr -CA ca-cert.pem -CAkey ca-key.pem -set_serial 03 -extensions v3_req -extfile <(printf "[v3_req]\nsubjectAltName=DNS:localhost,DNS:${SSL_HOST}") -out mongodb-cert.pem
 
 # Create the Client Key and CSR
 openssl genrsa -out client-key.pem 4096
