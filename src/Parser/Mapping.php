@@ -48,7 +48,7 @@ class Mapping implements ParserInterface
 
     /**
      * Parses provided data and writes to output files
-     * @param array<int, object> $data
+     * @param array<int, array<string, mixed>|object> $data
      * @throws \Keboola\Component\UserException
      * @throws \Exception
      */
@@ -67,28 +67,26 @@ class Mapping implements ParserInterface
         }
 
         foreach ($mapper->getCsvFiles() as $file) {
-            if ($file !== null) {
-                $name = Strings::webalize($file->getName());
-                $outputCsv = $this->path . '/' . $name . '.csv';
+            $name = Strings::webalize($file->getName());
+            $outputCsv = $this->path . '/' . $name . '.csv';
 
-                $content = file_get_contents($file->getPathname());
+            $content = file_get_contents($file->getPathname());
 
-                try {
-                    if (@file_put_contents($outputCsv, $content, FILE_APPEND | LOCK_EX) === false) {
-                        throw new Exception('Failed write to file "' . $outputCsv . '"');
-                    }
-                } catch (Throwable $e) {
+            try {
+                if (@file_put_contents($outputCsv, $content, FILE_APPEND | LOCK_EX) === false) {
                     throw new Exception('Failed write to file "' . $outputCsv . '"');
                 }
-
-                $this->manifestData[$outputCsv] = [
-                    'path' => $outputCsv . '.manifest',
-                    'primaryKey' => (array) ($file->getPrimaryKey(true) ?? []),
-                    'columns' => $file->getHeader(),
-                ];
-
-                $this->filesystem->remove($file->getPathname());
+            } catch (Throwable $e) {
+                throw new Exception('Failed write to file "' . $outputCsv . '"');
             }
+
+            $this->manifestData[$outputCsv] = [
+                'path' => $outputCsv . '.manifest',
+                'primaryKey' => (array) ($file->getPrimaryKey(true) ?? []),
+                'columns' => $file->getHeader(),
+            ];
+
+            $this->filesystem->remove($file->getPathname());
         }
     }
 

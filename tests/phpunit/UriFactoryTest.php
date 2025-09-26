@@ -75,7 +75,7 @@ class UriFactoryTest extends TestCase
                 ],
             ],
             'authDb-escape' => [
-                'mongodb://user:pass@localhost:27017/myDatabase?authSource=a/b/c$%25%5E',
+                'mongodb://user:pass@localhost:27017/myDatabase?authSource=a%2Fb%2Fc%24%25%5E',
                 [
                     'host' => 'localhost',
                     'port' => 27017,

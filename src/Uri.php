@@ -13,7 +13,7 @@ use League\Uri\UriString;
 
 class Uri
 {
-    private const HOSTS_PLACEHOLDER = 'uri_host_placeholder.hosts';
+    private const string HOSTS_PLACEHOLDER = 'uri_host_placeholder.hosts';
 
     private UriInterface $uri;
 
@@ -28,7 +28,7 @@ class Uri
     private ?string $hostPart;
 
     /**
-     * @throws \Keboola\Component\UserException
+     * @throws UserException
      */
     public static function createFromString(string $str): self
     {
@@ -61,15 +61,14 @@ class Uri
         $password = isset($components['pass']) ? urldecode($components['pass']) : null;
         unset($components['user'], $components['pass']);
 
-        $uri = LeagueUri::createFromComponents($components);
+        $uri = LeagueUri::fromComponents($components);
 
         return new self($uri->withUserInfo(null), $user, $password, $hostPart);
     }
 
     /**
-
-     * @param array<int, array{0:string, 1:string|null}> $query
-     * @throws \Keboola\Component\UserException
+ * @param array<int, array{0:string, 1:string|null}> $query
+     * @throws UserException
      */
     public static function createFromParts(
         string $protocol,
@@ -80,21 +79,21 @@ class Uri
         string $database,
         array $query = [],
     ): self {
-        return new self(LeagueUri::createFromComponents([
+        return new self(LeagueUri::fromComponents([
             'scheme' => $protocol,
             'host' => self::HOSTS_PLACEHOLDER,
             'port' => $port,
             'path' => '/' . urlencode($database),
-            'query' => Query::createFromPairs($query)->getContent(),
+            'query' => Query::fromPairs($query)->value(),
         ]), $user, $password, $host);
     }
 
     /**
-     * @throws \Keboola\Component\UserException
+     * @throws UserException
      */
     private function __construct(UriInterface $uri, ?string $user, ?string $password, ?string $hostPart)
     {
-        $this->uri = LeagueUri::createFromString($uri);
+        $this->uri = LeagueUri::new($uri);
         $this->user = $user;
         $this->password = $password;
         $this->hostPart = $hostPart;
@@ -112,7 +111,7 @@ class Uri
             );
         }
 
-        // Check hostPart, if present, URI must contains placeholder
+        // Check hostPart, if present, URI must contain placeholder
         if ($this->hostPart && $uri->getHost() !== self::HOSTS_PLACEHOLDER) {
             throw new InvalidArgumentException(sprintf(
                 'Unexpected host value: "%s", expected placeholder: "%s".',
@@ -183,12 +182,12 @@ class Uri
 
     public function getQuery(): Query
     {
-        return Query::createFromUri($this->uri);
+        return Query::fromUri($this->uri);
     }
 
     public function setQuery(Query $query): void
     {
-        $this->uri = $this->uri->withQuery($query->getContent());
+        $this->uri = $this->uri->withQuery($query->value());
     }
 
     public function getConnectionString(): string

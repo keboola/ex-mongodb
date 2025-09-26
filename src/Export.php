@@ -142,9 +142,7 @@ class Export
         }
 
         if (preg_match('/(Failed:.*?command)/s', $e->getMessage(), $matches)) {
-            if (isset($matches[1])) {
-                throw new UserException(trim($matches[1]));
-            }
+            throw new UserException(trim($matches[1]));
         }
 
         if (preg_match('/query \'\\[[^\\]]*\\]\' is not valid JSON/i', $e->getMessage())) {
