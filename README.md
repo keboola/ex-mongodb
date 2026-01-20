@@ -1,72 +1,102 @@
-# MongoDB extractor
+# MongoDB Extractor
 
-> Docker application for exporting data from MongoDB. Basically, it's a simple wrapper of mongoexport command, which exports data from specified database and collection. Then those data are processed by php-csvmap.
+Keboola Connection component for extracting data from MongoDB databases. The extractor uses the `mongoexport` command to export data from specified collections and transforms the output into structured CSV files using field mapping.
+
+**Table of Contents:**
+
+- [Configuration](#configuration)
+  - [Connection Parameters](#connection-parameters)
+  - [SSH Tunnel](#ssh-tunnel)
+  - [SSL/TLS](#ssltls)
+  - [Export Options](#export-options)
+- [Connection Protocols](#connection-protocols)
+  - [mongodb://](#mongodb)
+  - [mongodb+srv://](#mongodbsrv)
+  - [Custom URI](#custom-uri)
+- [Configuration Example](#configuration-example)
+- [Output](#output)
+- [Development](#development)
+- [Integration](#integration)
+- [License](#license)
 
 ## Configuration
 
-The configuration `config.json` contains following properties in `parameters` key:
-- `db` - object (required): Configuration of the connection.
-    - `protocol` - string (optional): One of `mongodb` (default), `mongodb+srv` or `custom_uri`.
-    - **Additional parameters if `protocol` = `custom_uri`**:
-        - `uri` - string:
-            - [MongoDB Connection String](https://docs.mongodb.com/manual/reference/connection-string/)
-            - Eg. `mongodb://user@localhost,localhost:27018,localhost:27019/db?replicaSet=test&ssl=true`.
-            - The password must not be a part of URI. It must be encrypted in `#password` item.
-        - `#password` - string (required): Password for user specified in `uri`.
-    - **Additional parameters if `protocol` = `mongodb` or `mongodb+srv`**:
-        - `host` - string (required):
-            - If `protocol` = `mongodb`, then value is hostname of MongoDB server.
-            - If `protocol` = `mongodb+srv`, then value is [DNS Seedlist Connection Format](https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format).
-        - `port` - string (optional): Server port (default port is `27017`).
-        - `database` - string (required):  Database to connect to.
-        - `authenticationDatabase` - string (optional): [Authentication database](https://docs.mongodb.com/manual/reference/program/mongo/#authentication-options) for `user`.
-        - `user` - string (optional): User with correct access rights.
-        - `#password` - string (optional): Password for given `user`. Both or none of couple `user` and `#password` must be specified.
-        - `ssh` - object (optional): Settings for SSH tunnel.
-            - `enabled` - bool (required):  Enables SSH tunnel.
-            - `sshHost` - string (required): IP address or hostname of SSH server.
-            - `sshPort` - integer (optional): SSH server port (default port is `22`).
-            - `localPort` - integer (required): SSH tunnel local port in Docker container (default `33006`).
-            - `user` - string (optional): SSH user (default same as `db.user`).
-            - `compression`  - bool (optional): Enables SSH tunnel compression (default `false`).
-            - `keys` - object (optional): SSH keys.
-                - `public` - string (optional): Public SSH key.
-                - `#private` - string (optional): Private SSH key.
-- `quiet` - boolean (optional): Default `false`, pass `--quiet` to `mongoexport` command to hide logs. It should help with `Failed: EOF` problem, [read more](https://stackoverflow.com/a/39122219).
-- `exports` - object[] (required): [Exports configuration](https://help.keboola.com/components/extractors/database/mongodb/#configure-exports).
-    - `enabled` - boolean (optional): Default `true`.
-    - `id` - scalar (required): Internal `id` of the export.
-    - `name` - string (required): Name of the output CSV file.
-    - `collection` - string (required): Represents the collection name in your MongoDB database.
-    - `query`- string (optional):
-        - JSON string specifying a query which limits documents data in exported data.
-        - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
-    - `incremental` - boolean (optional): Enables [Incremental Loading](https://help.keboola.com/storage/tables/#incremental-loading). Default `false`.
-    - `incrementalFetchingColumn` - string (optional): Name of column for [Incremental Fetching](https://help.keboola.com/components/extractors/database/#incremental-fetching)
-    - `sort`- string (optional):
-        - JSON string specifying the order of documents in exported data.
-        - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
-    - `limit`- string (optional): Limits the number of exported documents.
-    - `mode` - enum (optional)
-        - `mapping` (default) - Values are exported using specified `mapping`, [read more](https://help.keboola.com/components/extractors/database/mongodb/#configure-mapping).
-        - `raw` - Documents are exported as plain JSON strings, [read more](https://help.keboola.com/components/extractors/database/mongodb/#raw-export-mode).
-    - `mapping` - string - required for `mode` = `mapping`, [read more](https://help.keboola.com/components/extractors/database/mongodb/#configure-mapping).
-    - `includeParentInPK` - boolean (optional): Default `false`
-        - Intended for `mapping` mode and ignored in `raw` mode.
-        - If `false`
-            - PK of sub-document depends ONLY on sub-document content,
-            - ... so same PK is generated for sub-documents with same content, but from different parent document
-            - this is legacy/default behaviour
-        - If `true`
-            - PK of sub-document depends on content AND hash of parent document
-            - ... so different PK is generated for sub-documents with same content, but from different parent document
-            - this is new behaviour, the UI automatically turns it on for new configs
+The configuration `config.json` contains the following properties in the `parameters` key.
 
-### Protocol
+### Connection Parameters
 
-#### mongodb://
+The `db` object (required) configures the database connection:
 
-When `parameters.db.protocol` is not defined or is set to `mongodb`, then extractor connects to single MongoDB node.
+- `protocol` - string (optional): One of `mongodb` (default), `mongodb+srv`, or `custom_uri`.
+
+**Parameters for `protocol` = `mongodb` or `mongodb+srv`:**
+
+- `host` - string (required): Hostname of MongoDB server. For `mongodb+srv`, use the [DNS Seedlist Connection Format](https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format).
+- `port` - string (optional): Server port (default: `27017`).
+- `database` - string (required): Database to connect to.
+- `authenticationDatabase` - string (optional): [Authentication database](https://docs.mongodb.com/manual/reference/program/mongo/#authentication-options) for the user.
+- `user` - string (optional): User with appropriate access rights.
+- `#password` - string (optional): Password for the user. Both `user` and `#password` must be specified together, or neither.
+
+**Parameters for `protocol` = `custom_uri`:**
+
+- `uri` - string (required): Complete [MongoDB Connection String](https://docs.mongodb.com/manual/reference/connection-string/), e.g., `mongodb://user@localhost,localhost:27018,localhost:27019/db?replicaSet=test&ssl=true`. The password must not be included in the URI.
+- `#password` - string (required): Password for the user specified in the URI.
+
+Note: When using `custom_uri`, the `host`, `port`, `database`, and `authenticationDatabase` parameters must not be defined separately as they are part of the URI. Custom URI cannot be used with SSH tunnel.
+
+### SSH Tunnel
+
+The `ssh` object (optional) configures SSH tunnel connection:
+
+- `enabled` - boolean (required): Enables SSH tunnel.
+- `sshHost` - string (required): IP address or hostname of the SSH server.
+- `sshPort` - integer (optional): SSH server port (default: `22`).
+- `localPort` - integer (optional): SSH tunnel local port in the Docker container (default: `33006`).
+- `user` - string (optional): SSH user (defaults to `db.user`).
+- `compression` - boolean (optional): Enables SSH tunnel compression (default: `false`).
+- `keys` - object (optional): SSH keys for authentication.
+  - `public` - string (optional): Public SSH key.
+  - `#private` - string (optional): Private SSH key.
+
+### SSL/TLS
+
+The `ssl` object (optional) configures SSL/TLS encryption:
+
+- `enabled` - boolean (required): Enables SSL/TLS connection.
+- `ca` - string (optional): CA certificate.
+- `cert` - string (optional): Client certificate.
+- `#key` - string (optional): Client private key.
+- `cipher` - string (optional): SSL cipher to use.
+- `verifyServerCert` - boolean (optional): Verify server certificate (default: `true`).
+
+### Export Options
+
+- `quiet` - boolean (optional): Pass `--quiet` to `mongoexport` to hide logs (default: `false`). This can help resolve `Failed: EOF` issues ([more info](https://stackoverflow.com/a/39122219)).
+- `exports` - array (required): List of [export configurations](https://help.keboola.com/components/extractors/database/mongodb/#configure-exports).
+
+Each export object supports the following parameters:
+
+- `enabled` - boolean (optional): Enable or disable this export (default: `true`).
+- `id` - scalar (required): Internal identifier for the export.
+- `name` - string (required): Name of the output CSV file.
+- `collection` - string (required): MongoDB collection name.
+- `query` - string (optional): JSON query to filter documents. Must use [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
+- `sort` - string (optional): JSON string specifying document order. Must use [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
+- `limit` - string (optional): Maximum number of documents to export.
+- `incremental` - boolean (optional): Enable [Incremental Loading](https://help.keboola.com/storage/tables/#incremental-loading) (default: `false`).
+- `incrementalFetchingColumn` - string (optional): Column name for [Incremental Fetching](https://help.keboola.com/components/extractors/database/#incremental-fetching).
+- `mode` - enum (optional): Export mode.
+  - `mapping` (default): Export using specified field mapping ([documentation](https://help.keboola.com/components/extractors/database/mongodb/#configure-mapping)).
+  - `raw`: Export documents as plain JSON strings ([documentation](https://help.keboola.com/components/extractors/database/mongodb/#raw-export-mode)).
+- `mapping` - object (required for `mode` = `mapping`): Field mapping configuration ([documentation](https://help.keboola.com/components/extractors/database/mongodb/#configure-mapping)).
+- `includeParentInPK` - boolean (optional): Include parent document hash in sub-document primary keys (default: `false`). When `false`, sub-documents with identical content generate the same PK regardless of parent. When `true`, each sub-document gets a unique PK based on both its content and parent document. This option only applies to `mapping` mode.
+
+## Connection Protocols
+
+### mongodb://
+
+When `protocol` is not defined or set to `mongodb`, the extractor connects to a single MongoDB node.
 
 ```json
 {
@@ -78,15 +108,14 @@ When `parameters.db.protocol` is not defined or is set to `mongodb`, then extrac
       "user": "username",
       "#password": "password"
     },
-    "exports": "..."
+    "exports": []
   }
 }
 ```
 
-#### mongodb+srv://
+### mongodb+srv://
 
-When `parameters.db.protocol` = `mongodb+srv`, then extractor connects to
-MongoDB cluster using [DNS Seedlist Connection Format](https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format).
+When `protocol` is set to `mongodb+srv`, the extractor connects to a MongoDB cluster using [DNS Seedlist Connection Format](https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format).
 
 ```json
 {
@@ -98,17 +127,14 @@ MongoDB cluster using [DNS Seedlist Connection Format](https://docs.mongodb.com/
       "user": "username",
       "#password": "password"
     },
-    "exports": "..."
+    "exports": []
   }
 }
 ```
 
-#### Custom URI
+### Custom URI
 
-When `parameters.db.protocol` = `custom_uri`, then extractor connects to URI defined in `parameters.db.uri`:
-- The password is not a part of URI, but it must be encrypted in `#password` item.
-- `host`, `port`, `database`, `authenticationDatabase` are included in `uri` and must not be defined in separate items.
-- Custom URI cannot be used with SSH tunnel.
+When `protocol` is set to `custom_uri`, the extractor connects using the URI defined in `uri`. The password must be provided separately in `#password`.
 
 ```json
 {
@@ -118,12 +144,13 @@ When `parameters.db.protocol` = `custom_uri`, then extractor connects to URI def
       "uri": "mongodb://user@localhost,localhost:27018,localhost:27019/db?replicaSet=test&ssl=true",
       "#password": "password"
     },
-    "exports": "..."
+    "exports": []
   }
 }
 ```
 
-### Example
+## Configuration Example
+
 ```json
 {
   "parameters": {
@@ -140,7 +167,7 @@ When `parameters.db.protocol` = `custom_uri`, then extractor connects to URI def
         "user": "root",
         "keys": {
           "public": "ssh-rsa ...your public key...",
-          "private": "-----BEGIN RSA PRIVATE KEY-----\n...your private key...\n-----END RSA PRIVATE KEY-----\n"
+          "#private": "-----BEGIN RSA PRIVATE KEY-----\n...your private key...\n-----END RSA PRIVATE KEY-----\n"
         }
       }
     },
@@ -187,33 +214,37 @@ When `parameters.db.protocol` = `custom_uri`, then extractor connects to URI def
 
 ## Output
 
-After successful extraction there are several CSV files, which contains exported data. First output
-file is named after `name` parameter in export configuration. Other files are named after destination
-parameter in mapping section.
+After successful extraction, the component generates CSV files containing the exported data. The primary output file is named according to the `name` parameter in the export configuration. Additional files are created based on the `destination` parameters in the mapping section for nested data structures.
 
-Also, there is manifest file for each of the export.
+Each CSV file is accompanied by a manifest file that describes the data schema for downstream Keboola components.
 
 ## Development
- 
-Clone this repository and init the workspace with following command:
 
-```
+Clone this repository and initialize the workspace:
+
+```shell
 git clone https://github.com/keboola/ex-mongodb.git
 cd ex-mongodb
 cp .env.dist .env
-docker compose build #On M1 Mac build image: "DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose build"
+docker compose build
 docker compose run --rm dev composer install --no-scripts
 ```
 
-Run the test suite using this command:
+For ARM-based systems (Apple Silicon), build the image with:
 
+```shell
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose build
 ```
+
+Run the test suite:
+
+```shell
 docker compose run --rm dev composer tests
 ```
- 
-# Integration
 
-For information about deployment and integration with KBC, please refer to the [deployment section of developers documentation](https://developers.keboola.com/extend/component/deployment/) 
+## Integration
+
+For information about deployment and integration with Keboola, refer to the [deployment section of the developer documentation](https://developers.keboola.com/extend/component/deployment/).
 
 ## License
 
