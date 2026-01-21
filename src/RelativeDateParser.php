@@ -12,7 +12,8 @@ use Keboola\Component\UserException;
 
 class RelativeDateParser
 {
-    private const PLACEHOLDER_PATTERN = '/\{\{(now(?:-(\d+)([dwmy]))?)?\}\}/i';
+    // Pattern matches "{{now}}" or "{{now-Nd/w/m/y}}" including surrounding quotes
+    private const PLACEHOLDER_PATTERN = '/"?\{\{(now(?:-(\d+)([dwmy]))?)?\}\}"?/i';
 
     private DateTimeImmutable $now;
 
