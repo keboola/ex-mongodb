@@ -74,7 +74,8 @@ class RelativeDateParserTest extends TestCase
     public function testParseMultiplePlaceholders(): void
     {
         $input = '{"createdAt": {"$gte": "{{now-30d}}", "$lte": "{{now}}"}}';
-        $expected = '{"createdAt": {"$gte": {"$date": "2025-12-22T10:00:00+00:00"}, "$lte": {"$date": "2026-01-21T10:00:00+00:00"}}}';
+        $expected = '{"createdAt": {"$gte": {"$date": "2025-12-22T10:00:00+00:00"}, ' .
+            '"$lte": {"$date": "2026-01-21T10:00:00+00:00"}}}';
 
         Assert::assertSame($expected, $this->parser->parse($input));
     }
@@ -93,7 +94,8 @@ class RelativeDateParserTest extends TestCase
 
     public function testHasPlaceholdersFalse(): void
     {
-        Assert::assertFalse($this->parser->hasPlaceholders('{"createdAt": {"$gte": {"$date": "2025-01-01T00:00:00Z"}}}'));
+        $query = '{"createdAt": {"$gte": {"$date": "2025-01-01T00:00:00Z"}}}';
+        Assert::assertFalse($this->parser->hasPlaceholders($query));
     }
 
     public function testParseLargeNumbers(): void
@@ -107,7 +109,8 @@ class RelativeDateParserTest extends TestCase
     public function testParseWithOtherQueryConditions(): void
     {
         $input = '{"status": "active", "createdAt": {"$gte": "{{now-7d}}"}, "type": "order"}';
-        $expected = '{"status": "active", "createdAt": {"$gte": {"$date": "2026-01-14T10:00:00+00:00"}}, "type": "order"}';
+        $expected = '{"status": "active", "createdAt": {"$gte": {"$date": "2026-01-14T10:00:00+00:00"}}, ' .
+            '"type": "order"}';
 
         Assert::assertSame($expected, $this->parser->parse($input));
     }
