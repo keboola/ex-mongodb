@@ -8,9 +8,11 @@ use MongoExtractor\Config\DbNode;
 
 class ExportCommandFactory
 {
+    private RelativeDateParser $relativeDateParser;
 
     public function __construct(private UriFactory $uriFactory, private bool $quiet)
     {
+        $this->relativeDateParser = new RelativeDateParser();
     }
 
     /**
@@ -98,6 +100,7 @@ class ExportCommandFactory
         foreach (['query', 'sort', 'limit', 'skip'] as $option) {
             if (isset($params[$option]) && !empty(trim((string) $params[$option]))) {
                 if ($option === 'query') {
+                    $params[$option] = $this->relativeDateParser->parse($params[$option]);
                     $params[$option] = ExportHelper::addQuotesToJsonKeys($params[$option]);
                     $params[$option] = ExportHelper::convertStringIdToObjectId($params[$option]);
                 }
