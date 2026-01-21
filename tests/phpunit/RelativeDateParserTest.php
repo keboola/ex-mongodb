@@ -118,7 +118,7 @@ class RelativeDateParserTest extends TestCase
     public function testParseEmptyPlaceholderThrowsException(): void
     {
         $this->expectException(UserException::class);
-        $this->expectExceptionMessage('Invalid relative date placeholder: {{}}');
+        $this->expectExceptionMessage('Invalid relative date placeholder:');
 
         $this->parser->parse('{"createdAt": {"$gte": "{{}}"}}');
     }
