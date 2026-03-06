@@ -132,6 +132,30 @@ class RelativeDateParserTest extends TestCase
         $this->parser->parse('{"createdAt": {"$gte": "{{}}"}}');
     }
 
+    public function testParseUnsupportedUnitThrowsException(): void
+    {
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Unsupported relative date placeholder: {{now-1h}}');
+
+        $this->parser->parse('{"createdAt": {"$gte": "{{now-1h}}"}}');
+    }
+
+    public function testParseMissingUnitThrowsException(): void
+    {
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Unsupported relative date placeholder: {{now-7}}');
+
+        $this->parser->parse('{"createdAt": {"$gte": "{{now-7}}"}}');
+    }
+
+    public function testParseUnknownPlaceholderThrowsException(): void
+    {
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Unsupported relative date placeholder: {{foo}}');
+
+        $this->parser->parse('{"createdAt": {"$gte": "{{foo}}"}}');
+    }
+
     public function testDefaultNowUsesCurrentTime(): void
     {
         $parser = new RelativeDateParser();

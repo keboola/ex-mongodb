@@ -12,8 +12,10 @@ use Keboola\Component\UserException;
 
 class RelativeDateParser
 {
-    // Pattern matches "{{now}}" or "{{now-Nd/w/m/y}}" including surrounding quotes
-    private const PLACEHOLDER_PATTERN = '/"?\{\{(now(?:-(\d+)([dwmy]))?)?\}\}"?/i';
+    // Pattern matches "{{now}}" or "{{now-Nd/w/m/y}}" as a complete JSON string value
+    private const PLACEHOLDER_PATTERN = '/"\{\{(now(?:-(\d+)([dwmy]))?)?\}\}"/i';
+    // Pattern matches any remaining {{...}} form that was not handled by the main pattern
+    private const UNSUPPORTED_PLACEHOLDER_PATTERN = '/\{\{[^}]*\}\}/';
 
     private DateTimeImmutable $now;
 
@@ -24,11 +26,28 @@ class RelativeDateParser
 
     public function parse(string $query): string
     {
-        return (string) preg_replace_callback(
+        $result = preg_replace_callback(
             self::PLACEHOLDER_PATTERN,
             fn(array $matches): string => $this->replacePlaceholder($matches),
             $query,
         );
+
+        if ($result === null) {
+            throw new UserException(
+                'Failed to process relative date placeholders in query due to a regular expression error.',
+            );
+        }
+
+        // Detect any remaining unsupported {{...}} placeholders
+        if (preg_match(self::UNSUPPORTED_PLACEHOLDER_PATTERN, $result, $matches)) {
+            throw new UserException(sprintf(
+                'Unsupported relative date placeholder: %s.'
+                    . ' Supported formats: {{now}}, {{now-Nd}}, {{now-Nw}}, {{now-Nm}}, {{now-Ny}}.',
+                $matches[0],
+            ));
+        }
+
+        return $result;
     }
 
     public function hasPlaceholders(string $query): bool
