@@ -226,6 +226,25 @@ BASH;
         $this->assertSame($expectedCommand, $command);
     }
 
+    public function testQueryWithRelativeDatePlaceholder(): void
+    {
+        $options = [
+            'host' => 'localhost',
+            'port' => 27017,
+            'database' => 'myDatabase',
+            'collection' => 'myCollection',
+            'query' => '{"createdAt": {"$gte": "{{now-7d}}"}}',
+            'out' => '/tmp/create-test.json',
+        ];
+
+        $command = $this->commandFactory->create($options);
+
+        // Verify the command contains $date in the query (placeholder was resolved)
+        $this->assertStringContainsString('--query', $command);
+        $this->assertStringContainsString('"$date":', $command);
+        $this->assertStringNotContainsString('{{now', $command);
+    }
+
     public function testQuietTrue(): void
     {
         $options = [
