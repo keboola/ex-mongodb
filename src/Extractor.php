@@ -8,9 +8,7 @@ use Keboola\Component\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 use Keboola\Temp\Temp;
-use MongoDB\Driver\Command;
-use MongoDB\Driver\Exception\Exception;
-use MongoDB\Driver\Manager;
+use Symfony\Component\Process\Process;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
 use Psr\Log\LoggerInterface;
@@ -56,26 +54,73 @@ class Extractor
     }
 
     /**
-     * Sends listCollections command to test connection/credentials
+     * Tests connection using mongosh CLI
      * @throws \Keboola\Component\UserException
      */
     public function testConnection(): void
     {
         $uri = $this->uriFactory->create($this->dbParams);
-        try {
-            $manager = new Manager((string) $uri);
-        } catch (Exception $exception) {
-            throw new UserException($exception->getMessage(), 0, $exception);
+
+        // Add short timeout to avoid long waits on unreachable hosts
+        $uriString = (string) $uri;
+        $separator = str_contains($uriString, '?') ? '&' : '?';
+        $uriString .= $separator . 'serverSelectionTimeoutMS=5000';
+
+        $command = ['mongosh', $uriString, '--eval', 'db.runCommand({listCollections: 1})', '--quiet', '--norc'];
+
+        // Add TLS cert flags when SSL is enabled and cert files are provided
+        if (($this->dbParams['ssl']['enabled'] ?? false)) {
+            if (isset($this->dbParams['ssl']['caFile'])) {
+                $command[] = '--tlsCAFile=' . $this->dbParams['ssl']['caFile'];
+            }
+            if (isset($this->dbParams['ssl']['certKeyFile'])) {
+                $command[] = '--tlsCertificateKeyFile=' . $this->dbParams['ssl']['certKeyFile'];
+            }
         }
 
-        $this->retryProxy->call(function () use ($manager, $uri): void {
-            try {
-                $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
-            } catch (Exception $exception) {
+        $this->retryProxy->call(function () use ($command): void {
+            $process = new Process($command);
+            $process->setTimeout(30);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
                 echo sprintf('Retrying (%sx)...%s', $this->retryProxy->getTryCount(), PHP_EOL);
-                throw new UserException($exception->getMessage(), 0, $exception);
+                $errorMessage = self::parseMongoshError(
+                    $process->getErrorOutput(),
+                    $process->getOutput(),
+                );
+                throw new UserException($errorMessage);
             }
         });
+    }
+
+    /**
+     * Extracts a meaningful error message from mongosh output.
+     * Strips the Mongo*Error class prefix for cleaner user-facing messages.
+     */
+    public static function parseMongoshError(string $stderr, string $stdout): string
+    {
+        $output = trim($stderr) !== '' ? trim($stderr) : trim($stdout);
+
+        if ($output === '') {
+            return 'Connection test failed';
+        }
+
+        // mongosh errors look like: "MongoServerSelectionError: message"
+        // Extract just the message part for cleaner user output
+        if (preg_match('/^Mongo\w+Error:\s*(.+)$/m', $output, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Return first non-empty line as fallback
+        foreach (explode("\n", $output) as $line) {
+            $line = trim($line);
+            if ($line !== '') {
+                return $line;
+            }
+        }
+
+        return 'Connection test failed';
     }
 
     /**
