@@ -1,1 +1,1 @@
-getaddrinfo ENOTFOUND locahost
+Could not resolve hostname 'locahost'. Please check the host configuration.

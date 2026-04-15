@@ -96,7 +96,7 @@ class Extractor
 
     /**
      * Extracts a meaningful error message from mongosh output.
-     * Strips the Mongo*Error class prefix for cleaner user-facing messages.
+     * Strips the Mongo*Error class prefix and maps technical errors to user-friendly messages.
      */
     public static function parseMongoshError(string $stderr, string $stdout): string
     {
@@ -108,19 +108,49 @@ class Extractor
 
         // mongosh errors look like: "MongoServerSelectionError: message"
         // Extract just the message part for cleaner user output
+        $message = $output;
         if (preg_match('/^Mongo\w+Error:\s*(.+)$/m', $output, $matches)) {
-            return trim($matches[1]);
-        }
-
-        // Return first non-empty line as fallback
-        foreach (explode("\n", $output) as $line) {
-            $line = trim($line);
-            if ($line !== '') {
-                return $line;
+            $message = trim($matches[1]);
+        } else {
+            // Use first non-empty line as fallback
+            foreach (explode("\n", $output) as $line) {
+                $line = trim($line);
+                if ($line !== '') {
+                    $message = $line;
+                    break;
+                }
             }
         }
 
-        return 'Connection test failed';
+        return self::mapMongoshErrorToUserMessage($message);
+    }
+
+    /**
+     * Maps technical mongosh error messages to user-friendly messages.
+     */
+    private static function mapMongoshErrorToUserMessage(string $message): string
+    {
+        // DNS resolution failure: "getaddrinfo ENOTFOUND locahost"
+        if (preg_match('/getaddrinfo ENOTFOUND\s+(\S+)/', $message, $matches)) {
+            return sprintf("Could not resolve hostname '%s'. Please check the host configuration.", $matches[1]);
+        }
+
+        // Connection refused: "connect ECONNREFUSED 127.0.0.1:27017"
+        if (preg_match('/connect ECONNREFUSED\s+(\S+)/', $message, $matches)) {
+            return sprintf('Connection refused to %s. Please check the host and port configuration.', $matches[1]);
+        }
+
+        // Connection timeout: "connection timed out" or "Server selection timed out"
+        if (str_contains(strtolower($message), 'timed out')) {
+            return 'Connection timed out. Please check the host and port configuration.';
+        }
+
+        // Malformed URI / unescaped characters — mongosh misinterprets bad URIs
+        if (str_contains($message, 'unescaped characters')) {
+            return 'Failed to parse connection URI. Please check the connection parameters.';
+        }
+
+        return $message;
     }
 
     /**

@@ -9,11 +9,11 @@ use PHPUnit\Framework\TestCase;
 
 class ExtractorParseMongoshErrorTest extends TestCase
 {
-    public function testServerSelectionError(): void
+    public function testDnsResolutionError(): void
     {
         $stderr = "MongoServerSelectionError: getaddrinfo ENOTFOUND locahost\n";
         $result = Extractor::parseMongoshError($stderr, '');
-        self::assertSame('getaddrinfo ENOTFOUND locahost', $result);
+        self::assertSame("Could not resolve hostname 'locahost'. Please check the host configuration.", $result);
     }
 
     public function testAuthenticationError(): void
@@ -21,6 +21,30 @@ class ExtractorParseMongoshErrorTest extends TestCase
         $stderr = "MongoServerError: Authentication failed.\n";
         $result = Extractor::parseMongoshError($stderr, '');
         self::assertSame('Authentication failed.', $result);
+    }
+
+    public function testConnectionRefusedError(): void
+    {
+        $stderr = "MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017\n";
+        $result = Extractor::parseMongoshError($stderr, '');
+        self::assertSame(
+            'Connection refused to 127.0.0.1:27017. Please check the host and port configuration.',
+            $result,
+        );
+    }
+
+    public function testConnectionTimeoutError(): void
+    {
+        $stderr = "MongoServerSelectionError: Server selection timed out\n";
+        $result = Extractor::parseMongoshError($stderr, '');
+        self::assertSame('Connection timed out. Please check the host and port configuration.', $result);
+    }
+
+    public function testUnescapedCharactersError(): void
+    {
+        $stderr = "Password contains unescaped characters\n";
+        $result = Extractor::parseMongoshError($stderr, '');
+        self::assertSame('Failed to parse connection URI. Please check the connection parameters.', $result);
     }
 
     public function testFallbackToStdoutWhenStderrEmpty(): void
@@ -40,7 +64,10 @@ class ExtractorParseMongoshErrorTest extends TestCase
     {
         $stderr = "Some warning line\nMongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017\nstack trace...\n";
         $result = Extractor::parseMongoshError($stderr, '');
-        self::assertSame('connect ECONNREFUSED 127.0.0.1:27017', $result);
+        self::assertSame(
+            'Connection refused to 127.0.0.1:27017. Please check the host and port configuration.',
+            $result,
+        );
     }
 
     public function testNonMongoErrorReturnFirstLine(): void
@@ -48,5 +75,12 @@ class ExtractorParseMongoshErrorTest extends TestCase
         $stderr = "Unexpected error occurred\nMore details\n";
         $result = Extractor::parseMongoshError($stderr, '');
         self::assertSame('Unexpected error occurred', $result);
+    }
+
+    public function testUnmappedErrorPassedThrough(): void
+    {
+        $stderr = "MongoServerError: some unknown error\n";
+        $result = Extractor::parseMongoshError($stderr, '');
+        self::assertSame('some unknown error', $result);
     }
 }
