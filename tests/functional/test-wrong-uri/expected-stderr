@@ -1,1 +1,1 @@
-Failed to parse MongoDB URI: 'mongodb://mongodb://keboola-test@mongodb/test:27017/test'. %s
+Password contains unescaped characters
