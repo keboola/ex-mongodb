@@ -8,13 +8,13 @@ use Keboola\Component\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 use Keboola\Temp\Temp;
-use Symfony\Component\Process\Process;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
 use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
+use Symfony\Component\Process\Process;
 
 class Extractor
 {
