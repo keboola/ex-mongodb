@@ -132,8 +132,8 @@ class Extractor
      */
     private static function mapMongoshErrorToUserMessage(string $message): string
     {
-        // DNS resolution failure: "getaddrinfo ENOTFOUND locahost"
-        if (preg_match('/getaddrinfo ENOTFOUND\s+(\S+)/', $message, $matches)) {
+        // DNS resolution failure: "getaddrinfo ENOTFOUND host" or "getaddrinfo EAI_AGAIN host"
+        if (preg_match('/getaddrinfo \w+\s+(\S+)/', $message, $matches)) {
             return sprintf("Could not resolve hostname '%s'. Please check the host configuration.", $matches[1]);
         }
 

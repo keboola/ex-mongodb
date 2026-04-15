@@ -9,9 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 class ExtractorParseMongoshErrorTest extends TestCase
 {
-    public function testDnsResolutionError(): void
+    public function testDnsResolutionErrorNotFound(): void
     {
         $stderr = "MongoServerSelectionError: getaddrinfo ENOTFOUND locahost\n";
+        $result = Extractor::parseMongoshError($stderr, '');
+        self::assertSame("Could not resolve hostname 'locahost'. Please check the host configuration.", $result);
+    }
+
+    public function testDnsResolutionErrorTemporaryFailure(): void
+    {
+        $stderr = "MongoServerSelectionError: getaddrinfo EAI_AGAIN locahost\n";
         $result = Extractor::parseMongoshError($stderr, '');
         self::assertSame("Could not resolve hostname 'locahost'. Please check the host configuration.", $result);
     }
