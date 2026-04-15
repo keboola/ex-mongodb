@@ -74,7 +74,8 @@ class Extractor
                 $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
             } catch (Exception $exception) {
                 // Azure Cosmos DB uses SCRAM-SHA-256 with a 16-byte salt, which some versions
-                // of the PHP MongoDB driver (libmongoc) reject. Stop retrying — handle below.
+                // of the PHP MongoDB driver (libmongoc) reject. The Go-based mongoexport tool
+                // handles this correctly, so we skip the PHP driver test for this specific error.
                 // See: https://jira.mongodb.org/browse/CDRIVER-3650
                 if (str_contains($exception->getMessage(), 'invalid salt length')) {
                     $scramSaltError = true;
@@ -86,32 +87,11 @@ class Extractor
         });
 
         if ($scramSaltError) {
-            $this->logger->info(
-                'SCRAM-SHA-256 authentication failed due to invalid salt length. '
-                . 'Retrying with SCRAM-SHA-1 (Cosmos DB compatibility).',
+            $this->logger->warning(
+                'SCRAM-SHA-256 authentication failed due to invalid salt length '
+                . '(known Cosmos DB incompatibility with PHP MongoDB driver). '
+                . 'Skipping PHP driver connection test — mongoexport will handle authentication.',
             );
-            $this->testConnectionWithScramSha1($uri);
-        }
-    }
-
-    /**
-     * Fallback test connection using SCRAM-SHA-1 for Cosmos DB compatibility.
-     * Also sets authenticationMechanism in dbParams so mongoexport uses the same mechanism.
-     * @throws \Keboola\Component\UserException
-     */
-    private function testConnectionWithScramSha1(Uri $uri): void
-    {
-        $this->dbParams['authenticationMechanism'] = 'SCRAM-SHA-1';
-        try {
-            $manager = new Manager((string) $uri, ['authMechanism' => 'SCRAM-SHA-1']);
-        } catch (Exception $exception) {
-            throw new UserException($exception->getMessage(), 0, $exception);
-        }
-
-        try {
-            $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
-        } catch (Exception $exception) {
-            throw new UserException($exception->getMessage(), 0, $exception);
         }
     }
 

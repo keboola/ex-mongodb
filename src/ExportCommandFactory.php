@@ -82,11 +82,6 @@ class ExportCommandFactory
             }
         }
 
-        if (isset($params['authenticationMechanism'])) {
-            $command[] = '--authenticationMechanism '
-                . escapeshellarg($params['authenticationMechanism']);
-        }
-
         return [$command, $params];
     }
 
