@@ -68,17 +68,19 @@ class Extractor
             throw new UserException($exception->getMessage(), 0, $exception);
         }
 
-        $scramSaltError = false;
-        $this->retryProxy->call(function () use ($manager, $uri, &$scramSaltError): void {
+        $isCosmosDb = str_contains(strtolower((string) $uri), 'cosmos.azure.');
+        $cosmosDbAuthError = false;
+        $this->retryProxy->call(function () use ($manager, $uri, $isCosmosDb, &$cosmosDbAuthError): void {
             try {
                 $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
             } catch (Exception $exception) {
-                // Azure Cosmos DB uses SCRAM-SHA-256 with a 16-byte salt, which some versions
-                // of the PHP MongoDB driver (libmongoc) reject. The Go-based mongoexport tool
-                // handles this correctly, so we skip the PHP driver test for this specific error.
+                // Azure Cosmos DB's SCRAM-SHA-256 implementation is incompatible with the PHP
+                // MongoDB driver (libmongoc). This manifests as various SASL-related errors:
+                // "invalid salt length", "saslContinue" socket failures, etc.
+                // The Go-based mongoexport tool handles Cosmos DB authentication correctly.
                 // See: https://jira.mongodb.org/browse/CDRIVER-3650
-                if (str_contains($exception->getMessage(), 'invalid salt length')) {
-                    $scramSaltError = true;
+                if ($isCosmosDb && str_contains(strtolower($exception->getMessage()), 'sasl')) {
+                    $cosmosDbAuthError = true;
                     return;
                 }
                 echo sprintf('Retrying (%sx)...%s', $this->retryProxy->getTryCount(), PHP_EOL);
@@ -86,10 +88,9 @@ class Extractor
             }
         });
 
-        if ($scramSaltError) {
+        if ($cosmosDbAuthError) {
             $this->logger->warning(
-                'SCRAM-SHA-256 authentication failed due to invalid salt length '
-                . '(known Cosmos DB incompatibility with PHP MongoDB driver). '
+                'Cosmos DB SCRAM-SHA-256 authentication is incompatible with the PHP MongoDB driver. '
                 . 'Skipping PHP driver connection test — mongoexport will handle authentication.',
             );
         }
