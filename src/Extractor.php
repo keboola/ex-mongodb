@@ -61,10 +61,12 @@ class Extractor
     {
         $uri = $this->uriFactory->create($this->dbParams);
 
-        // Add short timeout to avoid long waits on unreachable hosts
+        // Add short timeout to avoid long waits on unreachable hosts (only if not already set)
         $uriString = (string) $uri;
-        $separator = str_contains($uriString, '?') ? '&' : '?';
-        $uriString .= $separator . 'serverSelectionTimeoutMS=5000';
+        if (!$uri->getQuery()->has('serverSelectionTimeoutMS')) {
+            $separator = str_contains($uriString, '?') ? '&' : '?';
+            $uriString .= $separator . 'serverSelectionTimeoutMS=5000';
+        }
 
         $command = ['mongosh', $uriString, '--eval', 'db.runCommand({listCollections: 1})', '--quiet', '--norc'];
 

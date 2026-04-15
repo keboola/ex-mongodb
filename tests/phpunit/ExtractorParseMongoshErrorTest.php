@@ -70,7 +70,7 @@ class ExtractorParseMongoshErrorTest extends TestCase
         );
     }
 
-    public function testNonMongoErrorReturnFirstLine(): void
+    public function testNonMongoErrorReturnsFirstLine(): void
     {
         $stderr = "Unexpected error occurred\nMore details\n";
         $result = Extractor::parseMongoshError($stderr, '');
