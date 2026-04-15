@@ -66,6 +66,10 @@ The component supports two config shapes detected at runtime in `Component::getC
 - **Old config** (`OldConfigDefinition`) — `parameters.exports[]` array with multiple exports
 - **Row config** (`ConfigRowDefinition`) — Single export per config row (current standard)
 
+### Connection Testing
+
+`Extractor::testConnection()` uses `mongosh` (not `mongoexport`) to verify connectivity. This is because `mongoexport` requires a `--collection` parameter and always tries to export data — it can't just test a connection. The `testConnection` sync action (UI's "Test Connection" button) has no collection context, so it runs `db.runCommand({listCollections: 1})` via `mongosh` which is the canonical way to verify authentication and connectivity. `mongoexport` is the wrong tool here because you'd have to fake a collection name, then distinguish "collection not found" from "can't connect" in the error output.
+
 ### Incremental Fetching
 
 Stores `lastFetchedRow` in state file between runs. Automatically builds `$gte` queries on the configured column. Supports date, numeric, and string column types with dot-notation paths for nested fields.
