@@ -8,15 +8,13 @@ use Keboola\Component\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 use Keboola\Temp\Temp;
-use MongoDB\Driver\Command;
-use MongoDB\Driver\Exception\Exception;
-use MongoDB\Driver\Manager;
 use MongoExtractor\Config\Config;
 use MongoExtractor\Config\ExportOptions;
 use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
+use Symfony\Component\Process\Process;
 
 class Extractor
 {
@@ -56,26 +54,105 @@ class Extractor
     }
 
     /**
-     * Sends listCollections command to test connection/credentials
+     * Tests connection using mongosh CLI
      * @throws \Keboola\Component\UserException
      */
     public function testConnection(): void
     {
         $uri = $this->uriFactory->create($this->dbParams);
-        try {
-            $manager = new Manager((string) $uri);
-        } catch (Exception $exception) {
-            throw new UserException($exception->getMessage(), 0, $exception);
+
+        // Add short timeout to avoid long waits on unreachable hosts (only if not already set)
+        $uriString = (string) $uri;
+        if (!$uri->getQuery()->has('serverSelectionTimeoutMS')) {
+            $separator = str_contains($uriString, '?') ? '&' : '?';
+            $uriString .= $separator . 'serverSelectionTimeoutMS=5000';
         }
 
-        $this->retryProxy->call(function () use ($manager, $uri): void {
-            try {
-                $manager->executeCommand($uri->getDatabase(), new Command(['listCollections' => 1]));
-            } catch (Exception $exception) {
+        $command = ['mongosh', $uriString, '--eval', 'db.runCommand({listCollections: 1})', '--quiet', '--norc'];
+
+        // Add TLS cert flags when SSL is enabled and cert files are provided
+        if (($this->dbParams['ssl']['enabled'] ?? false)) {
+            if (isset($this->dbParams['ssl']['caFile'])) {
+                $command[] = '--tlsCAFile=' . $this->dbParams['ssl']['caFile'];
+            }
+            if (isset($this->dbParams['ssl']['certKeyFile'])) {
+                $command[] = '--tlsCertificateKeyFile=' . $this->dbParams['ssl']['certKeyFile'];
+            }
+        }
+
+        $this->retryProxy->call(function () use ($command): void {
+            $process = new Process($command);
+            $process->setTimeout(30);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
                 echo sprintf('Retrying (%sx)...%s', $this->retryProxy->getTryCount(), PHP_EOL);
-                throw new UserException($exception->getMessage(), 0, $exception);
+                $errorMessage = self::parseMongoshError(
+                    $process->getErrorOutput(),
+                    $process->getOutput(),
+                );
+                throw new UserException($errorMessage);
             }
         });
+    }
+
+    /**
+     * Extracts a meaningful error message from mongosh output.
+     * Strips the Mongo*Error class prefix and maps technical errors to user-friendly messages.
+     */
+    public static function parseMongoshError(string $stderr, string $stdout): string
+    {
+        $output = trim($stderr) !== '' ? trim($stderr) : trim($stdout);
+
+        if ($output === '') {
+            return 'Connection test failed';
+        }
+
+        // mongosh errors look like: "MongoServerSelectionError: message"
+        // Extract just the message part for cleaner user output
+        $message = $output;
+        if (preg_match('/^Mongo\w+Error:\s*(.+)$/m', $output, $matches)) {
+            $message = trim($matches[1]);
+        } else {
+            // Use first non-empty line as fallback
+            foreach (explode("\n", $output) as $line) {
+                $line = trim($line);
+                if ($line !== '') {
+                    $message = $line;
+                    break;
+                }
+            }
+        }
+
+        return self::mapMongoshErrorToUserMessage($message);
+    }
+
+    /**
+     * Maps technical mongosh error messages to user-friendly messages.
+     */
+    private static function mapMongoshErrorToUserMessage(string $message): string
+    {
+        // DNS resolution failure: "getaddrinfo ENOTFOUND host" or "getaddrinfo EAI_AGAIN host"
+        if (preg_match('/getaddrinfo \w+\s+(\S+)/', $message, $matches)) {
+            return sprintf("Could not resolve hostname '%s'. Please check the host configuration.", $matches[1]);
+        }
+
+        // Connection refused: "connect ECONNREFUSED 127.0.0.1:27017"
+        if (preg_match('/connect ECONNREFUSED\s+(\S+)/', $message, $matches)) {
+            return sprintf('Connection refused to %s. Please check the host and port configuration.', $matches[1]);
+        }
+
+        // Connection timeout: "connection timed out" or "Server selection timed out"
+        if (str_contains(strtolower($message), 'timed out')) {
+            return 'Connection timed out. Please check the host and port configuration.';
+        }
+
+        // Malformed URI / unescaped characters — mongosh misinterprets bad URIs
+        if (str_contains($message, 'unescaped characters')) {
+            return 'Failed to parse connection URI. Please check the connection parameters.';
+        }
+
+        return $message;
     }
 
     /**

@@ -1,1 +1,1 @@
-No suitable servers found (`serverSelectionTryOnce` set): [Failed to resolve 'locahost']. Topology type: Single
+Could not resolve hostname 'locahost'. Please check the host configuration.
