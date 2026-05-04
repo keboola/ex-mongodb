@@ -75,6 +75,12 @@ class UriFactory
             $query[] = ['authSource', $params['authenticationDatabase']];
         }
 
+        if (isset($params['authenticationMechanism'])
+            && trim((string) $params['authenticationMechanism']) !== ''
+        ) {
+            $query[] = ['authMechanism', $params['authenticationMechanism']];
+        }
+
         if (($params['ssl']['enabled'] ?? false)) {
             $query[] = ['ssl', 'true'];
             if (isset($params['ssl']['caFile'])) {

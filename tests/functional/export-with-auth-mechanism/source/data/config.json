@@ -1,0 +1,30 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb-auth",
+      "port": 27017,
+      "database": "test",
+      "user": "user",
+      "#password": "p#a!s@sw:o&r%^d",
+      "authenticationMechanism": "SCRAM-SHA-256"
+    },
+    "collection": "restaurants",
+    "tableName": "export-all",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "name": {
+        "type": "column",
+        "mapping": {
+          "destination": "name"
+        }
+      }
+    },
+    "mode": "mapping",
+    "sort": "{_id: 1}"
+  }
+}

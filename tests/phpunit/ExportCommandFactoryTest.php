@@ -152,6 +152,54 @@ BASH;
         $this->assertSame($expectedCommand, $command);
     }
 
+    public function testWithAuthenticationMechanism(): void
+    {
+        $options = [
+            'host' => 'localhost',
+            'port' => 27017,
+            'database' => 'myDatabase',
+            'collection' => 'myCollection',
+            'out' => '/tmp/create-test.json',
+            'user' => 'user',
+            'password' => 'pass',
+            'authenticationDatabase' => 'myAuthDatabase',
+            'authenticationMechanism' => 'SCRAM-SHA-256',
+        ];
+
+        $command = $this->commandFactory->create($options);
+        // phpcs:disable Generic.Files.LineLength.MaxExceeded
+        $expectedCommand = <<<BASH
+mongoexport --host 'localhost' --port '27017' --db 'myDatabase' --username 'user' --password 'pass' --authenticationDatabase 'myAuthDatabase' --authenticationMechanism 'SCRAM-SHA-256' --collection 'myCollection' --sort '{_id: 1}' --type 'json'
+BASH;
+        // phpcs:enable
+
+        $this->assertSame($expectedCommand, $command);
+    }
+
+    public function testMongoDbSrvProtocolWithAuthenticationMechanism(): void
+    {
+        $options = [
+            'protocol' => 'mongodb+srv',
+            'host' => 'localhost',
+            'database' => 'myDatabase',
+            'collection' => 'myCollection',
+            'out' => '/tmp/create-test.json',
+            'user' => 'user',
+            'password' => 'pass',
+            'authenticationMechanism' => 'SCRAM-SHA-256',
+        ];
+
+        $command = $this->commandFactory->create($options);
+
+        // phpcs:disable Generic.Files.LineLength.MaxExceeded
+        $expectedCommand = <<<BASH
+mongoexport --uri 'mongodb+srv://user:pass@localhost/myDatabase?authMechanism=SCRAM-SHA-256' --collection 'myCollection' --sort '{_id: 1}' --type 'json'
+BASH;
+        // phpcs:enable
+
+        $this->assertSame($expectedCommand, $command);
+    }
+
     public function testWithEmptyCustomAuthenticationDatabase(): void
     {
         $options = [

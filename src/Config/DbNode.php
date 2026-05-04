@@ -19,6 +19,15 @@ class DbNode extends ArrayNodeDefinition
 
     public const NODE_NAME = 'db';
 
+    public const AUTH_MECHANISMS = [
+        'SCRAM-SHA-1',
+        'SCRAM-SHA-256',
+        'MONGODB-X509',
+        'GSSAPI',
+        'PLAIN',
+        'MONGODB-AWS',
+    ];
+
     public function __construct()
     {
         parent::__construct(self::NODE_NAME);
@@ -43,7 +52,7 @@ class DbNode extends ArrayNodeDefinition
                 }
 
                 // Check incompatible keys
-                foreach (['host', 'port', 'database', 'authenticationDatabase'] as $key) {
+                foreach (['host', 'port', 'database', 'authenticationDatabase', 'authenticationMechanism'] as $key) {
                     if (isset($v[$key])) {
                         throw new InvalidConfigurationException(sprintf(
                             'Configuration node "db.%s" is not compatible with custom URI.',
@@ -94,6 +103,9 @@ class DbNode extends ArrayNodeDefinition
             ->scalarNode('port')->cannotBeEmpty()->end()
             ->scalarNode('database')->cannotBeEmpty()->end()
             ->scalarNode('authenticationDatabase')->end()
+            ->enumNode('authenticationMechanism')
+                ->values(self::AUTH_MECHANISMS)
+            ->end()
             ->scalarNode('user')->end()
             ->scalarNode('password')->end()
             ->scalarNode('#password')->end()

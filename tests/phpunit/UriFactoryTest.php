@@ -118,6 +118,51 @@ class UriFactoryTest extends TestCase
                     'authenticationDatabase' => 'authDb',
                 ],
             ],
+            'authMechanism-mongodb' => [
+                'mongodb://user:pass@localhost:27017/myDatabase?authMechanism=SCRAM-SHA-256',
+                [
+                    'host' => 'localhost',
+                    'port' => 27017,
+                    'database' => 'myDatabase',
+                    'user' => 'user',
+                    'password' => 'pass',
+                    'authenticationMechanism' => 'SCRAM-SHA-256',
+                ],
+            ],
+            'authMechanism-with-authSource' => [
+                'mongodb://user:pass@localhost:27017/myDatabase?authSource=authDb&authMechanism=SCRAM-SHA-256',
+                [
+                    'host' => 'localhost',
+                    'port' => 27017,
+                    'database' => 'myDatabase',
+                    'user' => 'user',
+                    'password' => 'pass',
+                    'authenticationDatabase' => 'authDb',
+                    'authenticationMechanism' => 'SCRAM-SHA-256',
+                ],
+            ],
+            'authMechanism-srv' => [
+                'mongodb+srv://user:pass@mongodb.cluster.local/myDatabase?authMechanism=SCRAM-SHA-256',
+                [
+                    'protocol' => 'mongodb+srv',
+                    'host' => 'mongodb.cluster.local',
+                    'database' => 'myDatabase',
+                    'user' => 'user',
+                    'password' => 'pass',
+                    'authenticationMechanism' => 'SCRAM-SHA-256',
+                ],
+            ],
+            'authMechanism-empty-not-emitted' => [
+                'mongodb://user:pass@localhost:27017/myDatabase',
+                [
+                    'host' => 'localhost',
+                    'port' => 27017,
+                    'database' => 'myDatabase',
+                    'user' => 'user',
+                    'password' => 'pass',
+                    'authenticationMechanism' => '',
+                ],
+            ],
             'custom-uri' => [
                 'mongodb://user%40:pas%24%24word%40@localhost:27017/db?authSource=authDb&replicaSet=myRepl',
                 [
