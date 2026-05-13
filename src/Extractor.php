@@ -54,19 +54,23 @@ class Extractor
     }
 
     /**
+     * connectTimeoutMS bounds the underlying TCP connect (slow VPN routes hung
+     * here previously). serverSelectionTimeoutMS bounds post-handshake driver
+     * selection. The Process wall-clock must comfortably exceed both so mongosh
+     * can emit a clean error instead of being SIGKILLed.
+     */
+    private const MONGOSH_CONNECT_TIMEOUT_MS = 10000;
+    private const MONGOSH_SERVER_SELECTION_TIMEOUT_MS = 5000;
+    private const MONGOSH_PROCESS_TIMEOUT_SECONDS = 60;
+
+    /**
      * Tests connection using mongosh CLI
      * @throws \Keboola\Component\UserException
      */
     public function testConnection(): void
     {
         $uri = $this->uriFactory->create($this->dbParams);
-
-        // Add short timeout to avoid long waits on unreachable hosts (only if not already set)
-        $uriString = (string) $uri;
-        if (!$uri->getQuery()->has('serverSelectionTimeoutMS')) {
-            $separator = str_contains($uriString, '?') ? '&' : '?';
-            $uriString .= $separator . 'serverSelectionTimeoutMS=5000';
-        }
+        $uriString = self::appendMongoshTimeouts($uri);
 
         $command = ['mongosh', $uriString, '--eval', 'db.runCommand({listCollections: 1})', '--quiet', '--norc'];
 
@@ -82,7 +86,7 @@ class Extractor
 
         $this->retryProxy->call(function () use ($command): void {
             $process = new Process($command);
-            $process->setTimeout(30);
+            $process->setTimeout(self::MONGOSH_PROCESS_TIMEOUT_SECONDS);
             $process->run();
 
             if (!$process->isSuccessful()) {
@@ -94,6 +98,32 @@ class Extractor
                 throw new UserException($errorMessage);
             }
         });
+    }
+
+    /**
+     * Appends connectTimeoutMS and serverSelectionTimeoutMS to a mongosh URI so
+     * a connect failure surfaces as a clean MongoNetworkError instead of being
+     * killed by the wrapping Process timeout. User-supplied values take
+     * precedence — caller-provided timeouts are never overridden.
+     */
+    public static function appendMongoshTimeouts(Uri $uri): string
+    {
+        $defaults = [
+            'connectTimeoutMS' => self::MONGOSH_CONNECT_TIMEOUT_MS,
+            'serverSelectionTimeoutMS' => self::MONGOSH_SERVER_SELECTION_TIMEOUT_MS,
+        ];
+
+        $uriString = (string) $uri;
+        $query = $uri->getQuery();
+
+        foreach ($defaults as $key => $value) {
+            if (!$query->has($key)) {
+                $separator = str_contains($uriString, '?') ? '&' : '?';
+                $uriString .= $separator . $key . '=' . $value;
+            }
+        }
+
+        return $uriString;
     }
 
     /**
