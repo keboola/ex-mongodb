@@ -192,12 +192,6 @@ class Extractor
      */
     public function extract(string $outputPath): void
     {
-        // No pre-flight testConnection() — mongoexport surfaces connection
-        // failures directly. AJDA-2721: pre-flight via mongosh blocked at
-        // OS-level DNS/socket on VPN routes, which driver-level timeouts
-        // cannot bound, causing every nightly job to fail. testConnection()
-        // remains as the UI sync action only.
-
         $count = 0;
         $lastFetchedValues = [];
         $lastFetchedValue = null;

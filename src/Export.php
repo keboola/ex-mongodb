@@ -133,6 +133,12 @@ class Export
                 'connection handshake: dial tcp: i/o timeout');
         }
 
+        if (str_contains($e->getMessage(), 'error parsing URI')
+            || str_contains($e->getMessage(), 'error parsing uri')
+        ) {
+            throw new UserException('Failed to parse connection URI. Please check the connection parameters.');
+        }
+
         if (str_contains($e->getMessage(), 'sort key ordering must be 1 (for ascending) or -1 (for descending)')) {
             throw new UserException('$sort key ordering must be 1 (for ascending) or -1 (for descending)');
         }
