@@ -192,8 +192,6 @@ class Extractor
      */
     public function extract(string $outputPath): void
     {
-        $this->testConnection();
-
         $count = 0;
         $lastFetchedValues = [];
         $lastFetchedValue = null;
