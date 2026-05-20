@@ -1,0 +1,19 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "host": "mongodb-auth",
+      "port": 27017,
+      "database": "test",
+      "user": "user",
+      "#password": "p#a!s@sw:o&r%^d",
+      "authenticationMechanism": "SCRAM-SHA-256"
+    },
+    "tableName": "bakeries",
+    "collection": "restaurants",
+    "incremental": true,
+    "mapping": {
+      "_id.id": "id"
+    }
+  }
+}

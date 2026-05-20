@@ -31,6 +31,17 @@ class DbNode extends ArrayNodeDefinition
     public function __construct()
     {
         parent::__construct(self::NODE_NAME);
+        $this->beforeNormalization()->always(function (array $v): array {
+            // Treat an empty/whitespace-only authenticationMechanism as "not set"
+            // so the optional enum field does not reject "" sent by the UI for an
+            // unselected mechanism.
+            if (isset($v['authenticationMechanism'])
+                && trim((string) $v['authenticationMechanism']) === ''
+            ) {
+                unset($v['authenticationMechanism']);
+            }
+            return $v;
+        })->end();
         $this->validate()->always(function (array $v): array {
                 $protocol = $v['protocol'];
                 $sshTunnelEnabled = $v['ssh']['enabled'] ?? false;

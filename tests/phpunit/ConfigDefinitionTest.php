@@ -159,6 +159,33 @@ class ConfigRowDefinitionTest extends TestCase
             ],
         ];
 
+        yield 'valid config with empty authenticationMechanism' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => '',
+                            ],
+                        'exports' =>
+                            [
+                                0 =>
+                                    [
+                                        'name' => 'bronx-bakeries',
+                                        'id' => 123,
+                                        'collection' => 'restaurants',
+                                        'mapping' => ['_id' => null],
+                                    ],
+                            ],
+                    ],
+            ],
+        ];
+
         yield 'incremental fetching column normalization' => [
             'configData' => [
                 'parameters' =>
@@ -521,6 +548,25 @@ class ConfigRowDefinitionTest extends TestCase
                     ],
             ],
         ];
+
+        yield 'valid row config with empty authenticationMechanism' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => '',
+                            ],
+                            'tableName' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
+                    ],
+            ],
+        ];
     }
 
     /**
@@ -722,6 +768,12 @@ class ConfigRowDefinitionTest extends TestCase
     {
         if (!array_key_exists('protocol', $configData['parameters']['db'])) {
             $configData['parameters']['db']['protocol'] = DbNode::PROTOCOL_MONGO_DB;
+        }
+
+        if (array_key_exists('authenticationMechanism', $configData['parameters']['db'])
+            && trim((string) $configData['parameters']['db']['authenticationMechanism']) === ''
+        ) {
+            unset($configData['parameters']['db']['authenticationMechanism']);
         }
 
         if ($oldConfig) {
