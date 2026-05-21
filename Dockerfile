@@ -13,6 +13,7 @@ COPY docker/composer-install.sh /tmp/composer-install.sh
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libicu-dev \
         libssl-dev \
+        libzstd-dev \
         git \
         ssh \
         locales \
