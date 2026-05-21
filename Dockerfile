@@ -13,7 +13,6 @@ COPY docker/composer-install.sh /tmp/composer-install.sh
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libicu-dev \
         libssl-dev \
-        libzstd-dev \
         git \
         ssh \
         locales \
@@ -38,7 +37,7 @@ RUN wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86
 RUN docker-php-ext-configure intl \
     && docker-php-ext-install intl
 
-RUN pecl install mongodb \
+RUN pecl install mongodb-2.2.0 \
   && docker-php-ext-enable mongodb
 
 ## Composer - deps always cached unless changed
