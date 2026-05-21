@@ -70,6 +70,12 @@ class ExportCommandFactory
             ) {
                 $command[] = '--authenticationDatabase ' . escapeshellarg($params['authenticationDatabase']);
             }
+
+            if (isset($params['authenticationMechanism'])
+                && trim((string) $params['authenticationMechanism']) !== ''
+            ) {
+                $command[] = '--authenticationMechanism ' . escapeshellarg($params['authenticationMechanism']);
+            }
         }
 
         if (($params['ssl']['enabled'] ?? false)) {

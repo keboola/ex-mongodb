@@ -132,6 +132,60 @@ class ConfigRowDefinitionTest extends TestCase
             ],
         ];
 
+        yield 'valid config with authenticationMechanism' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => 'SCRAM-SHA-256',
+                            ],
+                        'exports' =>
+                            [
+                                0 =>
+                                    [
+                                        'name' => 'bronx-bakeries',
+                                        'id' => 123,
+                                        'collection' => 'restaurants',
+                                        'mapping' => ['_id' => null],
+                                    ],
+                            ],
+                    ],
+            ],
+        ];
+
+        yield 'valid config with empty authenticationMechanism' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => '',
+                            ],
+                        'exports' =>
+                            [
+                                0 =>
+                                    [
+                                        'name' => 'bronx-bakeries',
+                                        'id' => 123,
+                                        'collection' => 'restaurants',
+                                        'mapping' => ['_id' => null],
+                                    ],
+                            ],
+                    ],
+            ],
+        ];
+
         yield 'incremental fetching column normalization' => [
             'configData' => [
                 'parameters' =>
@@ -346,6 +400,62 @@ class ConfigRowDefinitionTest extends TestCase
             ],
             'expectedError' => 'Both incremental fetching and sort cannot be set together.',
         ];
+
+        yield 'invalid authenticationMechanism value' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => 'INVALID-MECHANISM',
+                            ],
+                        'exports' =>
+                            [
+                                0 =>
+                                    [
+                                        'name' => 'bronx-bakeries',
+                                        'id' => 123,
+                                        'collection' => 'restaurants',
+                                        'mapping' => ['_id' => null],
+                                    ],
+                            ],
+                    ],
+            ],
+            'expectedError' => 'The value "INVALID-MECHANISM" is not allowed for path '
+                . '"root.parameters.db.authenticationMechanism".',
+        ];
+
+        yield 'authenticationMechanism not allowed with custom_uri' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'protocol' => 'custom_uri',
+                                'uri' => 'mongodb://user@localhost/db',
+                                'password' => 'pass',
+                                'authenticationMechanism' => 'SCRAM-SHA-256',
+                            ],
+                        'exports' =>
+                            [
+                                0 =>
+                                    [
+                                        'name' => 'bronx-bakeries',
+                                        'id' => 123,
+                                        'collection' => 'restaurants',
+                                        'mapping' => ['_id' => null],
+                                    ],
+                            ],
+                    ],
+            ],
+            'expectedError' => 'Configuration node "db.authenticationMechanism" '
+                . 'is not compatible with custom URI.',
+        ];
     }
 
     /**
@@ -416,6 +526,44 @@ class ConfigRowDefinitionTest extends TestCase
                             'tableName' => 'bronx-bakeries',
                             'collection' => 'restaurants',
                             'incrementalFetchingColumn' => 'someColumn',
+                    ],
+            ],
+        ];
+
+        yield 'valid row config with authenticationMechanism' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => 'SCRAM-SHA-256',
+                            ],
+                            'tableName' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
+                    ],
+            ],
+        ];
+
+        yield 'valid row config with empty authenticationMechanism' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => '',
+                            ],
+                            'tableName' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
                     ],
             ],
         ];
@@ -570,6 +718,46 @@ class ConfigRowDefinitionTest extends TestCase
             ],
             'expectedError' => 'Both incremental fetching and sort cannot be set together.',
         ];
+
+        yield 'invalid authenticationMechanism value (row)' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'host' => '127.0.0.1',
+                                'port' => 27017,
+                                'database' => 'test',
+                                'user' => 'user',
+                                'password' => 'password',
+                                'authenticationMechanism' => 'INVALID-MECHANISM',
+                            ],
+                            'tableName' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
+                    ],
+            ],
+            'expectedError' => 'The value "INVALID-MECHANISM" is not allowed for path '
+                . '"root.parameters.db.authenticationMechanism".',
+        ];
+
+        yield 'authenticationMechanism not allowed with custom_uri (row)' => [
+            'configData' => [
+                'parameters' =>
+                    [
+                        'db' =>
+                            [
+                                'protocol' => 'custom_uri',
+                                'uri' => 'mongodb://user@localhost/db',
+                                'password' => 'pass',
+                                'authenticationMechanism' => 'SCRAM-SHA-256',
+                            ],
+                            'tableName' => 'bronx-bakeries',
+                            'collection' => 'restaurants',
+                    ],
+            ],
+            'expectedError' => 'Configuration node "db.authenticationMechanism" '
+                . 'is not compatible with custom URI.',
+        ];
     }
 
     /**
@@ -580,6 +768,12 @@ class ConfigRowDefinitionTest extends TestCase
     {
         if (!array_key_exists('protocol', $configData['parameters']['db'])) {
             $configData['parameters']['db']['protocol'] = DbNode::PROTOCOL_MONGO_DB;
+        }
+
+        if (array_key_exists('authenticationMechanism', $configData['parameters']['db'])
+            && trim((string) $configData['parameters']['db']['authenticationMechanism']) === ''
+        ) {
+            unset($configData['parameters']['db']['authenticationMechanism']);
         }
 
         if ($oldConfig) {

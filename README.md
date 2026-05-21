@@ -20,6 +20,7 @@ The configuration `config.json` contains following properties in `parameters` ke
         - `port` - string (optional): Server port (default port is `27017`).
         - `database` - string (required):  Database to connect to.
         - `authenticationDatabase` - string (optional): [Authentication database](https://docs.mongodb.com/manual/reference/program/mongo/#authentication-options) for `user`.
+        - `authenticationMechanism` - enum (optional): SASL mechanism passed to `mongoexport --authenticationMechanism`. One of `SCRAM-SHA-1`, `SCRAM-SHA-256`, `MONGODB-X509`, `GSSAPI`, `PLAIN`, `MONGODB-AWS`. Required for Azure Cosmos DB (set to `SCRAM-SHA-256`); leave unset against vanilla MongoDB so the driver negotiates. Cannot be used with `custom_uri` — embed `authMechanism=` in the URI itself instead.
         - `user` - string (optional): User with correct access rights.
         - `#password` - string (optional): Password for given `user`. Both or none of couple `user` and `#password` must be specified.
         - `ssh` - object (optional): Settings for SSH tunnel.

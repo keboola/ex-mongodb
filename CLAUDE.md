@@ -54,7 +54,7 @@ config.json → Component → Extractor → Export (mongoexport CLI) → Parse �
 
 ### Key Supporting Classes
 
-- **ExportCommandFactory** — Builds `mongoexport` shell commands from config params (URI, collection, query, sort, etc.)
+- **ExportCommandFactory** — Builds `mongoexport` shell commands from config params. Two protocol branches in `connectionOptions()`: `mongodb+srv` and `custom_uri` pass a single `--uri`; the default `mongodb://` path emits individual `--host`/`--port`/`--username`/`--password`/`--authenticationDatabase`/`--authenticationMechanism` flags (URI mode hangs against some servers — see comment in source). Any new auth-related option must be plumbed in both branches.
 - **UriFactory / Uri** — Handles MongoDB URI construction including multi-host, `mongodb+srv://`, custom URI, and special character encoding via `league/uri`
 - **ExportOptions** — Value object encapsulating all export parameters (collection, query, mode, mapping, incremental settings)
 - **RelativeDateParser** — Converts relative date expressions (e.g., `"now - 7 days"`) in queries to absolute dates
