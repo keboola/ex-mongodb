@@ -60,6 +60,7 @@ class OldConfigDefinition extends BaseConfigDefinition
                             ->end()
                             ->scalarNode('query')->end()
                             ->scalarNode('incrementalFetchingColumn')->end()
+                            ->scalarNode('incrementalFetchingOverlap')->end()
                             ->scalarNode('sort')->end()
                             ->scalarNode('limit')->end()
                             ->enumNode('mode')
