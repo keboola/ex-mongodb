@@ -23,6 +23,7 @@ class ExportOptions
     /** @var array<string, int|string|false> */
     private array $lastValueOptions;
     private ?string $incrementalFetchingColumn;
+    private ?int $incrementalFetchingOverlap;
     private ?string $query;
     private ?string $collection;
     private ?string $sort;
@@ -38,6 +39,9 @@ class ExportOptions
         $this->enabled = (bool) ($exportOptions['enabled'] ?? true);
         $this->id = isset($exportOptions['id']) ? (string) $exportOptions['id'] : null;
         $this->incrementalFetchingColumn = $exportOptions['incrementalFetchingColumn'] ?? null;
+        $this->incrementalFetchingOverlap = isset($exportOptions['incrementalFetchingOverlap'])
+            ? (int) $exportOptions['incrementalFetchingOverlap']
+            : null;
         $this->incrementalFetching = $exportOptions['incremental'] ?? false;
         $this->name = $exportOptions['tableName'] ?? $exportOptions['name'];
         $this->mode = $exportOptions['mode'];
@@ -120,6 +124,11 @@ class ExportOptions
     public function getIncrementalFetchingColumn(): string
     {
         return $this->incrementalFetchingColumn ?? '';
+    }
+
+    public function getIncrementalFetchingOverlap(): ?int
+    {
+        return $this->incrementalFetchingOverlap;
     }
 
     public function getQuery(): ?string

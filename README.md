@@ -44,6 +44,7 @@ The configuration `config.json` contains following properties in `parameters` ke
         - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
     - `incremental` - boolean (optional): Enables [Incremental Loading](https://help.keboola.com/storage/tables/#incremental-loading). Default `false`.
     - `incrementalFetchingColumn` - string (optional): Name of column for [Incremental Fetching](https://help.keboola.com/components/extractors/database/#incremental-fetching)
+    - `incrementalFetchingOverlap` - int (optional): Number of seconds to shift the stored watermark back, re-reading an overlapping window so records that became visible only after the previous run (write/replication lag, where the timestamp order differs from the insert order) are not skipped. Requires `incremental` load with a primary key so the re-read window is deduplicated. Supported only for date incremental columns.
     - `sort`- string (optional):
         - JSON string specifying the order of documents in exported data.
         - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
