@@ -80,6 +80,18 @@ class HandleMongoExportFailsTest extends TestCase
                 'execute command'),
         ];
 
+        yield 'ShutdownInProgress / quiesce mode' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-20T08:41:54.107+0000\t' .
+                'example-db.exampleCollection\t466797 2026-07-20T08:41:54.107+0000\tFailed:  connection pool for ' .
+                'shard-00-01.example.mongodb.net:27016 was cleared because another operation failed with: ' .
+                '(ShutdownInProgress) Mongos is in quiesce mode and will shut down')),
+            new UserException(
+                'The MongoDB server is shutting down or restarting (Mongos is in quiesce mode), ' .
+                'so the export could not be completed. This is usually a temporary state caused by ' .
+                'server maintenance or a failover. Please try running the extraction again in a few minutes.',
+            ),
+        ];
+
         yield 'AuthenticationFailed' => [
             new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-23T09:02:25.402+0000\t' .
                 'failed to connect to mongodb://[**REDACTED**]/production: connection() error occurred during ' .
