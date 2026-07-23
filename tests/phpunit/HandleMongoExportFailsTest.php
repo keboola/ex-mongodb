@@ -82,8 +82,8 @@ class HandleMongoExportFailsTest extends TestCase
 
         yield 'ShutdownInProgress / quiesce mode' => [
             new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-20T08:41:54.107+0000\t' .
-                'apifier-prod.act2Runs\t466797 2026-07-20T08:41:54.107+0000\tFailed:  connection pool for ' .
-                'apify-prod-shard-02-01-shcdj.mongodb.net:27016 was cleared because another operation failed with: ' .
+                'example-db.exampleCollection\t466797 2026-07-20T08:41:54.107+0000\tFailed:  connection pool for ' .
+                'shard-00-01.example.mongodb.net:27016 was cleared because another operation failed with: ' .
                 '(ShutdownInProgress) Mongos is in quiesce mode and will shut down')),
             new UserException(
                 'The MongoDB server is shutting down or restarting (Mongos is in quiesce mode), ' .
