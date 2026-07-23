@@ -133,6 +133,13 @@ class Export
                 'connection handshake: dial tcp: i/o timeout');
         }
 
+        if (str_contains($e->getMessage(), '(AuthenticationFailed)')
+            || str_contains($e->getMessage(), 'unable to authenticate')
+        ) {
+            throw new UserException('Could not authenticate against the MongoDB server. ' .
+                'Please check the configured username, password and authentication database.');
+        }
+
         if (str_contains($e->getMessage(), 'error parsing URI')
             || str_contains($e->getMessage(), 'error parsing uri')
         ) {
