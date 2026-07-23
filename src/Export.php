@@ -147,6 +147,16 @@ class Export
             throw new UserException('FieldPath field names may not start with \'$\'');
         }
 
+        if (str_contains($e->getMessage(), 'ShutdownInProgress')
+            || str_contains($e->getMessage(), 'Mongos is in quiesce mode')
+        ) {
+            throw new UserException(
+                'The MongoDB server is shutting down or restarting (Mongos is in quiesce mode), ' .
+                'so the export could not be completed. This is usually a temporary state caused by ' .
+                'server maintenance or a failover. Please try running the extraction again in a few minutes.',
+            );
+        }
+
         if (preg_match('/(Failed:.*?command)/s', $e->getMessage(), $matches)) {
             throw new UserException(trim($matches[1]));
         }

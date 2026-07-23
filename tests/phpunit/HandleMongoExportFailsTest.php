@@ -80,6 +80,18 @@ class HandleMongoExportFailsTest extends TestCase
                 'execute command'),
         ];
 
+        yield 'ShutdownInProgress / quiesce mode' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-20T08:41:54.107+0000\t' .
+                'apifier-prod.act2Runs\t466797 2026-07-20T08:41:54.107+0000\tFailed:  connection pool for ' .
+                'apify-prod-shard-02-01-shcdj.mongodb.net:27016 was cleared because another operation failed with: ' .
+                '(ShutdownInProgress) Mongos is in quiesce mode and will shut down')),
+            new UserException(
+                'The MongoDB server is shutting down or restarting (Mongos is in quiesce mode), ' .
+                'so the export could not be completed. This is usually a temporary state caused by ' .
+                'server maintenance or a failover. Please try running the extraction again in a few minutes.',
+            ),
+        ];
+
         yield 'field names may not start with $' => [
             new ProcessFailedException($this->createMockInstanceOfProcess('2023-05-17T12:49:22.079+0000\t' .
                 'connected to: mongodb+srv://[**REDACTED**]@cl-shared-all-prod-web.x0u5m.mongodb.net/slotManagementDB' .
