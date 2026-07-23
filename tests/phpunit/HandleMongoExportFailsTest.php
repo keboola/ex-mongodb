@@ -92,6 +92,15 @@ class HandleMongoExportFailsTest extends TestCase
             ),
         ];
 
+        yield 'AuthenticationFailed' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-23T09:02:25.402+0000\t' .
+                'failed to connect to mongodb://[**REDACTED**]/production: connection() error occurred during ' .
+                'connection handshake: auth error: sasl conversation error: unable to authenticate using ' .
+                'mechanism "SCRAM-SHA-1": (AuthenticationFailed) Authentication failed.')),
+            new UserException('Could not authenticate against the MongoDB server. ' .
+                'Please check the configured username, password and authentication database.'),
+        ];
+
         yield 'field names may not start with $' => [
             new ProcessFailedException($this->createMockInstanceOfProcess('2023-05-17T12:49:22.079+0000\t' .
                 'connected to: mongodb+srv://[**REDACTED**]@cl-shared-all-prod-web.x0u5m.mongodb.net/slotManagementDB' .
