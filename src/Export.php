@@ -175,6 +175,27 @@ class Export
             ));
         }
 
+        // Deliberately last, so it only catches messages that would otherwise fall through to the
+        // rethrow below: every branch above keeps its existing message and priority (the auth
+        // failure above also mentions the connection handshake, and must stay on its own branch).
+        // mongoexport reports a connection-establishment timeout in shapes the 'dial tcp: i/o
+        // timeout' check above does not match — the host:port sits in the middle of the string, or
+        // the driver reports a server-selection timeout instead — so those surfaced as an opaque
+        // internal error. Both a handshake/selection marker and a timeout marker are required, so
+        // a non-timeout handshake failure cannot match this branch.
+        if ((str_contains($e->getMessage(), 'error occurred during connection handshake')
+                || str_contains($e->getMessage(), 'server selection error'))
+            && (str_contains($e->getMessage(), 'i/o timeout')
+                || str_contains($e->getMessage(), 'context deadline exceeded'))
+        ) {
+            throw new UserException(
+                'Could not connect to the MongoDB server: the connection timed out while establishing ' .
+                'the session. This is usually a temporary network problem, or the server is unreachable ' .
+                'or overloaded. Please check the configured host, port and network access, then try ' .
+                'running the extraction again.',
+            );
+        }
+
         throw $e;
     }
 

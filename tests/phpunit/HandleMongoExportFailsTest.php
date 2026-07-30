@@ -101,6 +101,29 @@ class HandleMongoExportFailsTest extends TestCase
                 'Please check the configured username, password and authentication database.'),
         ];
 
+        // The 'dial tcp: i/o timeout' case above uses a shortened message. In production the Go
+        // driver puts the host:port between "dial tcp" and "i/o timeout", so that check never
+        // matched a real handshake timeout and it fell through as an opaque internal error.
+        yield 'connection handshake i/o timeout (real message, host:port in the middle)' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-30T03:14:11.204+0000\t' .
+                'Failed: error connecting to db server: connection() error occurred during connection ' .
+                'handshake: dial tcp 10.20.30.40:27017: i/o timeout')),
+            new UserException('Could not connect to the MongoDB server: the connection timed out while ' .
+                'establishing the session. This is usually a temporary network problem, or the server is ' .
+                'unreachable or overloaded. Please check the configured host, port and network access, ' .
+                'then try running the extraction again.'),
+        ];
+
+        yield 'server selection timeout (context deadline exceeded)' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2026-07-30T03:14:11.204+0000\t' .
+                'Failed: error connecting to db server: server selection error: context deadline exceeded, ' .
+                'current topology: { Type: ReplicaSetNoPrimary, Servers: [ ... ] }')),
+            new UserException('Could not connect to the MongoDB server: the connection timed out while ' .
+                'establishing the session. This is usually a temporary network problem, or the server is ' .
+                'unreachable or overloaded. Please check the configured host, port and network access, ' .
+                'then try running the extraction again.'),
+        ];
+
         yield 'field names may not start with $' => [
             new ProcessFailedException($this->createMockInstanceOfProcess('2023-05-17T12:49:22.079+0000\t' .
                 'connected to: mongodb+srv://[**REDACTED**]@cl-shared-all-prod-web.x0u5m.mongodb.net/slotManagementDB' .
