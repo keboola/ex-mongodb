@@ -131,6 +131,48 @@ class HandleMongoExportFailsTest extends TestCase
                 'Consider using $getField or $setField.')),
             new UserException('FieldPath field names may not start with \'$\''),
         ];
+
+        // Regression: a mongoexport fatal that matches none of the branches above and whose
+        // "Failed:" reason does not contain the word "command" (so the /(Failed:.*?command)/
+        // fallback misses it too) used to fall through to the rethrow, killing the job with an
+        // opaque "Internal Server Error occurred." (exit 2) instead of telling the user what
+        // mongoexport had already reported.
+        yield 'unclassified mongoexport failure surfaces its own "Failed:" reason' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess(
+                '2026-08-18T03:53:45.660+0000' . "\t" . 'connected to: mongodb://mongo:27017/' . "\n" .
+                '2026-08-18T04:23:11.560+0000' . "\t" . 'Failed: (CursorNotFound) cursor id 7412 not found' . "\n",
+            )),
+            new UserException('Export "" failed. MongoDB export tool reported: ' .
+                '(CursorNotFound) cursor id 7412 not found'),
+        ];
+    }
+
+    /**
+     * The fallback added for the case above must not become a catch-all: when mongoexport reported
+     * no "Failed:" reason at all there is nothing user-actionable to surface, so the original
+     * exception has to keep propagating exactly as before (opaque internal error, exit 2).
+     *
+     * @throws \ReflectionException
+     * @throws \Keboola\Component\UserException
+     */
+    public function testFailureWithoutFailedLineIsStillRethrown(): void
+    {
+        $mongoException = new ProcessFailedException(
+            $this->createMockInstanceOfProcess('Killed' . "\n"),
+        );
+
+        $this->expectException(ProcessFailedException::class);
+
+        $class = new ReflectionClass(Export::class);
+        $method = $class->getMethod('handleMongoExportFails');
+        $exportOptions = new ExportOptions(['name' => '', 'mode' => '']);
+        $exportClass = new Export(
+            new ExportCommandFactory(new UriFactory(), false),
+            [],
+            $exportOptions,
+            new NullLogger(),
+        );
+        $method->invoke($exportClass, $mongoException);
     }
 
     private function createMockInstanceOfProcess(string $errorOutput): Process

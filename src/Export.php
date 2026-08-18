@@ -196,6 +196,31 @@ class Export
             );
         }
 
+        // Deliberately the last branch, immediately before the rethrow, so it can only ever see
+        // messages that every branch above already declined - none of them lose a case or change
+        // their message because of it.
+        //
+        // mongodb-database-tools report a fatal error as a "Failed: <reason>" line and then exit 1.
+        // The generic /(Failed:.*?command)/ check above only matches reasons that happen to contain
+        // the word "command", so any other reason (a cursor dying mid-export, a read timeout, an
+        // interrupted operation, ...) fell through to the rethrow and the job died with an opaque
+        // "Internal Server Error occurred." (exit 2) - the team gets paged and the user is told
+        // nothing, even though mongoexport had already said exactly what went wrong.
+        //
+        // Surfacing that line as a UserException does not make the job succeed: it still fails,
+        // only now as a user error (exit 1) carrying the tool's own explanation.
+        //
+        // Only the "Failed:" line itself is surfaced - never $e->getMessage(), which embeds the
+        // full mongoexport command line including the connection credentials. \V stops the capture
+        // at the end of that line for the same reason.
+        if (preg_match('/Failed:\s*(\V+)/', $e->getMessage(), $matches)) {
+            throw new UserException(sprintf(
+                'Export "%s" failed. MongoDB export tool reported: %s',
+                $this->name,
+                trim($matches[1]),
+            ));
+        }
+
         throw $e;
     }
 
