@@ -186,6 +186,49 @@ class HandleMongoExportFailsTest extends TestCase
         $method->invoke($exportClass, $mongoException);
     }
 
+    /**
+     * Guards the credential boundary. ProcessFailedException::getMessage() prefixes the whole
+     * mongoexport command line, which carries the credentials - so the fallback must read the
+     * process stderr and never that message. Here the password itself contains the text "Failed:";
+     * matching against the full message would start the capture inside the password and surface
+     * the rest of it (and the trailing options) to the user.
+     *
+     * @throws \ReflectionException
+     * @throws \Keboola\Component\UserException
+     */
+    public function testFailedTextInsideTheCommandLineIsNeverSurfaced(): void
+    {
+        $mockProcess = $this->createMock(Process::class);
+        $mockProcess->method('isSuccessful')->willReturn(false);
+        $mockProcess->method('getCommandLine')->willReturn('mongoexport --host \'mongo\' ' .
+            '--port \'27017\' --db \'d\' --username \'u\' --password \'Failed:s3cret-tail\' ' .
+            '--collection \'c\' --type \'json\'');
+        $mockProcess->method('getExitCode')->willReturn(1);
+        $mockProcess->method('getExitCodeText')->willReturn('General error');
+        $mockProcess->method('getWorkingDirectory')->willReturn('/code');
+        $mockProcess->method('getOutput')->willReturn('');
+        // mongoexport reported no "Failed:" line of its own - the only one is in the command line.
+        $mockProcess->method('getErrorOutput')->willReturn('Killed' . "\n");
+
+        $mongoException = new ProcessFailedException($mockProcess);
+        self::assertStringContainsString('Failed:s3cret-tail', $mongoException->getMessage());
+
+        // The original exception must come straight back out: nothing from the command line is
+        // surfaced, and no UserException carrying the secret is raised.
+        $this->expectExceptionObject($mongoException);
+
+        $class = new ReflectionClass(Export::class);
+        $method = $class->getMethod('handleMongoExportFails');
+        $exportOptions = new ExportOptions(['name' => '', 'mode' => '']);
+        $exportClass = new Export(
+            new ExportCommandFactory(new UriFactory(), false),
+            [],
+            $exportOptions,
+            new NullLogger(),
+        );
+        $method->invoke($exportClass, $mongoException);
+    }
+
     private function createMockInstanceOfProcess(string $errorOutput): Process
     {
         $mockProcess = $this->createMock(Process::class);

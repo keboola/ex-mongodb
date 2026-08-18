@@ -216,10 +216,14 @@ class Export
         // Surfacing that line as a UserException does not make the job succeed: it still fails,
         // only now as a user error (exit 1) carrying the tool's own explanation.
         //
-        // Only the "Failed:" line itself is surfaced - never $e->getMessage(), which embeds the
-        // full mongoexport command line including the connection credentials. \V stops the capture
-        // at the end of that line for the same reason.
-        if (preg_match('/Failed:\s*(\V+)/', $e->getMessage(), $matches)) {
+        // Scan the process's stderr, NOT $e->getMessage(): the latter prefixes the full mongoexport
+        // command line, which carries the credentials (as --password, or inside --uri). Parts of
+        // that command line are user-controlled - a --query filtering on the literal text "Failed:"
+        // is perfectly ordinary - so matching against the whole message could start the capture
+        // inside the command line and surface the remainder of it. \V then stops the capture at the
+        // end of the matched line, so only that one line is ever surfaced.
+        $errorOutput = $e instanceof ProcessFailedException ? $e->getProcess()->getErrorOutput() : '';
+        if (preg_match('/Failed:\s*(\V+)/', $errorOutput, $matches)) {
             throw new UserException(sprintf(
                 'Export "%s" failed. MongoDB export tool reported: %s',
                 $this->name,
