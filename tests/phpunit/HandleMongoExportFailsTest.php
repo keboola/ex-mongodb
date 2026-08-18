@@ -169,7 +169,10 @@ class HandleMongoExportFailsTest extends TestCase
             $this->createMockInstanceOfProcess('Killed' . "\n"),
         );
 
-        $this->expectException(ProcessFailedException::class);
+        // expectExceptionObject rather than expectException: "exactly as before" means the class,
+        // the full message and the code all have to come back out untouched, which proves the new
+        // fallback neither wrapped nor rewrote the original exception.
+        $this->expectExceptionObject($mongoException);
 
         $class = new ReflectionClass(Export::class);
         $method = $class->getMethod('handleMongoExportFails');
