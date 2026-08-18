@@ -196,6 +196,41 @@ class Export
             );
         }
 
+        // Deliberately the last branch, immediately before the rethrow, so it can only ever see
+        // messages that every branch above already declined - none of them lose a case or change
+        // their message because of it.
+        //
+        // Once the export itself is running, mongoexport reports a fatal error as a
+        // "Failed: <reason>" line and exits 1 - verified against mongodb-database-tools 100.15.0,
+        // e.g. "Failed: (Location15975) $sort key ordering must be 1 (for ascending) or -1 (for
+        // descending)" and "Failed: (BadValue) unknown top level operator: $foo. ...". (Failures
+        // from before the export starts - connection and argument errors - exit 1 without the
+        // prefix; those are matched by the branches above on their own wording, which is why this
+        // branch stays keyed on "Failed:" rather than on the exit code.)
+        //
+        // The generic /(Failed:.*?command)/ check above only matches reasons that happen to contain
+        // the word "command", so any other reason fell through to the rethrow and the job died with
+        // an opaque "Internal Server Error occurred." (exit 2) - the team gets paged and the user is
+        // told nothing, even though mongoexport had already said exactly what went wrong.
+        //
+        // Surfacing that line as a UserException does not make the job succeed: it still fails,
+        // only now as a user error (exit 1) carrying the tool's own explanation.
+        //
+        // Scan the process's stderr, NOT $e->getMessage(): the latter prefixes the full mongoexport
+        // command line, which carries the credentials (as --password, or inside --uri). Parts of
+        // that command line are user-controlled - a --query filtering on the literal text "Failed:"
+        // is perfectly ordinary - so matching against the whole message could start the capture
+        // inside the command line and surface the remainder of it. \V then stops the capture at the
+        // end of the matched line, so only that one line is ever surfaced.
+        $errorOutput = $e instanceof ProcessFailedException ? $e->getProcess()->getErrorOutput() : '';
+        if (preg_match('/Failed:\s*(\V+)/', $errorOutput, $matches)) {
+            throw new UserException(sprintf(
+                'Export "%s" failed. MongoDB export tool reported: %s',
+                $this->name,
+                trim($matches[1]),
+            ));
+        }
+
         throw $e;
     }
 
