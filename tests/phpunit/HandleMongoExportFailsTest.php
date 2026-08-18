@@ -137,13 +137,21 @@ class HandleMongoExportFailsTest extends TestCase
         // fallback misses it too) used to fall through to the rethrow, killing the job with an
         // opaque "Internal Server Error occurred." (exit 2) instead of telling the user what
         // mongoexport had already reported.
+        //
+        // The stderr below is a verbatim capture from mongodb-database-tools 100.15.0 exporting a
+        // non-empty collection with --query '{"$foo": 1}'. Note it is NOT the same case as the
+        // "FieldPath field names may not start with '$'" branch above - that branch's marker does
+        // not appear here, which is exactly why this message used to fall through.
         yield 'unclassified mongoexport failure surfaces its own "Failed:" reason' => [
             new ProcessFailedException($this->createMockInstanceOfProcess(
-                '2026-08-18T03:53:45.660+0000' . "\t" . 'connected to: mongodb://mongo:27017/' . "\n" .
-                '2026-08-18T04:23:11.560+0000' . "\t" . 'Failed: (CursorNotFound) cursor id 7412 not found' . "\n",
+                '2026-08-18T06:35:37.390+0000' . "\t" . 'connected to: mongodb://mongo:27017/' . "\n" .
+                '2026-08-18T06:35:37.401+0000' . "\t" . 'Failed: (BadValue) unknown top level ' .
+                'operator: $foo. If you have a field name that starts with a \'$\' symbol, ' .
+                'consider using $getField or $setField.' . "\n",
             )),
-            new UserException('Export "" failed. MongoDB export tool reported: ' .
-                '(CursorNotFound) cursor id 7412 not found'),
+            new UserException('Export "" failed. MongoDB export tool reported: (BadValue) unknown ' .
+                'top level operator: $foo. If you have a field name that starts with a \'$\' ' .
+                'symbol, consider using $getField or $setField.'),
         ];
     }
 

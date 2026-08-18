@@ -200,12 +200,18 @@ class Export
         // messages that every branch above already declined - none of them lose a case or change
         // their message because of it.
         //
-        // mongodb-database-tools report a fatal error as a "Failed: <reason>" line and then exit 1.
+        // Once the export itself is running, mongoexport reports a fatal error as a
+        // "Failed: <reason>" line and exits 1 - verified against mongodb-database-tools 100.15.0,
+        // e.g. "Failed: (Location15975) $sort key ordering must be 1 (for ascending) or -1 (for
+        // descending)" and "Failed: (BadValue) unknown top level operator: $foo. ...". (Failures
+        // from before the export starts - connection and argument errors - exit 1 without the
+        // prefix; those are matched by the branches above on their own wording, which is why this
+        // branch stays keyed on "Failed:" rather than on the exit code.)
+        //
         // The generic /(Failed:.*?command)/ check above only matches reasons that happen to contain
-        // the word "command", so any other reason (a cursor dying mid-export, a read timeout, an
-        // interrupted operation, ...) fell through to the rethrow and the job died with an opaque
-        // "Internal Server Error occurred." (exit 2) - the team gets paged and the user is told
-        // nothing, even though mongoexport had already said exactly what went wrong.
+        // the word "command", so any other reason fell through to the rethrow and the job died with
+        // an opaque "Internal Server Error occurred." (exit 2) - the team gets paged and the user is
+        // told nothing, even though mongoexport had already said exactly what went wrong.
         //
         // Surfacing that line as a UserException does not make the job succeed: it still fails,
         // only now as a user error (exit 1) carrying the tool's own explanation.
