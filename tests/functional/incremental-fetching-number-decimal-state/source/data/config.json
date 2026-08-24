@@ -1,0 +1,17 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "tableName": "number-decimal-incremental",
+    "collection": "number-decimal-incremental",
+    "incremental": true,
+    "incrementalFetchingColumn": "amount",
+    "mapping": {
+      "id": "id",
+      "amount": "amount"
+    }
+  }
+}

@@ -218,6 +218,10 @@ Mapping keys written with the type suffix keep working - `amount.$numberDecimal`
 Other Extended JSON types are **not** unwrapped and are still mapped through their full path:
 `_id.$oid`, `date.$date`, `binary.$binary.base64`.
 
+`Decimal128` columns can also be used for incremental fetching. The last fetched value is stored
+in `state.json` as `NumberDecimal("783.028")`, the same way dates are stored as `ISODate(...)` and
+object ids as `ObjectId(...)`, and is turned back into a `Decimal128` when the next query is built.
+
 `raw` mode is unaffected - documents are written out exactly as `mongoexport` produced them.
 
 ## Output

@@ -44,6 +44,8 @@ class ExportHelper
         $input = self::convertDatesToString($input, true);
 
         $input = self::convertObjectIdToString($input);
+
+        $input = self::convertDecimalToString($input);
         return $input;
     }
 
@@ -52,6 +54,8 @@ class ExportHelper
         $input = self::fixIsoDateInGteQuery($input);
 
         $input = self::fixObjectIdInGteQuery($input);
+
+        $input = self::fixDecimalInGteQuery($input);
         return $input;
     }
 
@@ -83,6 +87,34 @@ class ExportHelper
             '~{"\$oid":(?>\s)*("(?>(?>\\\")|[^"])*")}~',
             function (array $m): string {
                 return '"ObjectId(' . addslashes($m[1]) .')"';
+            },
+            $input,
+        );
+
+        if ($output === null) {
+            throw new RuntimeException(sprintf(self::PREG_REPLACE_ERROR_MSG, __FUNCTION__));
+        }
+
+        return $output;
+    }
+
+    /**
+     * Decimal128 fields, eg. {"$numberDecimal":"783.028"}, are converted to a marker string
+     * NumberDecimal("783.028"), the same way dates and ObjectIds are.
+     *
+     * The value is deliberately kept as a string - casting it to a PHP float would silently lose
+     * precision and trailing zeros, which is the whole point of using Decimal128 in the first
+     * place. The marker is turned back into {"$numberDecimal": ...} by self::fixDecimalInGteQuery()
+     * when the stored state is used to build the next incremental fetching query; a plain string
+     * would not work there, because BSON type ordering sorts every number before every string,
+     * so "$gte" against a string would silently match no documents at all.
+     */
+    public static function convertDecimalToString(string $input): string
+    {
+        $output = preg_replace_callback(
+            '~{"\$numberDecimal":(?>\s)*("(?>(?>\\\")|[^"])*")}~',
+            function (array $m): string {
+                return '"NumberDecimal(' . addslashes($m[1]) .')"';
             },
             $input,
         );
@@ -134,6 +166,23 @@ class ExportHelper
             '~"\$gte":"ObjectId\((\\\"(?>(?>\\\")|[^"])*\\\")\)"~',
             function (array $m): string {
                 return '"$gte":{"$oid": ' . stripslashes($m[1]) . '}';
+            },
+            $input,
+        );
+
+        if ($output === null) {
+            throw new RuntimeException(sprintf(self::PREG_REPLACE_ERROR_MSG, __FUNCTION__));
+        }
+
+        return $output;
+    }
+
+    public static function fixDecimalInGteQuery(string $input): string
+    {
+        $output = preg_replace_callback(
+            '~"\$gte":"NumberDecimal\((\\\"(?>(?>\\\")|[^"])*\\\")\)"~',
+            function (array $m): string {
+                return '"$gte":{"$numberDecimal": ' . stripslashes($m[1]) . '}';
             },
             $input,
         );

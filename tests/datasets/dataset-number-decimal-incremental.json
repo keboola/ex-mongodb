@@ -1,0 +1,23 @@
+[
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa9101"
+    },
+    "id": 1,
+    "amount": {"$numberDecimal": "10.50"}
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa9102"
+    },
+    "id": 2,
+    "amount": {"$numberDecimal": "20.25"}
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa9103"
+    },
+    "id": 3,
+    "amount": {"$numberDecimal": "783.028"}
+  }
+]
