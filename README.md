@@ -186,6 +186,40 @@ When `parameters.db.protocol` = `custom_uri`, then extractor connects to URI def
 }
 ```
 
+### Extended JSON values
+
+`mongoexport` writes [relaxed Extended JSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/),
+in which most numeric BSON types become plain JSON numbers - but some values stay wrapped in a
+type object:
+
+- `Decimal128` is **always** wrapped, eg. `{"$numberDecimal": "150.00"}`, because JSON has no decimal type,
+- a `double` that is `NaN` or `Infinity` is wrapped as `{"$numberDouble": "NaN"}`.
+
+In `mapping` mode these are unwrapped to a plain value before the mapping is applied, so a plain
+mapping key works no matter which of the two shapes a given document uses:
+
+```json
+{
+  "amount": "amount"
+}
+```
+
+That also covers collections where the same field is a plain number in some documents and a
+`Decimal128` in others - a case that previously failed with
+`Cannot write data into column: (object) array('$numberDecimal' => ...)`.
+
+Decimal values are kept as strings, so precision and trailing zeros survive: `150.00` stays
+`150.00` and is not rounded to a `double`.
+
+Mapping keys written with the type suffix keep working - `amount.$numberDecimal`,
+`amount.$numberLong`, `amount.$numberInt` and `amount.$numberDouble` are all stripped down to
+`amount` and produce the same column as before.
+
+Other Extended JSON types are **not** unwrapped and are still mapped through their full path:
+`_id.$oid`, `date.$date`, `binary.$binary.base64`.
+
+`raw` mode is unaffected - documents are written out exactly as `mongoexport` produced them.
+
 ## Output
 
 After successful extraction there are several CSV files, which contains exported data. First output

@@ -273,7 +273,7 @@ class ExportHelperTest extends TestCase
                 'numberInt' => 'numberInt',
                 'numberDouble' => 'numberDouble',
                 'date.$date' => 'date',
-                'numberDecimal.$numberDecimal' => 'numberDecimal',
+                'numberDecimal' => 'numberDecimal',
                 'binary.$binary.base64' => 'binary',
             ],
         ];

@@ -1,0 +1,23 @@
+[
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa9001"
+    },
+    "amount": {"$numberDecimal": "150.00"},
+    "nested": {"amount": {"$numberDecimal": "1.50"}}
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa9002"
+    },
+    "amount": 150.5,
+    "nested": {"amount": 2}
+  },
+  {
+    "_id": {
+      "$oid": "5716054bee6e764c94fa9003"
+    },
+    "amount": {"$numberDecimal": "123456789012345678901234.5678"},
+    "nested": {"amount": {"$numberDecimal": "0.10"}}
+  }
+]
