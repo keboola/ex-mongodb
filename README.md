@@ -218,6 +218,12 @@ Mapping keys written with the type suffix keep working - `amount.$numberDecimal`
 Other Extended JSON types are **not** unwrapped and are still mapped through their full path:
 `_id.$oid`, `date.$date`, `binary.$binary.base64`.
 
+The unwrapping happens **before** the mapping is applied, so every mapping style sees a plain
+scalar rather than the wrapper object. Two styles behaved differently before this was introduced:
+a column with `"forceType": true` used to receive the JSON-encoded wrapper
+(`{"$numberDecimal":"150.00"}`) and now receives `150.00`, and a `"type": "table"` mapping pointed
+at such a field now receives a scalar instead of a one-key sub-document.
+
 `Decimal128` columns can also be used for incremental fetching. The last fetched value is stored
 in `state.json` as `NumberDecimal("783.028")`, the same way dates are stored as `ISODate(...)` and
 object ids as `ObjectId(...)`, and is turned back into a `Decimal128` when the next query is built.
