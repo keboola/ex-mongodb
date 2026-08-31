@@ -1,0 +1,23 @@
+{
+  "parameters": {
+    "db": {
+      "host": "mongodb",
+      "port": 27017,
+      "database": "test"
+    },
+    "collection": "number-decimal",
+    "tableName": "number-decimal",
+    "mapping": {
+      "_id.$oid": {
+        "type": "column",
+        "mapping": {
+          "destination": "id"
+        }
+      },
+      "amount.$numberDecimal": "amount",
+      "nested.amount.$numberDecimal": "nestedAmount"
+    },
+    "mode": "mapping",
+    "sort": "{_id: 1}"
+  }
+}

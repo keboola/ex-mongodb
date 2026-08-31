@@ -11,11 +11,41 @@ class ExportHelper
 
     private const PREG_REPLACE_ERROR_MSG = 'preg_replace in function \"%s\" failed.';
 
+    /**
+     * Extended JSON wrappers for numeric BSON types that are stripped from mapping keys.
+     *
+     * The UI builds mapping keys from a canonical-looking sample ("amount.$numberLong"), but
+     * mongoexport runs in relaxed mode and delivers these as plain JSON numbers, so the suffix
+     * has to go or the key stops matching the data.
+     *
+     * Non-numeric wrappers ($oid, $date, $binary, $timestamp, ...) are deliberately NOT listed
+     * here - mapping them via their full path (e.g. "_id.$oid", "date.$date") is the documented
+     * and supported way to map them.
+     */
+    public const UNWRAPPED_NUMERIC_TYPES = ['numberDouble', 'numberInt', 'numberLong', 'numberDecimal'];
+
+    /**
+     * Extended JSON wrappers unwrapped on the document-value side by ExtendedJsonNormalizer.
+     *
+     * A subset of self::UNWRAPPED_NUMERIC_TYPES: only these two survive relaxed mode as a wrapper
+     * around a value the mapping expects to be a scalar - Decimal128 always (JSON has no decimal
+     * type), and a double when it is NaN or Infinity.
+     *
+     * $numberInt and $numberLong are intentionally absent. Relaxed mode never emits them
+     * standalone; the only place they appear is nested inside {"$date":{"$numberLong":"..."}} for
+     * dates outside the relaxed range, and DateNormalizer has to see that wrapper to read the
+     * value as epoch milliseconds. Unwrapping it here would feed DateNormalizer a bare numeric
+     * string and break every pre-1970 date.
+     */
+    public const UNWRAPPED_VALUE_TYPES = ['numberDouble', 'numberDecimal'];
+
     public static function convertSpecialColumnsToString(string $input): string
     {
         $input = self::convertDatesToString($input, true);
 
         $input = self::convertObjectIdToString($input);
+
+        $input = self::convertDecimalToString($input);
         return $input;
     }
 
@@ -24,6 +54,8 @@ class ExportHelper
         $input = self::fixIsoDateInGteQuery($input);
 
         $input = self::fixObjectIdInGteQuery($input);
+
+        $input = self::fixDecimalInGteQuery($input);
         return $input;
     }
 
@@ -55,6 +87,34 @@ class ExportHelper
             '~{"\$oid":(?>\s)*("(?>(?>\\\")|[^"])*")}~',
             function (array $m): string {
                 return '"ObjectId(' . addslashes($m[1]) .')"';
+            },
+            $input,
+        );
+
+        if ($output === null) {
+            throw new RuntimeException(sprintf(self::PREG_REPLACE_ERROR_MSG, __FUNCTION__));
+        }
+
+        return $output;
+    }
+
+    /**
+     * Decimal128 fields, eg. {"$numberDecimal":"783.028"}, are converted to a marker string
+     * NumberDecimal("783.028"), the same way dates and ObjectIds are.
+     *
+     * The value is deliberately kept as a string - casting it to a PHP float would silently lose
+     * precision and trailing zeros, which is the whole point of using Decimal128 in the first
+     * place. The marker is turned back into {"$numberDecimal": ...} by self::fixDecimalInGteQuery()
+     * when the stored state is used to build the next incremental fetching query; a plain string
+     * would not work there, because BSON type ordering sorts every number before every string,
+     * so "$gte" against a string would silently match no documents at all.
+     */
+    public static function convertDecimalToString(string $input): string
+    {
+        $output = preg_replace_callback(
+            '~{"\$numberDecimal":(?>\s)*("(?>(?>\\\")|[^"])*")}~',
+            function (array $m): string {
+                return '"NumberDecimal(' . addslashes($m[1]) .')"';
             },
             $input,
         );
@@ -117,6 +177,23 @@ class ExportHelper
         return $output;
     }
 
+    public static function fixDecimalInGteQuery(string $input): string
+    {
+        $output = preg_replace_callback(
+            '~"\$gte":"NumberDecimal\((\\\"(?>(?>\\\")|[^"])*\\\")\)"~',
+            function (array $m): string {
+                return '"$gte":{"$numberDecimal": ' . stripslashes($m[1]) . '}';
+            },
+            $input,
+        );
+
+        if ($output === null) {
+            throw new RuntimeException(sprintf(self::PREG_REPLACE_ERROR_MSG, __FUNCTION__));
+        }
+
+        return $output;
+    }
+
     public static function addQuotesToJsonKeys(string $input): string
     {
         $output = preg_replace('/([{,])(\s*)([A-Za-z\d_\-]+?)\s*:/', '$1"$3":', $input);
@@ -133,10 +210,11 @@ class ExportHelper
      */
     public static function removeTypesInMappingKeys(array &$mapping): void
     {
+        $pattern = '/(\.\$(' . implode('|', self::UNWRAPPED_NUMERIC_TYPES) . '))$/';
         $final = [];
         foreach ($mapping as $k => &$v) {
             if (is_string($k)) {
-                $k = preg_replace('/(\.\$(numberDouble|numberInt|numberLong))$/', '', $k);
+                $k = preg_replace($pattern, '', $k);
             }
             if (is_array($v)) {
                 self::removeTypesInMappingKeys($v);

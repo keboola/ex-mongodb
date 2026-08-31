@@ -1,0 +1,1 @@
+{"incremental":true,"columns":["id","amount"],"column_metadata":{"id":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}],"amount":[{"key":"KBC.datatype.nullable","value":true},{"key":"KBC.datatype.basetype","value":"string"}]}}

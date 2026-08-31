@@ -49,6 +49,47 @@ class ExportHelperTest extends TestCase
         );
     }
 
+    public function testConvertDecimalToString(): void
+    {
+        $input = '{ "id": 1, "amount": {"$numberDecimal": "150.00"}, "string":  "testString"}';
+        $expected = '{ "id": 1, "amount": "NumberDecimal(\\"150.00\\")", "string":  "testString"}';
+
+        Assert::assertSame(
+            $expected,
+            ExportHelper::convertDecimalToString($input),
+        );
+    }
+
+    /**
+     * The state value has to survive the round trip back into a query as a Decimal128, not as a
+     * string: BSON type ordering sorts every number before every string, so a string "$gte" would
+     * silently match no documents at all.
+     */
+    public function testFixDecimalInGteQuery(): void
+    {
+        $input = '{"amount":{"$gte":"NumberDecimal(\\"783.028\\")"}}';
+        $expected = '{"amount":{"$gte":{"$numberDecimal": "783.028"}}}';
+
+        Assert::assertSame(
+            $expected,
+            ExportHelper::fixDecimalInGteQuery($input),
+        );
+    }
+
+    public function testDecimalMarkerRoundTrip(): void
+    {
+        $exportOutput = '{"amount":{"$numberDecimal":"123456789012345678901234.5678"}}';
+
+        $state = json_decode(ExportHelper::convertSpecialColumnsToString($exportOutput), true);
+        Assert::assertIsArray($state);
+
+        $query = ExportHelper::fixSpecialColumnsInGteQuery(
+            (string) json_encode(['amount' => ['$gte' => $state['amount']]]),
+        );
+
+        Assert::assertSame('{"amount":{"$gte":{"$numberDecimal": "123456789012345678901234.5678"}}}', $query);
+    }
+
     public function testConvertStringIdToObjectId(): void
     {
         $input = '{"_id": ObjectId("5716054bee6e764c94fa7ddd")}';
@@ -273,7 +314,7 @@ class ExportHelperTest extends TestCase
                 'numberInt' => 'numberInt',
                 'numberDouble' => 'numberDouble',
                 'date.$date' => 'date',
-                'numberDecimal.$numberDecimal' => 'numberDecimal',
+                'numberDecimal' => 'numberDecimal',
                 'binary.$binary.base64' => 'binary',
             ],
         ];

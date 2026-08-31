@@ -96,7 +96,12 @@ class Parse
                 $this->mapping,
                 $this->exportOptions->isIncludeParentInPK(),
                 $this->path,
-                new DateNormalizer($this->mapping),
+                new NormalizerChain([
+                    // DateNormalizer first: it needs to see {"$date":{"$numberLong":"..."}} intact
+                    // for dates outside the range relaxed mode writes as a plain ISO string.
+                    new DateNormalizer($this->mapping),
+                    new ExtendedJsonNormalizer(),
+                ]),
             );
         }
 
