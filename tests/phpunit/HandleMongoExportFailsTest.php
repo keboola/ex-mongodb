@@ -131,6 +131,102 @@ class HandleMongoExportFailsTest extends TestCase
                 'Consider using $getField or $setField.')),
             new UserException('FieldPath field names may not start with \'$\''),
         ];
+
+        // Regression: a mongoexport fatal that matches none of the branches above and whose
+        // "Failed:" reason does not contain the word "command" (so the /(Failed:.*?command)/
+        // fallback misses it too) used to fall through to the rethrow, killing the job with an
+        // opaque "Internal Server Error occurred." (exit 2) instead of telling the user what
+        // mongoexport had already reported.
+        //
+        // The stderr below is a verbatim capture from mongodb-database-tools 100.15.0 exporting a
+        // non-empty collection with --query '{"$foo": 1}'. Note it is NOT the same case as the
+        // "FieldPath field names may not start with '$'" branch above - that branch's marker does
+        // not appear here, which is exactly why this message used to fall through.
+        yield 'unclassified mongoexport failure surfaces its own "Failed:" reason' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess(
+                '2026-08-18T06:35:37.390+0000' . "\t" . 'connected to: mongodb://mongo:27017/' . "\n" .
+                '2026-08-18T06:35:37.401+0000' . "\t" . 'Failed: (BadValue) unknown top level ' .
+                'operator: $foo. If you have a field name that starts with a \'$\' symbol, ' .
+                'consider using $getField or $setField.' . "\n",
+            )),
+            new UserException('Export "" failed. MongoDB export tool reported: (BadValue) unknown ' .
+                'top level operator: $foo. If you have a field name that starts with a \'$\' ' .
+                'symbol, consider using $getField or $setField.'),
+        ];
+    }
+
+    /**
+     * The fallback added for the case above must not become a catch-all: when mongoexport reported
+     * no "Failed:" reason at all there is nothing user-actionable to surface, so the original
+     * exception has to keep propagating exactly as before (opaque internal error, exit 2).
+     *
+     * @throws \ReflectionException
+     * @throws \Keboola\Component\UserException
+     */
+    public function testFailureWithoutFailedLineIsStillRethrown(): void
+    {
+        $mongoException = new ProcessFailedException(
+            $this->createMockInstanceOfProcess('Killed' . "\n"),
+        );
+
+        // expectExceptionObject rather than expectException: "exactly as before" means the class,
+        // the full message and the code all have to come back out untouched, which proves the new
+        // fallback neither wrapped nor rewrote the original exception.
+        $this->expectExceptionObject($mongoException);
+
+        $class = new ReflectionClass(Export::class);
+        $method = $class->getMethod('handleMongoExportFails');
+        $exportOptions = new ExportOptions(['name' => '', 'mode' => '']);
+        $exportClass = new Export(
+            new ExportCommandFactory(new UriFactory(), false),
+            [],
+            $exportOptions,
+            new NullLogger(),
+        );
+        $method->invoke($exportClass, $mongoException);
+    }
+
+    /**
+     * Guards the credential boundary. ProcessFailedException::getMessage() prefixes the whole
+     * mongoexport command line, which carries the credentials - so the fallback must read the
+     * process stderr and never that message. Here the password itself contains the text "Failed:";
+     * matching against the full message would start the capture inside the password and surface
+     * the rest of it (and the trailing options) to the user.
+     *
+     * @throws \ReflectionException
+     * @throws \Keboola\Component\UserException
+     */
+    public function testFailedTextInsideTheCommandLineIsNeverSurfaced(): void
+    {
+        $mockProcess = $this->createMock(Process::class);
+        $mockProcess->method('isSuccessful')->willReturn(false);
+        $mockProcess->method('getCommandLine')->willReturn('mongoexport --host \'mongo\' ' .
+            '--port \'27017\' --db \'d\' --username \'u\' --password \'Failed:s3cret-tail\' ' .
+            '--collection \'c\' --type \'json\'');
+        $mockProcess->method('getExitCode')->willReturn(1);
+        $mockProcess->method('getExitCodeText')->willReturn('General error');
+        $mockProcess->method('getWorkingDirectory')->willReturn('/code');
+        $mockProcess->method('getOutput')->willReturn('');
+        // mongoexport reported no "Failed:" line of its own - the only one is in the command line.
+        $mockProcess->method('getErrorOutput')->willReturn('Killed' . "\n");
+
+        $mongoException = new ProcessFailedException($mockProcess);
+        self::assertStringContainsString('Failed:s3cret-tail', $mongoException->getMessage());
+
+        // The original exception must come straight back out: nothing from the command line is
+        // surfaced, and no UserException carrying the secret is raised.
+        $this->expectExceptionObject($mongoException);
+
+        $class = new ReflectionClass(Export::class);
+        $method = $class->getMethod('handleMongoExportFails');
+        $exportOptions = new ExportOptions(['name' => '', 'mode' => '']);
+        $exportClass = new Export(
+            new ExportCommandFactory(new UriFactory(), false),
+            [],
+            $exportOptions,
+            new NullLogger(),
+        );
+        $method->invoke($exportClass, $mongoException);
     }
 
     private function createMockInstanceOfProcess(string $errorOutput): Process
