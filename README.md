@@ -53,7 +53,8 @@ The configuration `config.json` contains following properties in `parameters` ke
     - `incrementalFetchingColumn` - string (optional): Name of column for [Incremental Fetching](https://help.keboola.com/components/extractors/database/#incremental-fetching)
     - `incrementalFetchingOverlap` - integer (optional): Number of seconds to shift the stored last fetched value back before the next incremental fetch, e.g. `300` for 5 minutes.
         - The overlapping window is read again, so documents that became visible only after the previous run (write/replication lag, timestamp order differs from insert order) are not skipped.
-        - Must be a non-negative integer. Supported only for date `incrementalFetchingColumn` columns, other column types fail with a user error.
+        - Must be a non-negative integer, at most `31536000` (one year). Supported only for date `incrementalFetchingColumn` columns, other column types fail with a user error.
+        - Requires `incrementalFetchingColumn`. Cannot be combined with `limit`: with a `limit` the saved state is the last exported document, so an overlap would move the state backwards and the export would never reach newer documents.
         - Use it with `incremental: true` and a primary key in the `mapping`, so the re-read documents are deduplicated in Storage. Without a primary key they are appended as duplicates.
     - `sort`- string (optional):
         - JSON string specifying the order of documents in exported data.

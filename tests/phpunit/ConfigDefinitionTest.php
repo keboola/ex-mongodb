@@ -298,7 +298,7 @@ class ConfigRowDefinitionTest extends TestCase
                     ],
                 ],
             ],
-            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+            'expectedError' => 'The "incrementalFetchingOverlap" must be between 0 and 31536000 seconds.',
         ];
 
         yield 'invalid incremental fetching overlap text' => [
@@ -742,7 +742,7 @@ class ConfigRowDefinitionTest extends TestCase
                     'incrementalFetchingOverlap' => -5,
                 ],
             ],
-            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+            'expectedError' => 'The "incrementalFetchingOverlap" must be between 0 and 31536000 seconds.',
         ];
 
         yield 'invalid incremental fetching overlap float' => [
@@ -800,6 +800,84 @@ class ConfigRowDefinitionTest extends TestCase
                 ],
             ],
             'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
+        yield 'incremental fetching overlap above the maximum' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => 31536001,
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be between 0 and 31536000 seconds.',
+        ];
+
+        yield 'incremental fetching overlap digit string above PHP_INT_MAX' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => '99999999999999999999',
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be between 0 and 31536000 seconds.',
+        ];
+
+        yield 'incremental fetching overlap without incremental fetching column' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingOverlap' => 300,
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" can be used only together with '
+                . '"incrementalFetchingColumn".',
+        ];
+
+        yield 'incremental fetching overlap together with limit' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => 300,
+                    'limit' => 2,
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" cannot be used together with "limit", because the '
+                . 'saved state would move backwards and the export would never reach newer documents.',
         ];
 
         yield 'old config' => [

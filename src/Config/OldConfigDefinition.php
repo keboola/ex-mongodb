@@ -34,12 +34,7 @@ class OldConfigDefinition extends BaseConfigDefinition
                                 $message = 'Both incremental fetching and sort cannot be set together.';
                                 throw new InvalidConfigurationException($message);
                             }
-                            $overlap = $v['incrementalFetchingOverlap'] ?? null;
-                            if ($overlap !== null && !ExportOptions::isValidIncrementalFetchingOverlap($overlap)) {
-                                $message = 'The "incrementalFetchingOverlap" must be a non-negative integer ' .
-                                    '(number of seconds).';
-                                throw new InvalidConfigurationException($message);
-                            }
+                            ExportOptions::validateIncrementalFetchingOverlap($v);
 
                             // Normalize incrementalFetchingColumn:
                             // In mapping are dates exported as "PARENT.FIELD.$date",

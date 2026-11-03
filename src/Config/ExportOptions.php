@@ -6,9 +6,13 @@ namespace MongoExtractor\Config;
 
 use Keboola\Component\UserException;
 use MongoExtractor\ExportHelper;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ExportOptions
 {
+    /** Upper bound for "incrementalFetchingOverlap", one year in seconds. */
+    public const MAX_INCREMENTAL_FETCHING_OVERLAP = 31536000;
+
     public const MODE_MAPPING = 'mapping';
     public const MODE_RAW = 'raw';
 
@@ -39,9 +43,8 @@ class ExportOptions
         $this->enabled = (bool) ($exportOptions['enabled'] ?? true);
         $this->id = isset($exportOptions['id']) ? (string) $exportOptions['id'] : null;
         $this->incrementalFetchingColumn = $exportOptions['incrementalFetchingColumn'] ?? null;
-        $this->incrementalFetchingOverlap = isset($exportOptions['incrementalFetchingOverlap'])
-            ? (int) $exportOptions['incrementalFetchingOverlap']
-            : null;
+        $overlap = $exportOptions['incrementalFetchingOverlap'] ?? null;
+        $this->incrementalFetchingOverlap = ($overlap === null || $overlap === '') ? null : (int) $overlap;
         $this->incrementalFetching = $exportOptions['incremental'] ?? false;
         $this->name = $exportOptions['tableName'] ?? $exportOptions['name'];
         $this->mode = $exportOptions['mode'];
@@ -131,9 +134,58 @@ class ExportOptions
         return $this->incrementalFetchingOverlap;
     }
 
-    public static function isValidIncrementalFetchingOverlap(mixed $value): bool
+    /**
+     * Validates "incrementalFetchingOverlap" against the rest of one export/row configuration.
+     *
+     * Shared by ConfigRowDefinition and OldConfigDefinition so both config formats stay in sync.
+     *
+     * @param array<string, mixed> $exportOptions
+     */
+    public static function validateIncrementalFetchingOverlap(array $exportOptions): void
     {
-        return (is_int($value) && $value >= 0) || (is_string($value) && ctype_digit($value));
+        $overlap = $exportOptions['incrementalFetchingOverlap'] ?? null;
+        if ($overlap === null) {
+            return;
+        }
+
+        if (is_int($overlap)) {
+            $seconds = $overlap;
+        } elseif (is_string($overlap) && ctype_digit($overlap)) {
+            // A digit string above PHP_INT_MAX saturates on cast, so the bound is checked after it.
+            $seconds = (int) $overlap;
+        } else {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+            );
+        }
+
+        if ($seconds < 0 || $seconds > self::MAX_INCREMENTAL_FETCHING_OVERLAP) {
+            throw new InvalidConfigurationException(sprintf(
+                'The "incrementalFetchingOverlap" must be between 0 and %d seconds.',
+                self::MAX_INCREMENTAL_FETCHING_OVERLAP,
+            ));
+        }
+
+        if (!isset($exportOptions['incrementalFetchingColumn'])
+            || $exportOptions['incrementalFetchingColumn'] === ''
+        ) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingOverlap" can be used only together with "incrementalFetchingColumn".',
+            );
+        }
+
+        // With a "limit" the saved state is not the maximum value in the collection: it is the
+        // last exported document, read as "limit 1, skip limit-1" in ascending order from the
+        // start of the query window. An overlap moves that start backwards, so the same documents
+        // are counted again and the saved state moves backwards too. The export would then repeat
+        // the same window on every run and would never reach newer documents.
+        $limit = $exportOptions['limit'] ?? null;
+        if (is_numeric($limit) && (int) $limit > 0) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingOverlap" cannot be used together with "limit", because the '
+                . 'saved state would move backwards and the export would never reach newer documents.',
+            );
+        }
     }
 
     public function getQuery(): ?string
