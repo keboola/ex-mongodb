@@ -6,6 +6,7 @@ namespace MongoExtractor;
 
 use DateInterval;
 use DateTimeImmutable;
+use DateTimeZone;
 use Generator;
 use Keboola\Component\UserException;
 use MongoExtractor\Config\ExportOptions;
@@ -236,7 +237,9 @@ class Export
             throw new UserException('"incrementalFetchingOverlap" is supported only for date incremental columns.');
         }
 
-        $shifted = (new DateTimeImmutable($m[1]))->sub(new DateInterval(sprintf('PT%dS', $overlapSeconds)));
+        $shifted = (new DateTimeImmutable($m[1]))
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->sub(new DateInterval(sprintf('PT%dS', $overlapSeconds)));
         return sprintf('ISODate("%s")', $shifted->format('Y-m-d\TH:i:s.v\Z'));
     }
 

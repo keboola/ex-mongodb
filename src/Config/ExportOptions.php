@@ -131,6 +131,11 @@ class ExportOptions
         return $this->incrementalFetchingOverlap;
     }
 
+    public static function isValidIncrementalFetchingOverlap(mixed $value): bool
+    {
+        return (is_int($value) && $value >= 0) || (is_string($value) && ctype_digit($value));
+    }
+
     public function getQuery(): ?string
     {
         return $this->query;

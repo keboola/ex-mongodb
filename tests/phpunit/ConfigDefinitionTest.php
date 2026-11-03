@@ -69,6 +69,54 @@ class ConfigRowDefinitionTest extends TestCase
      */
     public function validOldConfigsData(): Generator
     {
+        yield 'incremental fetching overlap as integer' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'exports' => [
+                        [
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'incremental' => true,
+                            'incrementalFetchingColumn' => 'someColumn',
+                            'incrementalFetchingOverlap' => 300,
+                            'mapping' => ['_id' => null],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        yield 'incremental fetching overlap as numeric string' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'exports' => [
+                        [
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'incremental' => true,
+                            'incrementalFetchingColumn' => 'someColumn',
+                            'incrementalFetchingOverlap' => '300',
+                            'mapping' => ['_id' => null],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
         yield 'valid config' => [
             'configData' => [
                 'parameters' =>
@@ -228,6 +276,56 @@ class ConfigRowDefinitionTest extends TestCase
      */
     public function invalidOldConfigsData(): Generator
     {
+        yield 'invalid incremental fetching overlap negative' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'exports' => [
+                        [
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'incremental' => true,
+                            'incrementalFetchingColumn' => 'someColumn',
+                            'incrementalFetchingOverlap' => -5,
+                            'mapping' => ['_id' => null],
+                        ],
+                    ],
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
+        yield 'invalid incremental fetching overlap text' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'exports' => [
+                        [
+                            'name' => 'bronx-bakeries',
+                            'id' => 123,
+                            'collection' => 'restaurants',
+                            'incremental' => true,
+                            'incrementalFetchingColumn' => 'someColumn',
+                            'incrementalFetchingOverlap' => 'abc',
+                            'mapping' => ['_id' => null],
+                        ],
+                    ],
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
         yield 'config row' => [
             'configData' => [
                 'parameters' =>
@@ -463,6 +561,60 @@ class ConfigRowDefinitionTest extends TestCase
      */
     public function validConfigsData(): Generator
     {
+        yield 'incremental fetching overlap as integer' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => 300,
+                ],
+            ],
+        ];
+
+        yield 'incremental fetching overlap as numeric string' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => '300',
+                ],
+            ],
+        ];
+
+        yield 'incremental fetching overlap zero' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => 0,
+                ],
+            ],
+        ];
+
         yield 'valid config' => [
             'configData' => [
                 'parameters' =>
@@ -574,6 +726,82 @@ class ConfigRowDefinitionTest extends TestCase
      */
     public function invalidConfigsData(): Generator
     {
+        yield 'invalid incremental fetching overlap negative' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => -5,
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
+        yield 'invalid incremental fetching overlap float' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => 1.5,
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
+        yield 'invalid incremental fetching overlap text' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => '5 minutes',
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
+        yield 'invalid incremental fetching overlap empty string' => [
+            'configData' => [
+                'parameters' => [
+                    'db' => [
+                        'host' => '127.0.0.1',
+                        'database' => 'test',
+                        'user' => 'user',
+                        'password' => 'password',
+                    ],
+                    'tableName' => 'bronx-bakeries',
+                    'collection' => 'restaurants',
+                    'incremental' => true,
+                    'incrementalFetchingColumn' => 'someColumn',
+                    'incrementalFetchingOverlap' => '',
+                ],
+            ],
+            'expectedError' => 'The "incrementalFetchingOverlap" must be a non-negative integer (number of seconds).',
+        ];
+
         yield 'old config' => [
             'configData' => [
                 'parameters' =>
