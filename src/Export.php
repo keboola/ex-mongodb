@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MongoExtractor;
 
+use DateInterval;
+use DateTimeImmutable;
+use DateTimeZone;
 use Generator;
 use Keboola\Component\UserException;
 use MongoExtractor\Config\ExportOptions;
@@ -205,6 +208,10 @@ class Export
     ): ExportOptions {
         $query = (object) [];
         if (!is_null($inputState)) {
+            $overlap = $exportOptions->getIncrementalFetchingOverlap();
+            if ($overlap !== null) {
+                $inputState = self::applyIncrementalFetchingOverlap($inputState, $overlap);
+            }
             $query = [
                 $exportOptions->getIncrementalFetchingColumn() => [
                     '$gte' => $inputState,
@@ -216,6 +223,24 @@ class Export
         $exportOptions->setSort(json_encode([$exportOptions->getIncrementalFetchingColumn() => 1]) ?: '');
 
         return $exportOptions;
+    }
+
+    /**
+     * Seconds overlap to prevent missing data
+     * @throws \Keboola\Component\UserException
+     */
+    private static function applyIncrementalFetchingOverlap(
+        string|int|float $inputState,
+        int $overlapSeconds,
+    ): string {
+        if (!is_string($inputState) || !preg_match('~^ISODate\("(.+)"\)$~', $inputState, $m)) {
+            throw new UserException('"incrementalFetchingOverlap" is supported only for date incremental columns.');
+        }
+
+        $shifted = (new DateTimeImmutable($m[1]))
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->sub(new DateInterval(sprintf('PT%dS', $overlapSeconds)));
+        return sprintf('ISODate("%s")', $shifted->format('Y-m-d\TH:i:s.v\Z'));
     }
 
     /**

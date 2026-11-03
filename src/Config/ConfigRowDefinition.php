@@ -24,6 +24,7 @@ class ConfigRowDefinition extends BaseConfigDefinition
                 $message = 'Both incremental fetching and sort cannot be set together.';
                 throw new InvalidConfigurationException($message);
             }
+            ExportOptions::validateIncrementalFetchingOverlap($v);
 
             // Normalize incrementalFetchingColumn:
             // In mapping are dates exported as "PARENT.FIELD.$date",
@@ -56,6 +57,7 @@ class ConfigRowDefinition extends BaseConfigDefinition
                 ->end()
                 ->scalarNode('query')->end()
                 ->scalarNode('incrementalFetchingColumn')->end()
+                ->scalarNode('incrementalFetchingOverlap')->end()
                 ->scalarNode('sort')->end()
                 ->scalarNode('limit')->end()
                 ->enumNode('mode')

@@ -33,6 +33,13 @@ The configuration `config.json` contains following properties in `parameters` ke
             - `keys` - object (optional): SSH keys.
                 - `public` - string (optional): Public SSH key.
                 - `#private` - string (optional): Private SSH key.
+    - `ssl` - object (optional): Settings for TLS/SSL connection.
+        - `enabled` - bool (optional): Enables TLS/SSL connection.
+        - `ca` - string (optional): Certificate of the certificate authority (PEM).
+        - `cert` - string (optional): Client certificate (PEM). Used only together with `#key`.
+        - `#key` - string (optional): Private key of the client certificate (PEM). Used only together with `cert`.
+        - `cipher` - string (optional): Accepted for backward compatibility, currently not used.
+        - `verifyServerCert` - bool (optional): Accepted for backward compatibility (default `true`), currently not used.
 - `quiet` - boolean (optional): Default `false`, pass `--quiet` to `mongoexport` command to hide logs. It should help with `Failed: EOF` problem, [read more](https://stackoverflow.com/a/39122219).
 - `exports` - object[] (required): [Exports configuration](https://help.keboola.com/components/extractors/database/mongodb/#configure-exports).
     - `enabled` - boolean (optional): Default `true`.
@@ -44,6 +51,11 @@ The configuration `config.json` contains following properties in `parameters` ke
         - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
     - `incremental` - boolean (optional): Enables [Incremental Loading](https://help.keboola.com/storage/tables/#incremental-loading). Default `false`.
     - `incrementalFetchingColumn` - string (optional): Name of column for [Incremental Fetching](https://help.keboola.com/components/extractors/database/#incremental-fetching)
+    - `incrementalFetchingOverlap` - integer (optional): Number of seconds to shift the stored last fetched value back before the next incremental fetch, e.g. `300` for 5 minutes.
+        - The overlapping window is read again, so documents that became visible only after the previous run (write/replication lag, timestamp order differs from insert order) are not skipped.
+        - Must be a non-negative integer, at most `31536000` (one year). Supported only for date `incrementalFetchingColumn` columns, other column types fail with a user error.
+        - Requires `incrementalFetchingColumn`. Cannot be combined with `limit`: with a `limit` the saved state is the last exported document, so an overlap would move the state backwards and the export would never reach newer documents.
+        - Use it with `incremental: true` and a primary key in the `mapping`, so the re-read documents are deduplicated in Storage. Without a primary key they are appended as duplicates.
     - `sort`- string (optional):
         - JSON string specifying the order of documents in exported data.
         - Must be specified in a [strict format](https://help.keboola.com/components/extractors/database/mongodb/#strict-format).
