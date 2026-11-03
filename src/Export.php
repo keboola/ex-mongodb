@@ -164,6 +164,25 @@ class Export
             );
         }
 
+        // mongoexport reports this when no replica set member matches the read preference in the
+        // connection string, for example readPreference=secondary with readPreferenceTags that no
+        // currently available node carries. It is a cluster-side state the user can act on, but it
+        // reached the user as an opaque internal error. The generic "Failed: ... command" branch
+        // below does not match it, because the message has no "command" after "Failed:".
+        if (str_contains($e->getMessage(), '(FailedToSatisfyReadPreference)')
+            || str_contains($e->getMessage(), 'Could not find host matching read preference')
+        ) {
+            throw new UserException(
+                'The MongoDB server could not run the query, because no server matched the read '
+                . 'preference in the connection. This usually happens when the preferred nodes are '
+                . 'temporarily unavailable, for example during cluster maintenance, a node restart '
+                . 'or a failover. Please check the state of your cluster. You can also change '
+                . '"readPreference=secondary" to "readPreference=secondaryPreferred" in the '
+                . 'connection options, so the extraction can use another node when the preferred '
+                . 'nodes are not available.',
+            );
+        }
+
         if (preg_match('/(Failed:.*?command)/s', $e->getMessage(), $matches)) {
             throw new UserException(trim($matches[1]));
         }

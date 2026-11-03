@@ -124,6 +124,24 @@ class HandleMongoExportFailsTest extends TestCase
                 'then try running the extraction again.'),
         ];
 
+        // A read preference that no available node matches reached the user as an opaque internal
+        // error: the generic "Failed: ... command" branch does not match this message.
+        yield 'FailedToSatisfyReadPreference' => [
+            new ProcessFailedException($this->createMockInstanceOfProcess('2026-11-03T15:54:43.394+0000\t' .
+                'Failed: (FailedToSatisfyReadPreference) Encountered non-retryable error during query :: ' .
+                'caused by :: Could not find host matching read preference { mode: "secondary", tags: ' .
+                '[ { nodeType: "ANALYTICS" } ] } for set example-shard-0')),
+            new UserException(
+                'The MongoDB server could not run the query, because no server matched the read '
+                . 'preference in the connection. This usually happens when the preferred nodes are '
+                . 'temporarily unavailable, for example during cluster maintenance, a node restart '
+                . 'or a failover. Please check the state of your cluster. You can also change '
+                . '"readPreference=secondary" to "readPreference=secondaryPreferred" in the '
+                . 'connection options, so the extraction can use another node when the preferred '
+                . 'nodes are not available.',
+            ),
+        ];
+
         yield 'field names may not start with $' => [
             new ProcessFailedException($this->createMockInstanceOfProcess('2023-05-17T12:49:22.079+0000\t' .
                 'connected to: mongodb+srv://[**REDACTED**]@cl-shared-all-prod-web.x0u5m.mongodb.net/slotManagementDB' .
